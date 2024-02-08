@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:interspeed_attendance_app/dashboard_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -126,7 +127,8 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         print('Login successful! Response: ${response.body}');
         var sessionData = jsonResponse['sessionData'];
-        Navigator.push(
+        await saveSessionData(sessionData);
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => DashboardPage(sessionData: sessionData),
@@ -140,7 +142,26 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> saveSessionData(Map<String, dynamic> sessionData) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setBool('seen', true);
+      prefs.setString('user_id', sessionData['user_id']);
+      prefs.setString('user_name', sessionData['user_name']);
+      prefs.setString('full_name', sessionData['full_name']);
+      prefs.setString('user_type_id', sessionData['user_type_id']);
+      prefs.setString('picture_name', sessionData['picture_name']);
+      prefs.setString('user_type_name', sessionData['user_type_name']);
+      prefs.setString('employee_id', sessionData['employee_id']);
+      prefs.setString('designation_id', sessionData['designation_id']);
+      prefs.setString('employee_position_id', sessionData['employee_position_id']);
+    } catch (error) {
+      print('Error saving session data: $error');
+    }
+  }
 }
+
+
 
 
 // https://br-isgalleon.com/login/login.php
