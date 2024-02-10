@@ -48,7 +48,7 @@ class _DashboardPageState extends State<DashboardPage> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: const Color(0xff246EE9),
+        backgroundColor: const Color(0xff010080),
         // automaticallyImplyLeading: false,
       ),
       drawer: Drawer(
@@ -93,108 +93,201 @@ class _DashboardPageState extends State<DashboardPage> {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Container(
-              padding: const EdgeInsets.all(20.0),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        //print("Before setState - _isSignOutButtonClicked: $_isSignInButtonClicked");
-                        _isSignInButtonClicked = true;
-                        _isSignOutButtonClicked = false;
-                        //print("After setState - _isSignOutButtonClicked: $_isSignInButtonClicked");
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: _isSignInButtonClicked? const Color(0xff2b7d2e):Color(0xffe60022),
-                      shape: const CircleBorder(),
-                      padding:
-                          const EdgeInsets.all(32.0), // Padding for the button
-                    ),
-                    child: const Text(
-                      'Sign In',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        color: Colors.black,
+      body: Container(
+        color: Color(0xfff2f2f2),
+        child: Column(
+          children: [
+            // Image.asset('assets/images/ic_attendance_inactive_btn.png'),
+            Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Container(
+                // padding: const EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isSignInButtonClicked = true;
+                          _isSignOutButtonClicked = false;
+                        });
+                        // Add your custom logic here
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05), // Adjust the padding based on screen width
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Image.asset(
+                              _isSignInButtonClicked ?'assets/images/ic_attendance_active_btn.png':'assets/images/ic_attendance_inactive_btn.png', // Replace with your image path
+                              width: MediaQuery.of(context).size.width * 0.25, // Adjust the width based on screen width
+                              height: MediaQuery.of(context).size.width * 0.25, // Adjust the height based on screen width
+                              fit: BoxFit.cover, // Adjust the fit based on your requirement
+                            ),
+                            const SizedBox(height: 8.0), // Adjust the spacing between image and text
+                            Text(
+                              'Sign In',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w900,
+                                color: _isSignInButtonClicked ? Colors.black : Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      //print("Before setState - _isSignOutButtonClicked: $_isSignOutButtonClicked");
-                      setState(() {
-                        _isSignOutButtonClicked = true;
-                        _isSignInButtonClicked = false;
-                      });
-                      //print("After setState - _isSignOutButtonClicked: $_isSignOutButtonClicked");
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: _isSignOutButtonClicked? const Color(0xff2b7d2e):Color(0xffe60022),
-                      shape: const CircleBorder(),
-                      padding:
-                          const EdgeInsets.all(32.0), // Padding for the button
+
+                    const SizedBox(
+                      width: 20,
                     ),
-                    child: const Text(
-                      'Sign Out',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isSignOutButtonClicked = true;
+                          _isSignInButtonClicked = false;
+                        });
+                        // Add your custom logic here
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05), // Adjust the padding based on screen width
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Image.asset(
+                              _isSignOutButtonClicked ?'assets/images/ic_attendance_active_btn.png':'assets/images/ic_attendance_inactive_btn.png', // Replace with your image path
+                              width: MediaQuery.of(context).size.width * 0.25, // Adjust the width based on screen width
+                              height: MediaQuery.of(context).size.width * 0.25, // Adjust the height based on screen width
+                              fit: BoxFit.cover, // Adjust the fit based on your requirement
+                            ),
+                            const SizedBox(height: 8.0), // Adjust the spacing between image and text
+                            Text(
+                              'Sign Out',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w900,
+                                color: _isSignOutButtonClicked ? Colors.black : Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
 
-          _isSignInButtonClicked ? Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Container(
-              padding: const EdgeInsets.all(20.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0),
+            _isSignInButtonClicked ? Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                padding: const EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                      child: _buildCard(
+                        image: 'assets/images/ic_camera.png',
+                        title: 'Camera',
+                        description: 'Image Captured',
+                      ),
+                    ),
+                    const SizedBox(width: 15,),
+                    Expanded(
+                      child: _buildCard(
+                        image: 'assets/images/ic_gps.png',
+                        title: 'GPS',
+                        description: 'Accuracy',
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Icon(Icons.camera,size: 100,),
-                  Icon(Icons.location_on_outlined,size: 100,),
-                ],
-              ),
-            ),
-          ):  const SizedBox.shrink(),
+            ):  const SizedBox.shrink(),
 
-          _isSignOutButtonClicked ? Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Container(
-              padding: const EdgeInsets.all(20.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0),
+            _isSignOutButtonClicked ? Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                padding: const EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        child: _buildCard(
+                          image: 'assets/images/ic_camera.png',
+                          title: 'Camera',
+                          description: 'Image Captured',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 15,),
+                    Expanded(
+                      child: _buildCard(
+                        image: 'assets/images/ic_gps.png',
+                        title: 'GPS',
+                        description: 'Accuracy',
+                      ),
+                    ),
+                  ],
+                )
               ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Icon(Icons.camera,size: 100,),
-                  Icon(Icons.location_on_outlined,size: 100,),
-                ],
+            ) :  const SizedBox.shrink(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCard({required String image, required String title, required String description}) {
+    return Card(
+      // Customize the card appearance as needed
+      elevation: 3,
+      color: Colors.white,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16.0),
+          color: Colors.white,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
               ),
             ),
-          ) :  const SizedBox.shrink(),
-        ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+              child: Image.asset(
+                image,
+                color: Colors.pinkAccent,
+                fit: BoxFit.fill,
+                // Adjust the fit based on your requirement
+              ),
+            ),
+
+            Text(
+              description,
+              style: const TextStyle(
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+
+
