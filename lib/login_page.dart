@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:interspeed_attendance_app/dashboard_page.dart';
@@ -13,6 +12,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -20,102 +20,145 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 36, 159, 233),
-      body: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                child: TextFormField(
-                    controller: usernameController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: "Enter your username",
-                      hintStyle: TextStyle(
-                        fontSize: 20,
+      backgroundColor: Colors.blue,
+      resizeToAvoidBottomInset: false,
+      body: Center(
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                    width: MediaQuery.of(context).size.width *
+                        0.8, // Adjust the percentage as needed
+                    height: 70,
+                    child: TextFormField(
+                        controller: usernameController,
+                        decoration: const InputDecoration(
+                          helperText: ' ',
+                          // Non-empty helper text to reserve space
+                          helperMaxLines: 1,
+                          //contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
+                          filled: true,
+                          fillColor: Colors.white,
+                          hintText: "Username",
+                          hintStyle: TextStyle(
+                            fontSize: 16,
+                          ),
+                          prefixIcon: Icon(
+                            Icons.person,
+                            color: const Color(0xff010080),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your email';
+                          } else if (value.contains(RegExp(r'\d'))) {
+                            return 'Username cannot contain numbers';
+                          }
+                          return null;
+                        }),
+                  ),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                    width: MediaQuery.of(context).size.width *
+                        0.8, // Adjust the percentage as needed
+                    height: 70,
+                    child: TextFormField(
+                        controller: passwordController,
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                            helperText: ' ',
+                            // Non-empty helper text to reserve space
+                            helperMaxLines: 1,
+                            // contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
+                            filled: true,
+                            fillColor: Colors.white,
+                            hintText: "Password",
+                            hintStyle: TextStyle(
+                              fontSize: 16,
+                            ),
+                            prefixIcon: Icon(
+                              Icons.key,
+                              color: Color(0xff010080),
+                            ),
+                            suffixIcon: Icon(
+                              Icons.lock,
+                              color: Color(0xff010080),
+                            )),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your password';
+                          }
+                          return null;
+                        }),
+                  ),
+                  Stack(children: [
+                    ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
                       ),
-                      prefixIcon: Icon(
-                        Icons.person,
-                        color: Colors.deepPurple,
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          _submitForm(); // Assuming _submitForm is an asynchronous function
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Please fill input')),
+                          );
+                        }
+                      },
+                      child: const Text(
+                        'Submit',
+                        style: TextStyle(
+                          color: Color(0xff010080),
+                        ),
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
-                      }else if (value.contains(RegExp(r'\d'))) {
-                        return 'Username cannot contain numbers';
-                      }
-                      return null;
-                    }),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                child: TextFormField(
-                    controller: passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Colors.white,
-                        hintText: "Enter your password",
-                        hintStyle: TextStyle(
-                          fontSize: 20,
+                    if (_isLoading)
+                      Positioned.fill(
+                        child: Container(
+                          color: Colors.black.withOpacity(0.5),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              valueColor:
+                              AlwaysStoppedAnimation<Color>(Color(0xff010080)),
+                            ),
+                          ),
                         ),
-                        prefixIcon: Icon(
-                          Icons.person,
-                          color: Colors.deepPurple,
-                        ),
-                        suffixIcon: Icon(
-                          Icons.lock,
-                          color: Colors.deepPurple,
-                        )),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      return null;
-                    }),
+                      ),
+                  ]),
+                ],
               ),
-
-              Padding(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 8, vertical: 16.0),
-                child: Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        _submitForm();
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Please fill input')),
-                        );
-                      }
-                    },
-                    child: const Text('Submit'),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  void _submitForm () async{
+  void _submitForm() async {
     String username = usernameController.text.trim();
     String password = passwordController.text;
 
     try {
+      FocusScope.of(context).unfocus();
+      setState(() {
+        _isLoading = true;
+      });
       var url = Uri.parse('https://br-isgalleon.com/api/login/login.php');
       var request = http.MultipartRequest('POST', url);
 
@@ -124,16 +167,24 @@ class _LoginPageState extends State<LoginPage> {
 
       var response = await http.Response.fromStream(await request.send());
       var jsonResponse = json.decode(response.body);
+      setState(() {
+        _isLoading = false;
+      });
       if (response.statusCode == 200) {
-        print('Login successful! Response: ${response.body}');
-        var sessionData = jsonResponse['sessionData'];
-        await saveSessionData(sessionData);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DashboardPage(sessionData: sessionData),
-          ),
-        );
+        bool loginSuccess = json.decode(response.body)['success'];
+        if (loginSuccess) {
+          print('Login successful! Response: ${response.body}');
+          var sessionData = jsonResponse['sessionData'];
+          await saveSessionData(sessionData);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DashboardPage(sessionData: sessionData),
+            ),
+          );
+        } else {
+          _showLoginFailedDialog();
+        }
       } else {
         print('Login failed! Status Code: ${response.statusCode}');
       }
@@ -154,14 +205,34 @@ class _LoginPageState extends State<LoginPage> {
       prefs.setString('user_type_name', sessionData['user_type_name']);
       prefs.setString('employee_id', sessionData['employee_id']);
       prefs.setString('designation_id', sessionData['designation_id']);
-      prefs.setString('employee_position_id', sessionData['employee_position_id']);
+      prefs.setString(
+          'employee_position_id', sessionData['employee_position_id']);
     } catch (error) {
       print('Error saving session data: $error');
     }
   }
+
+  void _showLoginFailedDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Login Failed'),
+          content: Text(
+            'Invalid username or password. Please try again.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
-
-
-
 
 // https://br-isgalleon.com/login/login.php
