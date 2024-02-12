@@ -44,6 +44,35 @@ class _CameraPageState extends State<CameraPage> {
     }
   }
 
+
+  Future<void> saveImageToLocalDirectory(String imagePath) async {
+    try {
+      final Directory appDir = await getApplicationDocumentsDirectory();
+      final String imagesDirPath = path.join(appDir.path, 'static');
+
+      // Create 'images' directory if it doesn't exist
+      if (!Directory(imagesDirPath).existsSync()) {
+        Directory(imagesDirPath).createSync();
+      }
+
+      // Get the original file name from the path
+      final String originalFileName = path.basename(imagePath);
+
+      // Create the destination path in the 'images' directory
+      final String localImagePath = path.join(imagesDirPath, originalFileName);
+
+      // Copy the image file to the 'images' directory
+      File(imagePath).copySync(localImagePath);
+
+      // Now, localImagePath contains the path to the saved image in local storage
+      print('Image saved to local storage: $localImagePath');
+    } catch (e) {
+      print('Error saving image to local storage: $e');
+    }
+  }
+
+
+
   @override
   void dispose() {
     _cameraController.dispose();
@@ -86,9 +115,10 @@ class _CameraPageState extends State<CameraPage> {
                                     children: [
                                       IconButton(
                                         icon: Icon(Icons.check),
-                                        onPressed: () {
+                                        onPressed: () async{
                                           // Handle the logic when the tick button is pressed
                                           // For now, print a message and reset _imageFile
+                                          await saveImageToLocalDirectory(_imageFile.path);
                                           print('Image confirmed!');
                                           Navigator.of(context).pop(); // Close the dialog
                                           setState(() {

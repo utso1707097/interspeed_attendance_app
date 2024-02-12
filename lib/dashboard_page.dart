@@ -66,20 +66,21 @@ class _DashboardPageState extends State<DashboardPage> {
     final designationId = widget.sessionData['designation_id'] ?? '';
     final employeePositionId = widget.sessionData['employee_position_id'] ?? '';
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text(
-          'Attendance',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w500,
-            color: Colors.white,
-          ),
-        ),
-        backgroundColor: const Color(0xff010080),
-        // automaticallyImplyLeading: false,
-      ),
+      // appBar: AppBar(
+      //   iconTheme: const IconThemeData(color: Colors.white),
+      //   title: const Text(
+      //     'Attendance',
+      //     style: TextStyle(
+      //       fontSize: 24,
+      //       fontWeight: FontWeight.w500,
+      //       color: Colors.white,
+      //     ),
+      //   ),
+      //   backgroundColor: const Color(0xff010080),
+      //   // automaticallyImplyLeading: false,
+      // ),
       drawer: Drawer(
+        backgroundColor: Color(0xff1a1a1a),
         width: MediaQuery.of(context).size.width * 0.75,
         child: ListView(
           children: [
@@ -88,15 +89,8 @@ class _DashboardPageState extends State<DashboardPage> {
               margin: const EdgeInsets.all(0),
               child: UserAccountsDrawerHeader(
                 margin: const EdgeInsets.all(0),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Color(0xff010080),
-                      Colors.blue,
-                    ],
-                    stops: [0.0, 1.0],
-                    tileMode: TileMode.clamp,
-                  ),
+                decoration: const BoxDecoration(
+                  color: Color(0xff333333)
                 ),
                 accountName: Text("${fullName}"),
                 accountEmail: const Text("example@gmail.com"),
@@ -106,24 +100,24 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ),
             const ListTile(
-              leading: Icon(Icons.home),
-              title: Text("Home"),
+              leading: Icon(Icons.home,color: Colors.white,),
+              title: Text("Home",style: TextStyle(color: Colors.white),),
             ),
             const ListTile(
-              leading: Icon(Icons.person),
-              title: Text("Profile"),
+              leading: Icon(Icons.person,color: Colors.white,),
+              title: Text("Profile",style: TextStyle(color: Colors.white),),
             ),
             const ListTile(
-              leading: Icon(Icons.email),
-              title: Text("Email"),
+              leading: Icon(Icons.email,color: Colors.white,),
+              title: Text("Email",style: TextStyle(color: Colors.white),),
             ),
             const ListTile(
-              leading: Icon(Icons.phone),
-              title: Text("Phone"),
+              leading: Icon(Icons.phone,color: Colors.white,),
+              title: Text("Phone",style: TextStyle(color: Colors.white),),
             ),
             ListTile(
-              leading: const Icon(Icons.exit_to_app),
-              title: const Text("Logout"),
+              leading: const Icon(Icons.exit_to_app,color: Colors.white,),
+              title: const Text("Logout",style: TextStyle(color: Colors.white),),
               onTap: () {
                 showDialog(
                   context: context,
@@ -165,38 +159,98 @@ class _DashboardPageState extends State<DashboardPage> {
           ],
         ),
       ),
+
+
       body: Container(
-        color: const Color(0xfff2f2f2),
+        color: const Color(0xff1a1a1a),
         child: Column(
           children: [
             // Image.asset('assets/images/ic_attendance_inactive_btn.png'),
-            Stack(
-              children: [
-                Container(
-                  color: Colors.blue,
-                  height: 100,
-                  width: double.infinity,
-                  child: FractionallySizedBox(
-                    alignment: Alignment.topCenter,
-                    widthFactor: 0.6,
-                    // Set the desired width as a fraction (0.0 to 1.0)
-                    heightFactor: 0.6,
-                    // Set the desired height as a fraction (0.0 to 1.0)
-                    child: Image.asset('assets/images/ic_calendar.png'),
-                  ),
+            Container(
+              width: double.infinity,
+              height: 180,
+              decoration: const BoxDecoration(
+                color: const Color(0xff333333),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(12),
+                  bottomRight: Radius.circular(12),
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(32, 64, 32, 16),
-                  child: Container(
-                    // padding: const EdgeInsets.all(10.0),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/images/logo.jpg',
+                    width: 70,
+                    height: 70,
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "$fullName",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const Text(
+                        "Software Engineer",
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 13,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const Text(
+                        "Interspeed Marketing Solution Ltd",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            Container(
+              // color: Colors.white,
+              height: 200,
+              width: double.infinity,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    width: 110,
+                    height: 140,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: const Color(0xff3a473e),
                       borderRadius: BorderRadius.circular(16.0),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    child: Column(
                       children: [
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: const Color(0xff00a0b0),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(16.0),
+                              topRight: Radius.circular(16.0),
+                            ),
+                          ),
+                          width: double.infinity,
+                          height: 25,
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
                         GestureDetector(
+
                           onTap: () {
                             getCurrentLocation();
                             setState(() {
@@ -205,36 +259,17 @@ class _DashboardPageState extends State<DashboardPage> {
                             });
                             // Add your custom logic here
                           },
-                          child: Padding(
-                            padding: EdgeInsets.all(
-                                MediaQuery.of(context).size.width * 0.05),
-                            // Adjust the padding based on screen width
+                          child: Container(
                             child: Stack(
                               alignment: Alignment.center,
                               children: [
-                                Image.asset(
-                                  _isSignInButtonClicked
-                                      ? 'assets/images/ic_attendance_active_btn.png'
-                                      : 'assets/images/ic_attendance_inactive_btn.png',
-                                  // Replace with your image path
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.25,
-                                  // Adjust the width based on screen width
-                                  height:
-                                      MediaQuery.of(context).size.width * 0.25,
-                                  // Adjust the height based on screen width
-                                  fit: BoxFit
-                                      .cover, // Adjust the fit based on your requirement
-                                ),
-                                const SizedBox(height: 8.0),
-                                // Adjust the spacing between image and text
-                                Text(
-                                  'Sign In',
+                                Image.asset('assets/images/entry_button.png', height: 70, width: 70),
+                                const Text(
+                                  'Entry',
                                   style: TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    color: _isSignInButtonClicked
-                                        ? Colors.black
-                                        : Colors.white,
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ],
@@ -242,59 +277,207 @@ class _DashboardPageState extends State<DashboardPage> {
                           ),
                         ),
                         const SizedBox(
-                          width: 20,
+                          height: 6
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            getCurrentLocation();
-                            setState(() {
-                              _isSignOutButtonClicked = true;
-                              _isSignInButtonClicked = false;
-                            });
-                            // Add your custom logic here
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.all(
-                                MediaQuery.of(context).size.width * 0.05),
-                            // Adjust the padding based on screen width
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Image.asset(
-                                  _isSignOutButtonClicked
-                                      ? 'assets/images/ic_attendance_active_btn.png'
-                                      : 'assets/images/ic_attendance_inactive_btn.png',
-                                  // Replace with your image path
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.25,
-                                  // Adjust the width based on screen width
-                                  height:
-                                      MediaQuery.of(context).size.width * 0.25,
-                                  // Adjust the height based on screen width
-                                  fit: BoxFit
-                                      .cover, // Adjust the fit based on your requirement
+                        Container(
+                          width: double.infinity,
+                          alignment: Alignment.bottomCenter,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Image.asset('assets/images/entry_time_box.png', height: 13),
+                              const Text(
+                                '10:20 AM',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
                                 ),
-                                const SizedBox(height: 8.0),
-                                // Adjust the spacing between image and text
-                                Text(
-                                  'Sign Out',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    color: _isSignOutButtonClicked
-                                        ? Colors.black
-                                        : Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ),
+                        )
                       ],
+
                     ),
                   ),
-                ),
-              ],
+                  Container(
+                    width: 110,
+                    height: 140,
+                    decoration: BoxDecoration(
+                      color: const Color(0xff3a473e),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: const Color(0xfffec34f),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(16.0),
+                              topRight: Radius.circular(16.0),
+                            ),
+                          ),
+                          width: double.infinity,
+                          height: 25,
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        GestureDetector(
+                            onTap: () {
+                              getCurrentLocation();
+                              setState(() {
+                                _isSignOutButtonClicked = true;
+                                _isSignInButtonClicked = false;
+                              });
+                              // Add your custom logic here
+                            },
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Image.asset('assets/images/exit_button.png', height: 70, width: 70),
+                              const Text(
+                                'Exit',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(
+                            height: 6
+                        ),
+
+                        Container(
+                          width: double.infinity,
+                          alignment: Alignment.bottomCenter,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Image.asset('assets/images/exit_time_box.png', height: 13),
+                              const Text(
+                                '10:20 AM',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
+
+            // Padding(
+            //   padding: const EdgeInsets.fromLTRB(32, 64, 32, 16),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //     children: [
+            //       GestureDetector(
+            //         onTap: () {
+            //           getCurrentLocation();
+            //           setState(() {
+            //             _isSignInButtonClicked = true;
+            //             _isSignOutButtonClicked = false;
+            //           });
+            //           // Add your custom logic here
+            //         },
+            //         child: Padding(
+            //           padding: EdgeInsets.all(
+            //               MediaQuery.of(context).size.width * 0.05),
+            //           // Adjust the padding based on screen width
+            //           child: Stack(
+            //             alignment: Alignment.center,
+            //             children: [
+            //               Image.asset(
+            //                 _isSignInButtonClicked
+            //                     ? 'assets/images/ic_attendance_active_btn.png'
+            //                     : 'assets/images/ic_attendance_inactive_btn.png',
+            //                 // Replace with your image path
+            //                 width: MediaQuery.of(context).size.width * 0.25,
+            //                 // Adjust the width based on screen width
+            //                 height: MediaQuery.of(context).size.width * 0.25,
+            //                 // Adjust the height based on screen width
+            //                 fit: BoxFit
+            //                     .cover, // Adjust the fit based on your requirement
+            //               ),
+            //               const SizedBox(height: 8.0),
+            //               // Adjust the spacing between image and text
+            //               Text(
+            //                 'Sign In',
+            //                 style: TextStyle(
+            //                   fontWeight: FontWeight.w900,
+            //                   color: _isSignInButtonClicked
+            //                       ? Colors.black
+            //                       : Colors.white,
+            //                 ),
+            //               ),
+            //             ],
+            //           ),
+            //         ),
+            //       ),
+            //       const SizedBox(
+            //         width: 20,
+            //       ),
+            //       GestureDetector(
+            //         onTap: () {
+            //           getCurrentLocation();
+            //           setState(() {
+            //             _isSignOutButtonClicked = true;
+            //             _isSignInButtonClicked = false;
+            //           });
+            //           // Add your custom logic here
+            //         },
+            //         child: Padding(
+            //           padding: EdgeInsets.all(
+            //               MediaQuery.of(context).size.width * 0.05),
+            //           // Adjust the padding based on screen width
+            //           child: Stack(
+            //             alignment: Alignment.center,
+            //             children: [
+            //               Image.asset(
+            //                 _isSignOutButtonClicked
+            //                     ? 'assets/images/ic_attendance_active_btn.png'
+            //                     : 'assets/images/ic_attendance_inactive_btn.png',
+            //                 // Replace with your image path
+            //                 width: MediaQuery.of(context).size.width * 0.25,
+            //                 // Adjust the width based on screen width
+            //                 height: MediaQuery.of(context).size.width * 0.25,
+            //                 // Adjust the height based on screen width
+            //                 fit: BoxFit
+            //                     .cover, // Adjust the fit based on your requirement
+            //               ),
+            //               const SizedBox(height: 8.0),
+            //               // Adjust the spacing between image and text
+            //               Text(
+            //                 'Sign Out',
+            //                 style: TextStyle(
+            //                   fontWeight: FontWeight.w900,
+            //                   color: _isSignOutButtonClicked
+            //                       ? Colors.black
+            //                       : Colors.white,
+            //                 ),
+            //               ),
+            //             ],
+            //           ),
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+
+
 
             _isSignInButtonClicked
                 ? Padding(
@@ -318,6 +501,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                 );
                               },
                               child: _buildCard(
+                                color: 0xff74c2c6,
                                 image: 'assets/images/ic_camera.png',
                                 title: 'Camera',
                                 description: 'Image Captured',
@@ -329,6 +513,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           ),
                           Expanded(
                             child: _buildCard(
+                              color: 0xff74c2c6,
                               image: 'assets/images/ic_gps.png',
                               title: 'GPS',
                               description: 'Accuracy: ${accuracy.toString()}',
@@ -354,11 +539,20 @@ class _DashboardPageState extends State<DashboardPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
                                 Expanded(
-                                  child: Container(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => CameraPage(),
+                                        ),
+                                      );
+                                    },
                                     child: _buildCard(
                                       image: 'assets/images/ic_camera.png',
                                       title: 'Camera',
                                       description: 'Image Captured',
+                                      color: 0xfffed593,
                                     ),
                                   ),
                                 ),
@@ -371,6 +565,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                     title: 'GPS',
                                     description:
                                         'Accuracy: ${accuracy.toString()}',
+                                    color: 0xfffed593,
                                   ),
                                 ),
                               ],
@@ -379,6 +574,19 @@ class _DashboardPageState extends State<DashboardPage> {
                         )),
                   )
                 : const SizedBox.shrink(),
+            GestureDetector(
+              onTap: () {
+                // Handle button click here
+                print('Button Clicked');
+                // Add your custom logic or navigation here
+              },
+              child: Image.asset(
+                'assets/images/Submit tickxxxhdpi.png', // Replace with your asset image path
+                width: 70, // Adjust width as needed
+                height: 70, // Adjust height as needed
+                fit: BoxFit.cover, // Adjust the fit based on your requirement
+              ),
+            )
           ],
         ),
       ),
@@ -388,15 +596,16 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildCard(
       {required String image,
       required String title,
-      required String description}) {
+      required String description,
+      required int color}) {
     return Card(
       // Customize the card appearance as needed
       elevation: 3,
-      color: Colors.white,
+      color: const Color(0xff1a1a1a),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16.0),
-          color: Colors.white,
+          //color: Colors.white,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -406,13 +615,14 @@ class _DashboardPageState extends State<DashboardPage> {
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
+                color: Colors.white
               ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(25, 0, 25, 0),
               child: Image.asset(
                 image,
-                color: const Color(0xff010080),
+                color: Color(color),
                 fit: BoxFit.fill,
                 // Adjust the fit based on your requirement
               ),
@@ -421,6 +631,7 @@ class _DashboardPageState extends State<DashboardPage> {
               description,
               style: const TextStyle(
                 fontSize: 16,
+                color: Colors.white,
               ),
             ),
           ],
