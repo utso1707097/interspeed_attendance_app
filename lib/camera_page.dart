@@ -27,8 +27,8 @@ class _CameraPageState extends State<CameraPage> {
   Future<void> _initializeCamera() async {
     final cameras = await availableCameras();
     _cameraController = CameraController(
-      _isFrontCamera? cameras[1]:cameras[0],
-    ResolutionPreset.high,
+      _isFrontCamera ? cameras[1] : cameras[0],
+      ResolutionPreset.high,
     );
     _initializeControllerFuture = _cameraController.initialize();
     if (!mounted) return;
@@ -42,14 +42,14 @@ class _CameraPageState extends State<CameraPage> {
     await _initializeCamera();
   }
 
-
   Future<void> _takePicture() async {
     try {
       await _initializeControllerFuture;
       final XFile image = await _cameraController.takePicture();
 
 // Use image package to handle orientation
-      final img.Image capturedImage = img.decodeImage(await File(image.path).readAsBytes())!; // Use ! to assert non-nullability
+      final img.Image capturedImage = img.decodeImage(await File(image.path)
+          .readAsBytes())!; // Use ! to assert non-nullability
 
 // Check if the image needs to be mirrored based on camera sensor orientation
       bool mirrorImage = _cameraController.description?.sensorOrientation == 90;
@@ -73,7 +73,6 @@ class _CameraPageState extends State<CameraPage> {
       print('Error taking picture: $e');
     }
   }
-
 
   Future<void> saveImageToLocalDirectory(String imagePath) async {
     try {
@@ -100,8 +99,6 @@ class _CameraPageState extends State<CameraPage> {
       print('Error saving image to local storage: $e');
     }
   }
-
-
 
   @override
   void dispose() {
@@ -133,115 +130,95 @@ class _CameraPageState extends State<CameraPage> {
                   alignment: Alignment.bottomCenter,
                   children: [
                     CameraPreview(_cameraController),
-                    if (_imageFile != null)
-                      Positioned(
-                        top: 10.0,
-                        right: 10.0,
-                        child: GestureDetector(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return Dialog(
-                                  child: Container(
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: FileImage(File(_imageFile.path)),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                      children: [
-                                        IconButton(
-                                          icon: Icon(Icons.check,color: Colors.white),
-                                          onPressed: () async{
-                                            // Handle the logic when the tick button is pressed
-                                            // For now, print a message and reset _imageFile
-                                            await saveImageToLocalDirectory(_imageFile.path);
-                                            print('Image confirmed!');
-                                            Navigator.of(context).pop(); // Close the dialog
-                                            setState(() {
-                                              _imageFile = XFile('');
-                                            });
-                                          },
-                                        ),
-                                        IconButton(
-                                          icon: Icon(Icons.clear,color: Colors.white),
-                                          onPressed: () {
-                                            // Handle the logic when the cross button is pressed
-                                            // For now, print a message and reset _imageFile
-                                            print('Image canceled!');
-                                            Navigator.of(context).pop(); // Close the dialog
-                                            setState(() {
-                                              _imageFile = XFile('');
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                          child: Container(
-                            width: 100.0,
-                            height: 100.0,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: FileImage(File(_imageFile.path)),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
+                    if (_imageFile != null && _imageFile.path.isNotEmpty)
+                      Container(
+                        height: MediaQuery.of(context).size.height,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: FileImage(File(_imageFile.path)),
+                            fit: BoxFit.cover,
                           ),
                         ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.check,
+                                color: Colors.green,
+                                size: 36.0,
+                              ),
+                              onPressed: () async {
+                                // Handle the logic when the tick button is pressed
+                                // For now, print a message and reset _imageFile
+                                await saveImageToLocalDirectory(
+                                    _imageFile.path);
+                                print('Image confirmed!');
+                                Navigator.of(context).pop(); // Close the dialog
+                                setState(() {
+                                  _imageFile = XFile('');
+                                });
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.clear,
+                                color: Colors.red,
+                                // Change the color to light green
+                                size:
+                                    36.0, // Change the size to 36.0 or any other desired size
+                              ),
+                              onPressed: () {
+                                print('Image discarded!');
+                                //Navigator.of(context).pop(); // Close the dialog
+                                setState(() {
+                                  _imageFile = XFile('');
+                                });
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    // Padding(
-                    //   padding: const EdgeInsets.all(16.0),
-                    //   child: ElevatedButton(
-                    //     onPressed: _takePicture,
-                    //     child: Icon(Icons.camera),
-                    //   ),
-                    // ),
                   ],
                 ),
               );
             } else {
-              return Center(child: Text("Camera not initialized"));
+              return const Center(child: Text("Camera not initialized"));
             }
           } else {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
         },
       ),
+
       bottomNavigationBar: BottomAppBar(
-        color: Color(0xff1a1a1a),
-        shape: CircularNotchedRectangle(),
+        color: const Color(0xff1a1a1a),
+        shape: const CircularNotchedRectangle(),
         notchMargin: 10.0,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              icon: Icon(Icons.arrow_back,color: Colors.white),
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () {
                 Navigator.pop(context);
               },
             ),
             IconButton(
-              icon: Icon(Icons.camera,color: Colors.white,),
+              icon: const Icon(
+                Icons.camera,
+                color: Colors.white,
+              ),
               onPressed: _takePicture,
             ),
             IconButton(
-              icon: Icon(Icons.switch_camera,color: Colors.white),
+              icon: const Icon(Icons.switch_camera, color: Colors.white),
               onPressed: _toggleCamera,
             ),
           ],
         ),
       ),
-
     );
   }
 }
