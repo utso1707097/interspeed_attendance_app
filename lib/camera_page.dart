@@ -1,9 +1,10 @@
 import 'dart:io';
-
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:image/image.dart' as img;
 
 class CameraPage extends StatefulWidget {
   @override
@@ -14,6 +15,7 @@ class _CameraPageState extends State<CameraPage> {
   late CameraController _cameraController;
   late Future<void> _initializeControllerFuture;
   late XFile _imageFile;
+  bool _isFrontCamera = false;
 
   @override
   void initState() {
@@ -24,20 +26,48 @@ class _CameraPageState extends State<CameraPage> {
 
   Future<void> _initializeCamera() async {
     final cameras = await availableCameras();
-    _cameraController = CameraController(cameras[1], ResolutionPreset.high);
+    _cameraController = CameraController(
+      _isFrontCamera? cameras[1]:cameras[0],
+    ResolutionPreset.high,
+    );
     _initializeControllerFuture = _cameraController.initialize();
     if (!mounted) return;
     setState(() {});
   }
+
+  Future<void> _toggleCamera() async {
+    setState(() {
+      _isFrontCamera = !_isFrontCamera;
+    });
+    await _initializeCamera();
+  }
+
 
   Future<void> _takePicture() async {
     try {
       await _initializeControllerFuture;
       final XFile image = await _cameraController.takePicture();
 
-      // If you want to display the captured image immediately:
+// Use image package to handle orientation
+      final img.Image capturedImage = img.decodeImage(await File(image.path).readAsBytes())!; // Use ! to assert non-nullability
+
+// Check if the image needs to be mirrored based on camera sensor orientation
+      bool mirrorImage = _cameraController.description?.sensorOrientation == 90;
+
+// Apply orientation and mirror adjustments
+      final img.Image orientedImage = img.copyRotate(capturedImage, angle: 180);
+      img.flipVertical(orientedImage);
+      if (mirrorImage) {
+        // Mirror the image horizontally
+        img.flipHorizontal(orientedImage);
+      }
+
+// Save the oriented image
+      await File(image.path).writeAsBytes(img.encodeJpg(orientedImage));
+
+// Update _imageFile to point to the same file
       setState(() {
-        _imageFile = image;
+        _imageFile = XFile(image.path);
       });
     } catch (e) {
       print('Error taking picture: $e');
@@ -82,89 +112,102 @@ class _CameraPageState extends State<CameraPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(
+      //   title: const Text('Camera Page'),
+      //   leading: IconButton(
+      //     icon: const Icon(Icons.arrow_back),
+      //     onPressed: () {
+      //       Navigator.pop(context);
+      //     },
+      //   ),
+      // ),
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (_cameraController.value.isInitialized) {
-              return Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  CameraPreview(_cameraController),
-                  if (_imageFile != null)
-                    Positioned(
-                      top: 10.0,
-                      right: 10.0,
-                      child: GestureDetector(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Dialog(
-                                child: Container(
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: FileImage(File(_imageFile.path)),
-                                      fit: BoxFit.cover,
+              return Container(
+                height: MediaQuery.of(context).size.height,
+                width: double.infinity,
+                child: Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    CameraPreview(_cameraController),
+                    if (_imageFile != null)
+                      Positioned(
+                        top: 10.0,
+                        right: 10.0,
+                        child: GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Dialog(
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: FileImage(File(_imageFile.path)),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      children: [
+                                        IconButton(
+                                          icon: Icon(Icons.check,color: Colors.white),
+                                          onPressed: () async{
+                                            // Handle the logic when the tick button is pressed
+                                            // For now, print a message and reset _imageFile
+                                            await saveImageToLocalDirectory(_imageFile.path);
+                                            print('Image confirmed!');
+                                            Navigator.of(context).pop(); // Close the dialog
+                                            setState(() {
+                                              _imageFile = XFile('');
+                                            });
+                                          },
+                                        ),
+                                        IconButton(
+                                          icon: Icon(Icons.clear,color: Colors.white),
+                                          onPressed: () {
+                                            // Handle the logic when the cross button is pressed
+                                            // For now, print a message and reset _imageFile
+                                            print('Image canceled!');
+                                            Navigator.of(context).pop(); // Close the dialog
+                                            setState(() {
+                                              _imageFile = XFile('');
+                                            });
+                                          },
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    children: [
-                                      IconButton(
-                                        icon: Icon(Icons.check),
-                                        onPressed: () async{
-                                          // Handle the logic when the tick button is pressed
-                                          // For now, print a message and reset _imageFile
-                                          await saveImageToLocalDirectory(_imageFile.path);
-                                          print('Image confirmed!');
-                                          Navigator.of(context).pop(); // Close the dialog
-                                          setState(() {
-                                            _imageFile = XFile('');
-                                          });
-                                        },
-                                      ),
-                                      IconButton(
-                                        icon: Icon(Icons.clear),
-                                        onPressed: () {
-                                          // Handle the logic when the cross button is pressed
-                                          // For now, print a message and reset _imageFile
-                                          print('Image canceled!');
-                                          Navigator.of(context).pop(); // Close the dialog
-                                          setState(() {
-                                            _imageFile = XFile('');
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                        child: Container(
-                          width: 100.0,
-                          height: 100.0,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: FileImage(File(_imageFile.path)),
-                              fit: BoxFit.cover,
+                                );
+                              },
+                            );
+                          },
+                          child: Container(
+                            width: 100.0,
+                            height: 100.0,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: FileImage(File(_imageFile.path)),
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: ElevatedButton(
-                      onPressed: _takePicture,
-                      child: Icon(Icons.camera),
-                    ),
-                  ),
-                ],
+                    // Padding(
+                    //   padding: const EdgeInsets.all(16.0),
+                    //   child: ElevatedButton(
+                    //     onPressed: _takePicture,
+                    //     child: Icon(Icons.camera),
+                    //   ),
+                    // ),
+                  ],
+                ),
               );
             } else {
               return Center(child: Text("Camera not initialized"));
@@ -174,6 +217,31 @@ class _CameraPageState extends State<CameraPage> {
           }
         },
       ),
+      bottomNavigationBar: BottomAppBar(
+        color: Color(0xff1a1a1a),
+        shape: CircularNotchedRectangle(),
+        notchMargin: 10.0,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: Icon(Icons.arrow_back,color: Colors.white),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.camera,color: Colors.white,),
+              onPressed: _takePicture,
+            ),
+            IconButton(
+              icon: Icon(Icons.switch_camera,color: Colors.white),
+              onPressed: _toggleCamera,
+            ),
+          ],
+        ),
+      ),
+
     );
   }
 }

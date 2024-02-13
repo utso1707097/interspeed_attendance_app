@@ -5,7 +5,7 @@ import 'package:interspeed_attendance_app/camera_page.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:interspeed_attendance_app/login_page.dart';
-
+import 'package:intl/intl.dart';
 class DashboardPage extends StatefulWidget {
   final Map<String, dynamic> sessionData;
 
@@ -56,6 +56,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    var currentTime = DateFormat('h:mm a', 'en_US').format(DateTime.now().toUtc().add(const Duration(hours: 6))); // Dhaka UTC+6
     final userId = widget.sessionData['user_id'] ?? '';
     final String userName = widget.sessionData['user_name'] ?? '';
     final String fullName = widget.sessionData['full_name'] ?? '';
@@ -80,7 +81,7 @@ class _DashboardPageState extends State<DashboardPage> {
       //   // automaticallyImplyLeading: false,
       // ),
       drawer: Drawer(
-        backgroundColor: Color(0xff1a1a1a),
+        backgroundColor: const Color(0xff1a1a1a),
         width: MediaQuery.of(context).size.width * 0.75,
         child: ListView(
           children: [
@@ -119,41 +120,7 @@ class _DashboardPageState extends State<DashboardPage> {
               leading: const Icon(Icons.exit_to_app,color: Colors.white,),
               title: const Text("Logout",style: TextStyle(color: Colors.white),),
               onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
-                      ),
-                      title: const Text('Are you sure?'),
-                      content: const Text('you will be logged out.'),
-                      actions: <Widget>[
-                        TextButton(
-                          onPressed: () => Navigator.pop(context, 'Cancel'),
-                          child: const Text(
-                            'Cancel',
-                            style: TextStyle(
-                              color: Color(0xff010080),
-                            ),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            _logout();
-                            Navigator.pop(context, 'OK');
-                          },
-                          child: const Text(
-                            'Logout',
-                            style: TextStyle(
-                              color: Color(0xff010080),
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
+                _showLogoutDialog();
               },
             ),
           ],
@@ -170,7 +137,7 @@ class _DashboardPageState extends State<DashboardPage> {
               width: double.infinity,
               height: 180,
               decoration: const BoxDecoration(
-                color: const Color(0xff333333),
+                color: Color(0xff333333),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(12),
                   bottomRight: Radius.circular(12),
@@ -237,7 +204,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       children: [
                         Container(
                           decoration: const BoxDecoration(
-                            color: const Color(0xff00a0b0),
+                            color: Color(0xff00a0b0),
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(16.0),
                               topRight: Radius.circular(16.0),
@@ -286,9 +253,9 @@ class _DashboardPageState extends State<DashboardPage> {
                             alignment: Alignment.center,
                             children: [
                               Image.asset('assets/images/entry_time_box.png', height: 13),
-                              const Text(
-                                '10:20 AM',
-                                style: TextStyle(
+                              Text(
+                                currentTime,
+                                style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 12,
                                   fontWeight: FontWeight.normal,
@@ -312,7 +279,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       children: [
                         Container(
                           decoration: const BoxDecoration(
-                            color: const Color(0xfffec34f),
+                            color: Color(0xfffec34f),
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(16.0),
                               topRight: Radius.circular(16.0),
@@ -360,9 +327,9 @@ class _DashboardPageState extends State<DashboardPage> {
                             alignment: Alignment.center,
                             children: [
                               Image.asset('assets/images/exit_time_box.png', height: 13),
-                              const Text(
-                                '10:20 AM',
-                                style: TextStyle(
+                              Text(
+                                currentTime,
+                                style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 12,
                                   fontWeight: FontWeight.normal,
@@ -481,7 +448,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
             _isSignInButtonClicked
                 ? Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Container(
                       padding: const EdgeInsets.all(10.0),
                       decoration: BoxDecoration(
@@ -527,7 +494,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
             _isSignOutButtonClicked
                 ? Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Container(
                         padding: const EdgeInsets.all(10.0),
                         decoration: BoxDecoration(
@@ -637,6 +604,67 @@ class _DashboardPageState extends State<DashboardPage> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showLogoutDialog(){
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1a1a1a),
+          title: Container(// Header area color
+            child: const Text(
+              'Are you sure?',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          content: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              'You will be logged out.',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'Cancel'),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                _logout();
+                Navigator.pop(context, 'OK');
+              },
+              child: const Text(
+                'Logout',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+          ),
+        );
+
+      },
     );
   }
 }

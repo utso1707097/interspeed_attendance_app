@@ -12,6 +12,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  bool _validatedUsername = true;
+  bool _validatedPassword = true;
   bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
   TextEditingController usernameController = TextEditingController();
@@ -20,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xff1a1a1a),
+      backgroundColor: const Color(0xff1a1a1a),
       resizeToAvoidBottomInset: true,
       body: Column(
         children: [
@@ -42,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
           // Image.asset('assets/interspeed/logo_white.jpg'),
-          SizedBox(
+          const SizedBox(
             height: 8,
           ),
 
@@ -66,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
                           height: 45,
                           child: TextFormField(
                               controller: usernameController,
-                              decoration:  InputDecoration(
+                              decoration: InputDecoration(
                                 // helperText: ' ',
                                 // Non-empty helper text to reserve space
                                 //helperMaxLines: 1,
@@ -82,29 +84,42 @@ class _LoginPageState extends State<LoginPage> {
                                 focusedBorder: const OutlineInputBorder(
                                   borderSide: BorderSide.none,
                                 ),
+                                suffixIcon: !_validatedUsername ? const Icon(
+                                        Icons.error,
+                                        color: Colors.red,
+                                      ): const SizedBox(),
+                                errorStyle: const TextStyle(height: 0.01),
+                                // Exclamation sign or any other icon
                                 // prefixIcon: Icon(
                                 //   Icons.person,
                                 //   color: const Color(0xff010080),
                                 // ),
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(6.0), // Adjust the radius as needed
+                                  borderRadius: BorderRadius.circular(
+                                      6.0), // Adjust the radius as needed
                                 ),
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter your id';
-                                } else if (value.contains(RegExp(r'\d'))) {
-                                  return 'Username cannot contain numbers';
+                                  setState(() {
+                                    _validatedUsername =false;
+                                  });
+                                  return " ";
+                                }
+                                if(!_validatedUsername){
+                                  setState(() {
+                                    _validatedUsername =true;
+                                  });
                                 }
                                 return null;
                               }),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 8,
                         ),
                         Container(
                           //padding: const EdgeInsets.symmetric(
-                              // vertical: 8, horizontal: 16),
+                          // vertical: 8, horizontal: 16),
                           width: MediaQuery.of(context).size.width *
                               0.7, // Adjust the percentage as needed
                           height: 50,
@@ -120,16 +135,24 @@ class _LoginPageState extends State<LoginPage> {
                                 fillColor: Colors.white,
                                 hintText: "password",
                                 hintStyle: const TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xff808080)
-                                ),
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xff808080)),
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(6.0), // Adjust the radius as needed
+                                  borderRadius: BorderRadius.circular(
+                                      6.0), // Adjust the radius as needed
                                 ),
                                 focusedBorder: const OutlineInputBorder(
                                   borderSide: BorderSide.none,
                                 ),
+                                errorStyle: const TextStyle(height: 0.01),
+                                suffixIcon: !_validatedPassword ? const Tooltip(
+                                  message: 'required',
+                                  child: Icon(
+                                    Icons.error,
+                                    color: Colors.red,
+                                  ),
+                                ): const SizedBox(),
                                 // prefixIcon: Icon(
                                 //   Icons.key,
                                 //   color: Color(0xff010080),
@@ -141,28 +164,31 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter your password';
+                                  setState(() {
+                                    _validatedPassword =false;
+                                  });
+                                  return '';
+                                }
+                                if(!_validatedPassword){
+                                  setState(() {
+                                    _validatedPassword =true;
+                                  });
                                 }
                                 return null;
                               }),
                         ),
                         SizedBox(
-                          height: MediaQuery.of(context).size.height *0.07
-                        )
-                        ,
+                            height: MediaQuery.of(context).size.height * 0.07),
                         Stack(children: [
                           GestureDetector(
                             onTap: () async {
                               if (_formKey.currentState!.validate()) {
                                 _submitForm(); // Assuming _submitForm is an asynchronous function
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Please fill input')),
-                                );
                               }
                             },
                             child: Image.asset(
-                              'assets/images/Submit tickxxxhdpi.png', // Replace with your asset path
+                              'assets/images/Submit tickxxxhdpi.png',
+                              // Replace with your asset path
                               width: 70, // Adjust the width as needed
                               height: 70, // Adjust the height as needed
                               // color: Color(0xff010080),
@@ -172,7 +198,7 @@ class _LoginPageState extends State<LoginPage> {
                             Positioned.fill(
                               child: Container(
                                 color: Colors.black.withOpacity(0.5),
-                                child: Center(
+                                child: const Center(
                                   child: CircularProgressIndicator(
                                     valueColor: AlwaysStoppedAnimation<Color>(
                                         Color(0xff010080)),
@@ -260,18 +286,40 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Login Failed'),
-          content: Text(
+          backgroundColor: const Color(0xFF333333), // Body color
+          title: Container(
+
+            // color: const Color(0xFF1a1a1a), // Header area color
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Login Failed ',
+                  style: TextStyle(color: Colors.white),
+                ),
+                Icon(
+                  Icons.error,
+                  color: Colors.white,
+                ),
+              ],
+            ),
+          ),
+          content: const Text(
             'Invalid username or password. Please try again.',
+            style: TextStyle(color: Colors.white),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('OK'),
+              child: const Text('OK', style: TextStyle(color: Colors.white)),
             ),
           ],
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+          ),
         );
       },
     );
