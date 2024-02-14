@@ -1,5 +1,6 @@
+import 'dart:convert';
 import 'dart:developer';
-
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:interspeed_attendance_app/camera_page.dart';
 import 'package:geolocator/geolocator.dart';
@@ -16,11 +17,13 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  String _signInbase64Image = "";
+  String _signOutbase64Image = "";
   bool _isSignInButtonClicked = false;
   bool _isSignOutButtonClicked = false;
   double latitude = -1;
   double longitude = -1;
-  int accuracy = 100;
+  int accuracy = -100;
 
   getCurrentLocation() async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -52,6 +55,12 @@ class _DashboardPageState extends State<DashboardPage> {
       context,
       MaterialPageRoute(builder: (context) => const LoginPage()),
     );
+  }
+  @override
+  void initState() {
+    _signInbase64Image = "";
+    _signOutbase64Image = "";
+    super.initState();
   }
 
   @override
@@ -460,18 +469,13 @@ class _DashboardPageState extends State<DashboardPage> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => CameraPage(),
-                                  ),
-                                );
+                                navigateToCameraPage();
                               },
                               child: _buildCard(
                                 color: 0xff74c2c6,
                                 image: 'assets/images/ic_camera.png',
                                 title: 'Camera',
-                                description: 'Image Captured',
+                                description: _signInbase64Image!= ""?'Image Captured':'Capture Image',
                               ),
                             ),
                           ),
@@ -508,17 +512,12 @@ class _DashboardPageState extends State<DashboardPage> {
                                 Expanded(
                                   child: GestureDetector(
                                     onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => CameraPage(),
-                                        ),
-                                      );
+                                      navigateToCameraPage();
                                     },
                                     child: _buildCard(
                                       image: 'assets/images/ic_camera.png',
                                       title: 'Camera',
-                                      description: 'Image Captured',
+                                      description: _signOutbase64Image!= ""?'Image Captured':'Capture Image',
                                       color: 0xfffed593,
                                     ),
                                   ),
@@ -544,6 +543,7 @@ class _DashboardPageState extends State<DashboardPage> {
             GestureDetector(
               onTap: () {
                 // Handle button click here
+                sendAttendanceData();
                 print('Button Clicked');
                 // Add your custom logic or navigation here
               },
@@ -666,5 +666,84 @@ class _DashboardPageState extends State<DashboardPage> {
 
       },
     );
+  }
+
+  Future<void> navigateToCameraPage() async {
+    // Navigate to the camera page and wait for the result
+    String? base64Image = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CameraPage(),
+      ),
+    );
+
+    // Handle the base64Image received from the camera page
+    if (base64Image != null) {
+      // Do something with the base64 image, e.g., display it
+      print('Received base64 image: $base64Image');
+      setState(() {
+        if(_isSignInButtonClicked)_signInbase64Image = base64Image;
+        if(_isSignOutButtonClicked)_signOutbase64Image = base64Image;
+      });
+    } else {
+      // Handle the case where the user canceled or an error occurred
+      print('Image capture canceled or error occurred');
+    }
+  }
+
+  Future<void> sendAttendanceData() async {
+    // Set up the URL
+    final String url = _isSignInButtonClicked?'https://br-isgalleon.com/api/attendance/insert_daily_attendance_in.php': 'https://br-isgalleon.com/api/attendance/insert_daily_attendance_out.php';
+
+    // Create the multipart request
+    final http.MultipartRequest request = http.MultipartRequest('POST', Uri.parse(url));
+
+    //Validate the request
+    if (_isSignOutButtonClicked &&(_signOutbase64Image == null || _signOutbase64Image!.isEmpty)) {
+      // Handle the case when _base64Image is empty
+      print('Error: Image data is empty');
+      return;
+    }
+
+    if (_isSignInButtonClicked &&(_signInbase64Image == null || _signInbase64Image!.isEmpty)) {
+      // Handle the case when _base64Image is empty
+      print('Error: Image data is empty');
+      return;
+    }
+
+    if (latitude == -1 || longitude == -1) {
+      // Handle the case when latitude or longitude is not set
+      print('Error: Latitude or longitude not set');
+      return;
+    }
+
+    // Add your data to the request
+    request.fields['UserId'] = widget.sessionData['user_id'];
+    request.fields['LatValue'] = latitude.toString();
+    request.fields['LonValue'] = longitude.toString();
+    request.fields['Accuracy'] = accuracy.toString();
+    request.fields['InRemark'] = "";
+    request.fields['ImageData']=_isSignInButtonClicked?_signInbase64Image:_signOutbase64Image;
+
+
+
+
+    // Send the request
+    try {
+      final http.Response response = await http.Response.fromStream(await request.send());
+
+      if (response.statusCode == 200) {
+        // Request was successful
+        Map<String, dynamic> responseData = jsonDecode(response.body);
+        // Process the response data
+        print(responseData);
+      } else {
+        // Request failed
+        print('Request failed with status: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle errors
+      print('Error sending request: $error');
+    }
   }
 }

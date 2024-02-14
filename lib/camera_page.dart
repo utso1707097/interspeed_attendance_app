@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
+import 'dart:convert';
 
 class CameraPage extends StatefulWidget {
   @override
@@ -12,6 +13,7 @@ class CameraPage extends StatefulWidget {
 }
 
 class _CameraPageState extends State<CameraPage> {
+  String? base64Image;
   late CameraController _cameraController;
   late Future<void> _initializeControllerFuture;
   late XFile _imageFile;
@@ -152,10 +154,14 @@ class _CameraPageState extends State<CameraPage> {
                               onPressed: () async {
                                 // Handle the logic when the tick button is pressed
                                 // For now, print a message and reset _imageFile
-                                await saveImageToLocalDirectory(
-                                    _imageFile.path);
+                                // await saveImageToLocalDirectory(
+                                //     _imageFile.path);
+                                List<int> imageBytes = await File(_imageFile.path).readAsBytes();
+                                String base64Image = base64Encode(imageBytes);
+                                print(base64Image);
                                 print('Image confirmed!');
-                                Navigator.of(context).pop(); // Close the dialog
+                                Navigator.pop(context, base64Image);
+                                //Navigator.of(context).pop(); // Close the dialog
                                 setState(() {
                                   _imageFile = XFile('');
                                 });
