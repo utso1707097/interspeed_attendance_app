@@ -30,33 +30,33 @@ class _MyAppState extends State<MyApp> {
     bool seen = pref.getBool('seen') ?? false;
     setState(() {
       isFirstScreen = seen;
-      loadSessionData();
+      //loadSessionData();
     });
   }
 
-  Future<void> loadSessionData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      print(prefs.getString('user_id'));
-      sessionData = {
-        'user_id': prefs.getString('user_id') ?? '',
-        'user_name': prefs.getString('user_name') ?? '',
-        'full_name': prefs.getString('full_name') ?? '',
-        'user_type_id': prefs.getString('user_type_id') ?? '',
-        'picture_name': prefs.getString('picture_name') ?? '',
-        'user_type_name': prefs.getString('user_type_name') ?? '',
-        'employee_id': prefs.getString('employee_id') ?? '',
-        'designation_id': prefs.getString('designation_id') ?? '',
-        'employee_position_id': prefs.getString('employee_position_id') ?? '',
-      };
-    });
-  }
+  // Future<void> loadSessionData() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   setState(() {
+  //     print(prefs.getString('employee_id'));
+  //     sessionData = {
+  //       'user_id': prefs.getString('user_id') ?? '',
+  //       'user_name': prefs.getString('user_name') ?? '',
+  //       'full_name': prefs.getString('full_name') ?? '',
+  //       'user_type_id': prefs.getString('user_type_id') ?? '',
+  //       'picture_name': prefs.getString('picture_name') ?? '',
+  //       'user_type_name': prefs.getString('user_type_name') ?? '',
+  //       'employee_id': prefs.getString('employee_id') ?? '',
+  //       'designation_id': prefs.getString('designation_id') ?? '',
+  //       'employee_position_id': prefs.getString('employee_position_id') ?? '',
+  //     };
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: !isFirstScreen ? LoginPage() : DashboardPage(sessionData: sessionData),
+      home: !isFirstScreen ? LoginPage() : DashboardPage(),
     );
   }
 }

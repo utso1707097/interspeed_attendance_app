@@ -248,7 +248,7 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => DashboardPage(sessionData: sessionData),
+              builder: (context) => DashboardPage(),
             ),
           );
         } else {
@@ -265,17 +265,22 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> saveSessionData(Map<String, dynamic> sessionData) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setBool('seen', true);
-      prefs.setString('user_id', sessionData['user_id']);
-      prefs.setString('user_name', sessionData['user_name']);
-      prefs.setString('full_name', sessionData['full_name']);
-      prefs.setString('user_type_id', sessionData['user_type_id']);
-      prefs.setString('picture_name', sessionData['picture_name']);
-      prefs.setString('user_type_name', sessionData['user_type_name']);
-      prefs.setString('employee_id', sessionData['employee_id']);
-      prefs.setString('designation_id', sessionData['designation_id']);
-      prefs.setString(
-          'employee_position_id', sessionData['employee_position_id']);
+      // print(sessionData['employee_id']);
+      prefs.setBool("seen", true);
+      prefs.setString("user_id", sessionData["user_id"] ?? "");
+      prefs.setString("user_name", sessionData["user_name"] ?? "");
+      prefs.setString("full_name", sessionData["full_name"] ?? "");
+      prefs.setString("user_type_id", sessionData["user_type_id"] ?? "");
+      prefs.setString("user_type_name", sessionData["user_type_name"] ?? "");
+      prefs.setString("office_name", sessionData["office_name"] ?? "");
+      prefs.setString("designation_name", sessionData["designation_name"] ?? "");
+      prefs.setString("access_level", sessionData["access_level"] ?? "");
+      prefs.setString("picture_name", sessionData["picture_name"] ?? "");
+      prefs.setString("employee_id", sessionData["employee_id"] ?? "");
+      prefs.setString("designation_id", sessionData["designation_id"] ?? "");
+      prefs.setString("employee_position_id", sessionData["employee_position_id"] ?? "");
+
+      // print("Employee id saved in shared pref is: ${prefs.getString('employee_id')}");
     } catch (error) {
       print('Error saving session data: $error');
     }

@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:interspeed_attendance_app/camera_page.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:interspeed_attendance_app/drawer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:interspeed_attendance_app/login_page.dart';
 import 'package:intl/intl.dart';
@@ -11,15 +12,14 @@ import 'package:intl/intl.dart';
 import 'profile_page.dart';
 
 class DashboardPage extends StatefulWidget {
-  final Map<String, dynamic> sessionData;
-
-  DashboardPage({required this.sessionData});
+  const DashboardPage({Key? key}) : super(key: key);
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  Map<String, dynamic> sessionData = {};
   String _signInbase64Image = "";
   String _signOutbase64Image = "";
   bool _isSignInButtonClicked = false;
@@ -28,6 +28,35 @@ class _DashboardPageState extends State<DashboardPage> {
   double longitude = -1;
   int accuracy = 100;
   bool showProgressBar = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSessionData();
+  }
+
+  Future<void> _fetchSessionData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      sessionData = {
+        'user_id': prefs.getString('user_id') ?? '',
+        'user_name': prefs.getString('user_name') ?? '',
+        'full_name': prefs.getString('full_name') ?? '',
+        'user_type_id': prefs.getString('user_type_id') ?? '',
+        'user_type_name': prefs.getString('user_type_name') ?? '',
+        'office_name': prefs.getString('office_name') ?? '',
+        'designation_name': prefs.getString('designation_name') ?? '',
+        'access_level': prefs.getString('access_level') ?? '',
+        'picture_name': prefs.getString('picture_name') ?? '',
+        'employee_id': prefs.getString('employee_id') ?? '',
+        'designation_id': prefs.getString('designation_id') ?? '',
+        'employee_position_id': prefs.getString('employee_position_id') ?? '',
+        // Add more key-value pairs as needed...
+      };
+      print(sessionData);
+    });
+  }
+
 
   getCurrentLocation() async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -49,18 +78,6 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  Future<void> _logout() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs
-        .clear(); // Clear all stored data, you might want to clear specific keys
-
-    // Navigate to the login screen
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginPage()),
-    );
-  }
-
   Future<void> sendAttendanceData() async {
     // Set up the URL
     final String url = _isSignInButtonClicked
@@ -72,8 +89,7 @@ class _DashboardPageState extends State<DashboardPage> {
         http.MultipartRequest('POST', Uri.parse(url));
 
     //Validate the request
-    if (_isSignOutButtonClicked &&
-        (_signOutbase64Image == null || _signOutbase64Image!.isEmpty)) {
+    if (_isSignOutButtonClicked && _signOutbase64Image == "") {
       // Handle the case when _base64Image is empty
       setState(() {
         showProgressBar = false;
@@ -110,7 +126,7 @@ class _DashboardPageState extends State<DashboardPage> {
     }
 
     // Add your data to the request
-    request.fields['UserId'] = widget.sessionData['user_id'];
+    request.fields['UserId'] = sessionData['user_id']!;
     request.fields['LatValue'] = latitude.toString();
     request.fields['LonValue'] = longitude.toString();
     request.fields['Accuracy'] = accuracy.toString();
@@ -158,183 +174,17 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   // https://br-isgalleon.com/api/employee/get_employee_by_id.php
-  void sendUserDataToProfile() async {
-    try {
 
-      // final Uri uri = Uri.parse('https://na57.salesforce.com/services/oauth2/token');
-      // final map = <String, dynamic>{};
-      // map['grant_type'] = 'password';
-      // map['client_id'] = '3MVG9dZJodJWITSviqdj3EnW.LrZ81MbuGBqgIxxxdD6u7Mru2NOEs8bHFoFyNw_nVKPhlF2EzDbNYI0rphQL';
-      // map['client_secret'] = '42E131F37E4E05313646E1ED1D3788D76192EBECA7486D15BDDB8408B9726B42';
-      // map['username'] = 'example@mail.com.us';
-      // map['password'] = 'ABC1234563Af88jesKxPLVirJRW8wXvj3D';
-
-      // http.Response response = await http.post(
-      //   uri,
-      //   body: map,
-      // );
-      final String profileDataUrl = 'https://br-isgalleon.com/api/employee/get_employee_by_id.php';
-      final Uri uri = Uri.parse(profileDataUrl);
-      final map = <String, dynamic>{};
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      // Add parameters for the user data
-      map['EmployeeId'] = prefs.getString('employee_id') ?? '0';
-      map['UserId'] = prefs.getString('user_id') ?? '0';
-
-      print("employee_id:${map['EmployeeId']},user_id:${map['UserId']}.");
-
-      // Send the combined data request
-      final http.Response response =
-      await http.post(
-        uri,
-        body: map,
-      );
-      print("Request data: $map");
-      print('Response status code: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        // If the server returns a 200 OK response, parse the data
-        final Map<String, dynamic> userData = json.decode(response.body);
-        print('User data: ${userData}');
-
-        // Navigate to the profile page and pass the user data
-        if (userData['success'] == true) {
-          // Navigate to the profile page and pass the user data
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ProfilePage(userData: userData),
-            ),
-          );
-        } else {
-          // Show the attendance dialog with a failure message
-          _showAttendacneDialog("Failed", "User data not available", 0);
-        }
-
-      } else {
-        // If the server did not return a 200 OK response,
-        // handle the error accordingly (you might want to show an error message)
-        print('Failed to load user data. Status code: ${response.statusCode}');
-      }
-    } catch (error) {
-      // Handle errors
-      print('Error getting combined data: $error');
-    }
-  }
-
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
     var currentTime = DateFormat('h:mm a', 'en_US').format(
         DateTime.now().toUtc().add(const Duration(hours: 6))); // Dhaka UTC+6
-    final userId = widget.sessionData['user_id'] ?? '';
-    final String userName = widget.sessionData['user_name'] ?? '';
-    final String fullName = widget.sessionData['full_name'] ?? '';
-    final userTypeId = widget.sessionData['user_type_id'] ?? '';
-    final pictureName = widget.sessionData['picture_name'] ?? '';
-    final userTypeName = widget.sessionData['user_type_name'] ?? '';
-    final employeeId = widget.sessionData['employee_id'] ?? '';
-    final designationId = widget.sessionData['designation_id'] ?? '';
-    final employeePositionId = widget.sessionData['employee_position_id'] ?? '';
+    final String fullName = sessionData['full_name'] ?? '';
+    final officeName = sessionData['office_name'] ?? ''; // Add this line
+    final designationName = sessionData['designation_name'] ?? ''; // Add this line
     return Scaffold(
-      // appBar: AppBar(
-      //   iconTheme: const IconThemeData(color: Colors.white),
-      //   title: const Text(
-      //     'Attendance',
-      //     style: TextStyle(
-      //       fontSize: 24,
-      //       fontWeight: FontWeight.w500,
-      //       color: Colors.white,
-      //     ),
-      //   ),
-      //   backgroundColor: const Color(0xff010080),
-      //   // automaticallyImplyLeading: false,
-      // ),
-      drawer: Drawer(
-        backgroundColor: const Color(0xff1a1a1a),
-        width: MediaQuery.of(context).size.width * 0.75,
-        child: ListView(
-          children: [
-            DrawerHeader(
-              padding: const EdgeInsets.all(0),
-              margin: const EdgeInsets.all(0),
-              child: UserAccountsDrawerHeader(
-                margin: const EdgeInsets.all(0),
-                decoration: const BoxDecoration(color: Color(0xff333333)),
-                accountName: Text("${fullName}"),
-                accountEmail: const Text("example@gmail.com"),
-                currentAccountPicture: Image.network(
-                  "https://winaero.com/blog/wp-content/uploads/2017/12/User-icon-256-blue.png",
-                ),
-              ),
-            ),
-            const ListTile(
-              leading: Icon(
-                Icons.home,
-                color: Colors.white,
-              ),
-              title: Text(
-                "Home",
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(
-                Icons.person,
-                color: Colors.white,
-              ),
-              title: const Text(
-                "Profile",
-                style: TextStyle(color: Colors.white),
-              ),
-              onTap: () {
-                // Fetch user data when the ListTile is tapped
-                sendUserDataToProfile();
-              },
-            ),
-            const ListTile(
-              leading: Icon(
-                Icons.email,
-                color: Colors.white,
-              ),
-              title: Text(
-                "Email",
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            const ListTile(
-              leading: Icon(
-                Icons.phone,
-                color: Colors.white,
-              ),
-              title: Text(
-                "Phone",
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(
-                Icons.exit_to_app,
-                color: Colors.white,
-              ),
-              title: const Text(
-                "Logout",
-                style: TextStyle(color: Colors.white),
-              ),
-              onTap: () {
-                _showLogoutDialog();
-              },
-            ),
-          ],
-        ),
-      ),
-
+      drawer: MyDrawer(context: context, fullName: fullName),
       body: Container(
         color: const Color(0xff1a1a1a),
         child: Column(
@@ -342,7 +192,7 @@ class _DashboardPageState extends State<DashboardPage> {
             // Image.asset('assets/images/ic_attendance_inactive_btn.png'),
             Container(
               width: double.infinity,
-              height: 180,
+              height: MediaQuery.of(context).size.height * 0.25, // Adjust the factor as needed
               decoration: const BoxDecoration(
                 color: Color(0xff333333),
                 borderRadius: BorderRadius.only(
@@ -356,32 +206,32 @@ class _DashboardPageState extends State<DashboardPage> {
                 children: [
                   Image.asset(
                     'assets/images/logo.jpg',
-                    width: 70,
-                    height: 70,
+                    width: 60,
+                    height: MediaQuery.of(context).size.height * 0.1, // Same height as the Column
                   ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "$fullName",
+                        fullName,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                           color: Colors.white,
                         ),
                       ),
-                      const Text(
-                        "Software Engineer",
-                        style: TextStyle(
+                      Text(
+                        designationName,
+                        style: const TextStyle(
                           fontWeight: FontWeight.normal,
                           fontSize: 13,
                           color: Colors.white,
                         ),
                       ),
                       const Text(
-                        "Interspeed Marketing Solution Ltd",
-                        style: TextStyle(
+                        "Interspeed Marketing Solutions Ltd",
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
                           color: Colors.white,
@@ -814,68 +664,6 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF1a1a1a),
-          title: Container(
-            // Header area color
-            child: const Text(
-              'Are you sure?',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          content: const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text(
-              'You will be logged out.',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-              ),
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.pop(context, 'Cancel'),
-              child: const Text(
-                'Cancel',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                _logout();
-                Navigator.pop(context, 'OK');
-              },
-              child: const Text(
-                'Logout',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ],
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape: RoundedRectangleBorder(
-            borderRadius:
-                BorderRadius.circular(15.0), // Adjust the radius as needed
-          ),
-        );
-      },
-    );
-  }
 
   Future<void> navigateToCameraPage() async {
     // Navigate to the camera page and wait for the result
