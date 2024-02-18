@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:path/path.dart' as path;
@@ -111,15 +110,6 @@ class _CameraPageState extends State<CameraPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text('Camera Page'),
-      //   leading: IconButton(
-      //     icon: const Icon(Icons.arrow_back),
-      //     onPressed: () {
-      //       Navigator.pop(context);
-      //     },
-      //   ),
-      // ),
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
@@ -152,16 +142,11 @@ class _CameraPageState extends State<CameraPage> {
                                 size: 36.0,
                               ),
                               onPressed: () async {
-                                // Handle the logic when the tick button is pressed
-                                // For now, print a message and reset _imageFile
-                                // await saveImageToLocalDirectory(
-                                //     _imageFile.path);
                                 List<int> imageBytes = await File(_imageFile.path).readAsBytes();
                                 String base64Image = base64Encode(imageBytes);
                                 print(base64Image);
                                 print('Image confirmed!');
                                 Navigator.pop(context, base64Image);
-                                //Navigator.of(context).pop(); // Close the dialog
                                 setState(() {
                                   _imageFile = XFile('');
                                 });

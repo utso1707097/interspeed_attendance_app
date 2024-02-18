@@ -1,20 +1,30 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:interspeed_attendance_app/dashboard_page.dart';
 import 'package:interspeed_attendance_app/login_page.dart';
 import 'package:interspeed_attendance_app/profile_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class MyDrawer extends StatelessWidget {
-  final BuildContext context;
-  final String fullName;
+import 'controller/dashboard_controller.dart';
+import 'leave_application_page.dart';
 
-  const MyDrawer({Key? key, required this.context,required this.fullName}) : super(key: key);
+class MyDrawer extends StatelessWidget {
+  // Access the DashboardController using Get.find
+
+  // Extract relevant data from sessionData
+  final BuildContext context;
+
+  const MyDrawer({
+    Key? key,
+    required this.context,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context){
+    DashboardController dashboardController = Get.find<DashboardController>();
+    String fullName = dashboardController.sessionData['full_name'] ?? '';
+    String sbName = dashboardController.sessionData['sb_name'] ?? '';
     return Drawer(
       backgroundColor: const Color(0xff1a1a1a),
       width: MediaQuery.of(context).size.width * 0.75,
@@ -26,8 +36,8 @@ class MyDrawer extends StatelessWidget {
             child: UserAccountsDrawerHeader(
               margin: const EdgeInsets.all(0),
               decoration: const BoxDecoration(color: Color(0xff333333)),
-              accountName: Text("${fullName}"),
-              accountEmail: const Text("example@gmail.com"),
+              accountName: Text(fullName),
+              accountEmail: Text(sbName),
               currentAccountPicture: Image.network(
                 "https://winaero.com/blog/wp-content/uploads/2017/12/User-icon-256-blue.png",
               ),
@@ -46,7 +56,7 @@ class MyDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const DashboardPage(),
+                  builder: (context) => DashboardPage(),
                 ),
               );
             },
@@ -70,29 +80,37 @@ class MyDrawer extends StatelessWidget {
               );
             },
           ),
-          const ListTile(
-            leading: Icon(
-              Icons.email,
+          ListTile(
+            leading: const Icon(
+              Icons.edit_calendar,
               color: Colors.white,
             ),
-            title: Text(
-              "Email",
+            title: const Text(
+              "Request Leave",
               style: TextStyle(color: Colors.white),
             ),
+            onTap: (){
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LeaveApplicationPage(),
+                ),
+              );
+            },
           ),
           const ListTile(
             leading: Icon(
-              Icons.phone,
+              Icons.change_circle,
               color: Colors.white,
             ),
             title: Text(
-              "Phone",
+              "Update Password",
               style: TextStyle(color: Colors.white),
             ),
           ),
           ListTile(
             leading: const Icon(
-              Icons.exit_to_app,
+              Icons.exit_to_app_sharp,
               color: Colors.white,
             ),
             title: const Text(
@@ -248,7 +266,7 @@ class MyDrawer extends StatelessWidget {
     // Navigate to the login screen
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const LoginPage()),
+      MaterialPageRoute(builder: (context) => LoginPage()),
     );
   }
 

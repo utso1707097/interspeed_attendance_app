@@ -24,7 +24,7 @@ class ProfilePage extends StatelessWidget {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
             // Data loaded successfully
-            return MyDrawer(fullName: snapshot.data ?? "Guest", context: context,);
+            return MyDrawer(context: context,);
           }
         },
       ),
