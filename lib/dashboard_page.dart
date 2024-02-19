@@ -132,6 +132,8 @@ class DashboardPage extends StatelessWidget {
       final String fullName = dashboardController.sessionData['full_name'] ?? '';
       final officeName = dashboardController.sessionData['office_name'] ?? ''; // Add this line
       final designationName = dashboardController.sessionData['designation_name'] ?? '';
+      final userImage = dashboardController.sessionData['picture_name'] ?? '';
+      print(userImage);
       return Scaffold(
         drawer: MyDrawer(context: context),
         body: Container(
@@ -153,44 +155,65 @@ class DashboardPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Image.asset(
-                      'assets/images/logo.jpg',
-                      width: 60,
-                      height: MediaQuery.of(context).size.height * 0.1, // Same height as the Column
+                    // Flex 1 - userImage section
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        height: MediaQuery.of(context).size.height * 0.1, // Set a specific height
+                        child: userImage != ""
+                            ? Image.network(
+                          'https://br-isgalleon.com/image_ops/employee/${userImage.toString()}',
+                          width: MediaQuery.of(context).size.width * 0.1,
+                          height: MediaQuery.of(context).size.height * 0.1,
+                        )
+                            : Image.asset(
+                          'assets/images/logo.jpg',
+                          width: MediaQuery.of(context).size.width * 0.2,
+                          height: MediaQuery.of(context).size.height * 0.1,
+                        ),
+                      ),
                     ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          fullName,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
+                    // Flex 2 - Column section
+                    Expanded(
+                      flex: 2,
+                      child: Container(
+                        height: MediaQuery.of(context).size.height * 0.1, // Set a specific height
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              fullName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              designationName,
+                              style:const  TextStyle(
+                                fontWeight: FontWeight.normal,
+                                fontSize: 13,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const Text(
+                              "Interspeed Marketing Solutions Ltd",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          designationName,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.normal,
-                            fontSize: 13,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const Text(
-                          "Interspeed Marketing Solutions Ltd",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
               ),
+
 
               SizedBox(
                 // color: Colors.white,
@@ -379,7 +402,9 @@ class DashboardPage extends StatelessWidget {
                           color: 0xff74c2c6,
                           image: 'assets/images/ic_gps.png',
                           title: 'GPS',
-                          description: 'Accuracy: ${dashboardController.accuracy.value.toString()}',
+                          description: dashboardController.accuracy.value == 100
+                              ? 'Loading!'
+                              : 'Accuracy: ${dashboardController.accuracy.value.toString()}',
 
                         ),
                       ),
@@ -428,8 +453,10 @@ class DashboardPage extends StatelessWidget {
                               child: _buildCard(
                                 image: 'assets/images/ic_gps.png',
                                 title: 'GPS',
-                                description:
-                                'Accuracy: ${dashboardController.accuracy.value.toString()}',
+                                description: dashboardController.accuracy.value == 100
+                                    ? 'Loading!'
+                                    : 'Accuracy: ${dashboardController.accuracy.value.toString()}',
+
                                 color: 0xfffed593,
                               ),
                             ),

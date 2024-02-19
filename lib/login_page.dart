@@ -265,7 +265,7 @@ class LoginPage extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF333333), // Body color
+          backgroundColor: const Color(0xFF333333),// Body color
           title: Container(
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,

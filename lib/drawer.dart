@@ -25,6 +25,11 @@ class MyDrawer extends StatelessWidget {
     DashboardController dashboardController = Get.find<DashboardController>();
     String fullName = dashboardController.sessionData['full_name'] ?? '';
     String sbName = dashboardController.sessionData['sb_name'] ?? '';
+    String picture_name = dashboardController.sessionData['picture_name']?? '';
+    String user_id = dashboardController.sessionData['user_id'] ?? '';
+    String employee_id = dashboardController.sessionData['employee_id'] ?? '';
+
+
     return Drawer(
       backgroundColor: const Color(0xff1a1a1a),
       width: MediaQuery.of(context).size.width * 0.75,
@@ -39,7 +44,7 @@ class MyDrawer extends StatelessWidget {
               accountName: Text(fullName),
               accountEmail: Text(sbName),
               currentAccountPicture: Image.network(
-                "https://winaero.com/blog/wp-content/uploads/2017/12/User-icon-256-blue.png",
+                picture_name != ''? 'https://br-isgalleon.com/image_ops/employee/${picture_name.toString()}' : "https://winaero.com/blog/wp-content/uploads/2017/12/User-icon-256-blue.png",
               ),
             ),
           ),
@@ -93,7 +98,8 @@ class MyDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => LeaveApplicationPage(),
+                  builder: (context) => LeaveApplicationPage(userId: user_id,
+                    employeeId: employee_id,),
                 ),
               );
             },
