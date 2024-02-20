@@ -1,9 +1,10 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:interspeed_attendance_app/drawer.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:http/http.dart' as http;
+
+import 'utils/layout_size.dart';
 
 class LeaveApplicationPage extends StatefulWidget {
   final String userId;
@@ -20,13 +21,11 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
   List<DateTime> selectedDates = [];
   bool showRemark = false;
   TextEditingController textEditingController = TextEditingController();
+  TextEditingController remarkController = TextEditingController();
   String? _selectedLeaveType;
 
   final List<String> _leaveTypes = [
     'Casual Leave',
-    'Half Day Leave',
-    'On Meeting',
-    'On Training',
     'Sick Leave',
   ];
 
@@ -49,70 +48,85 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
                   //color: const Color(0xff333333),
                   borderRadius: BorderRadius.circular(10.0),
                 ),
-                child: SfDateRangePicker(
-                  // showActionButtons: true,
-                  view: DateRangePickerView.month,
-                  // monthViewSettings: const DateRangePickerMonthViewSettings(firstDayOfWeek: 1),
-                  monthViewSettings:DateRangePickerMonthViewSettings(blackoutDates:[DateTime(2020, 03, 26)],
-                      weekendDays: [5],
-                      //specialDates:[DateTime(2020, 03, 20),DateTime(2020, 03, 16),DateTime(2020,03,17)],
-                      // showTrailingAndLeadingDates: true,
-                      firstDayOfWeek: 1
+                child: Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: const ColorScheme.light(
+                      primary: Colors.red, // header background color
+                      onPrimary: Colors.black, // header text color
+                      onSurface: Colors.white, // body text color
+                    ),
+                    textButtonTheme: TextButtonThemeData(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.green, // button text color
+                      ),
+                    ),
                   ),
-                  monthCellStyle: DateRangePickerMonthCellStyle(
-                    textStyle:const TextStyle(color: Colors.white),
-                    blackoutDatesDecoration: BoxDecoration(
-                        color: Colors.red,
-                        border: Border.all(color: const Color(0xFFF44436), width: 1),
-                        shape: BoxShape.circle),
-                    weekendDatesDecoration: BoxDecoration(
-                        color: Colors.red,
-                        border: Border.all(color: const Color(0xFFB6B6B6), width: 1),
-                        shape: BoxShape.circle),
-                    specialDatesDecoration: BoxDecoration(
-                        color: Colors.green,
-                        border: Border.all(color: const Color(0xFF2B732F), width: 1),
-                        shape: BoxShape.circle),
-                    blackoutDateTextStyle: const TextStyle(color: Colors.white, decoration: TextDecoration.lineThrough),
-                    specialDatesTextStyle: const TextStyle(color: Colors.white),
-                    todayCellDecoration: BoxDecoration(
-                        color: const Color(0xFFDFDFDF),
-                        border: Border.all(color: const Color(0xFFB6B6B6), width: 1),
-                        shape: BoxShape.circle),
-                    todayTextStyle: const TextStyle(color: Colors.white),
-                  ),
+                  child: SfDateRangePicker(
+                    // showActionButtons: true,
+                    view: DateRangePickerView.month,
+                    // monthViewSettings: const DateRangePickerMonthViewSettings(firstDayOfWeek: 1),
+                    monthViewSettings:DateRangePickerMonthViewSettings(blackoutDates:[DateTime(2020, 03, 26)],
+                        weekendDays: [5],
+                        //specialDates:[DateTime(2020, 03, 20),DateTime(2020, 03, 16),DateTime(2020,03,17)],
+                        // showTrailingAndLeadingDates: true,
+                        firstDayOfWeek: 1
+                    ),
+                    monthCellStyle: DateRangePickerMonthCellStyle(
+                      textStyle:const TextStyle(color: Colors.white),
+                      blackoutDatesDecoration: BoxDecoration(
+                          color: Colors.red,
+                          border: Border.all(color: const Color(0xFFF44436), width: 1),
+                          shape: BoxShape.circle),
+                      weekendDatesDecoration: BoxDecoration(
+                          color: Colors.red,
+                          border: Border.all(color: const Color(0xFFB6B6B6), width: 1),
+                          shape: BoxShape.circle),
+                      specialDatesDecoration: BoxDecoration(
+                          color: Colors.green,
+                          border: Border.all(color: const Color(0xFF2B732F), width: 1),
+                          shape: BoxShape.circle),
+                      blackoutDateTextStyle: const TextStyle(color: Colors.white, decoration: TextDecoration.lineThrough),
+                      specialDatesTextStyle: const TextStyle(color: Colors.white),
+                      todayCellDecoration: BoxDecoration(
+                          color: const Color(0xFFDFDFDF),
+                          border: Border.all(color: const Color(0xFFB6B6B6), width: 1),
+                          shape: BoxShape.circle),
+                      todayTextStyle: const TextStyle(color: Colors.black),
+                    ),
 
-                  selectionMode: DateRangePickerSelectionMode.multiple,
-                  onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
-                    setState(() {
-                      selectedDates = args.value.cast<DateTime>();
-                      textEditingController.text = _getFormattedDates(selectedDates);
-                      print(selectedDates);
-                    });
-                  },
-                  headerStyle: const DateRangePickerHeaderStyle(
-                    textAlign: TextAlign.center,
-                    textStyle: TextStyle(color: Colors.white),
+                    selectionMode: DateRangePickerSelectionMode.multiple,
+                    onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
+                      setState(() {
+                        selectedDates = args.value.cast<DateTime>();
+                        textEditingController.text = _getFormattedDates(selectedDates);
+                        print(selectedDates);
+                      });
+                    },
+                    headerStyle: const DateRangePickerHeaderStyle(
+                      textAlign: TextAlign.center,
+                      textStyle: TextStyle(color: Colors.white),
+                    ),
+                    showActionButtons: true,
+                    // todayHighlightColor: Colors.purple, // Color of today's date
+                    selectionColor: Colors.green, // Color of selected dates
+                    rangeSelectionColor: Colors.white.withOpacity(0.3), // Color of the range selection
+                    onCancel: () {
+                      setState(() {
+                        selectedDates = []; // Clear the selected dates
+                        textEditingController.text = '';
+                        print(selectedDates);
+                      });
+                      Navigator.of(context).pop();
+                    },
+                    onSubmit: (dynamic value) {
+                      setState(() {
+                        // Handle selected dates here if needed
+                        textEditingController.text = _getFormattedDates(selectedDates);
+                        print(selectedDates);
+                      });
+                      Navigator.of(context).pop();
+                    },
                   ),
-                  showActionButtons: true,
-                  todayHighlightColor: Colors.purple, // Color of today's date
-                  selectionColor: Colors.green, // Color of selected dates
-                  rangeSelectionColor: Colors.white.withOpacity(0.3), // Color of the range selection
-                  onCancel: () {
-                    setState(() {
-                      selectedDates = []; // Clear the selected dates
-                      print(selectedDates);
-                    });
-                    Navigator.of(context).pop();
-                  },
-                  onSubmit: (dynamic value) {
-                    setState(() {
-                      // Handle selected dates here if needed
-                      textEditingController.text = _getFormattedDates(selectedDates);
-                      print(selectedDates);
-                    });
-                    Navigator.of(context).pop();
-                  },
                 ),
               ),
             ),
@@ -130,9 +144,11 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
 
   @override
   Widget build(BuildContext context) {
-    final double boxHeight = MediaQuery.of(context).size.height * 0.08;
+    final layout = AppLayout(context: context);
+    //final double boxHeight = MediaQuery.of(context).size.height * 0.08;
     final double boxWidth = MediaQuery.of(context).size.width * 0.7;
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xff1a1a1a),
       drawer: MyDrawer(context: context),
       body: Center(
@@ -140,9 +156,6 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(
-              height: 48,
-            ),
             const Padding(
               padding: EdgeInsets.all(16),
               child: Text(
@@ -157,7 +170,7 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Container(
                 width: boxWidth,
-                height: boxHeight,
+                height: layout.getHeight(55),
                 decoration: BoxDecoration(
                   color: const Color(0xff333333),
                   borderRadius: BorderRadius.circular(10.0),
@@ -202,20 +215,23 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Container(
+                color: const Color(0xff333333),
                 width: boxWidth,
-                height: boxHeight,
+                height: layout.getHeight(55),
                 padding: const EdgeInsets.all(0),
                 child: DropdownButtonFormField<String>(
-                  value: _selectedLeaveType,
                   onChanged: (String? newValue) {
                     setState(() {
                       _selectedLeaveType = newValue;
+                      print(_selectedLeaveType);
                     });
                   },
+                  style: const TextStyle(fontSize: 13),
+                  value: _selectedLeaveType,
                   decoration: InputDecoration(
                     labelText: _selectedLeaveType == null ? 'Select Leave Type' : null,
                     labelStyle: const TextStyle(color: Colors.white, fontSize: 13),
@@ -266,21 +282,24 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Container(
                 width: boxWidth,
-                height: boxHeight,
+                height: layout.getHeight(55),
                 color: const Color(0xff333333),
-                child: const TextField(
-                  style: TextStyle(
+                child: TextField(
+                  controller: remarkController,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 13,
                   ),
                   maxLines: 1,
                   keyboardType: TextInputType.multiline,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
+                    hintStyle: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xff808080),
+                    ),
                     border: OutlineInputBorder(),
                     hintText: 'Remark...',
-                    hintStyle: TextStyle(
-                      color: Colors.white,
-                    ),
                   ),
                 ),
               ),
@@ -315,13 +334,14 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
       print('Employee ID: ${widget.employeeId}');
       print('Selected Dates: $selectedDates');
       print('Selected Leave Type: $_selectedLeaveType');
+      print('remarks: ${remarkController.text}');
 
       submitLeaveRequest(
         userId: widget.userId,
         leaveDates: selectedDates,
         employeeId: widget.employeeId,
         leaveType: _selectedLeaveType!,
-        remark: textEditingController.text,
+        remark: remarkController.text,
       );
 
       //_showAlertDialog(context,'Success', 'Leave application submitted successfully.',200);
@@ -374,6 +394,13 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
     );
   }
 
+  List<Map<String, String>> getFormattedDates(List<DateTime> dates) {
+    return dates.map((date) {
+      return {'LeaveDate': date.toLocal().toString().split(' ')[0]};
+    }).toList();
+  }
+
+
   Future<void> submitLeaveRequest({
     required String userId,
     required List<DateTime> leaveDates,
@@ -381,7 +408,8 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
     required String leaveType,
     required String remark,
   }) async {
-    final String apiUrl = 'https://br-isgalleon.com/api/leave/leave_submit.php';
+    final String apiUrl = 'https://br-isgalleon.com/api/leave/insert_leave_submit.php';
+
 
     try {
       var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
@@ -392,10 +420,12 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
       request.fields['LeaveType'] = leaveType;
       request.fields['Remark'] = remark;
 
-      print("$userId + $employeeId + $leaveType + $remark");
+      // print("$userId + $employeeId + $leaveType + $remark");
 
       // Add leaveDates as a list of strings
-      request.fields['LeaveDates'] = leaveDates.map((date) => date.toLocal().toString().split(' ')[0]).join(',');
+      List<Map<String, String>> formattedDates = getFormattedDates(selectedDates);
+      request.fields['LeaveDates'] = jsonEncode(formattedDates);
+      print(request.fields.toString());
 
       // Make the request
       final http.Response response = await http.Response.fromStream(await request.send());
@@ -403,8 +433,15 @@ class _LeaveApplicationPageState extends State<LeaveApplicationPage> {
         // Successfully submitted
         Map<String, dynamic> responseData = jsonDecode(response.body);
         if (responseData['success'] == true){
-          print(response.body);
+          // print(response.body);
           _showAlertDialog(context,'Success' ,responseData['message'],200);
+          // Clear fields after successful submission
+          setState(() {
+            selectedDates = [];
+            _selectedLeaveType = null;
+            remarkController.clear();
+            textEditingController.clear();
+          });
         }
         else{
           _showAlertDialog(context,'Failure' ,responseData['message'],0);

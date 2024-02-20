@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:interspeed_attendance_app/dashboard_page.dart';
+import 'package:interspeed_attendance_app/leave_page.dart';
 import 'package:interspeed_attendance_app/login_page.dart';
+import 'package:interspeed_attendance_app/password_change_page.dart';
 import 'package:interspeed_attendance_app/profile_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -58,7 +60,7 @@ class MyDrawer extends StatelessWidget {
               style: TextStyle(color: Colors.white),
             ),
             onTap: () {
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                   builder: (context) => DashboardPage(),
@@ -98,21 +100,29 @@ class MyDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => LeaveApplicationPage(userId: user_id,
+                  builder: (context) => LeaveApplicationListPage(userId: user_id,
                     employeeId: employee_id,),
                 ),
               );
             },
           ),
-          const ListTile(
-            leading: Icon(
+          ListTile(
+            leading: const Icon(
               Icons.change_circle,
               color: Colors.white,
             ),
-            title: Text(
+            title: const Text(
               "Update Password",
               style: TextStyle(color: Colors.white),
             ),
+            onTap: (){
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PasswordChangeForm(userId: user_id,),
+                ),
+              );
+            },
           ),
           ListTile(
             leading: const Icon(

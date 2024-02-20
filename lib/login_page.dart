@@ -3,20 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:interspeed_attendance_app/dashboard_page.dart';
+import 'package:interspeed_attendance_app/utils/layout_size.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'controller/login_controller.dart';
 
-
-
 class LoginPage extends StatelessWidget {
   final LoginController loginController = Get.put(LoginController());
-  final _formKey = GlobalKey<FormState>();
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return Obx((){
+    final layout = AppLayout(context: context);
+    return Obx(() {
       return Scaffold(
         backgroundColor: const Color(0xff1a1a1a),
         resizeToAvoidBottomInset: true,
@@ -24,32 +23,34 @@ class LoginPage extends StatelessWidget {
           children: [
             Container(
               width: double.infinity,
-              height: 250,
-              decoration: const BoxDecoration(
+              height: layout.getHeight(250),
+              decoration: BoxDecoration(
                 color: const Color(0xff333333),
                 borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(120),
+                  bottomLeft: Radius.circular(layout.getHeight(120)),
                 ),
               ),
               child: Center(
                 child: Image.asset(
                   'assets/images/logo.jpg',
-                  width: 70,
-                  height: 70,
+                  width: layout.getwidth(70),
+                  height: layout.getHeight(70),
                 ),
               ),
             ),
             // Image.asset('assets/interspeed/logo_white.jpg'),
-            const SizedBox(
-              height: 8,
+            SizedBox(
+              height: layout.getHeight(8),
             ),
 
             Expanded(
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: SingleChildScrollView(
-                  child: Form(
-                    key: _formKey,
+                  child: AnimatedPadding(
+                    padding: MediaQuery.of(context).viewInsets,
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.decelerate,
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -61,7 +62,7 @@ class LoginPage extends StatelessWidget {
                                 vertical: 0, horizontal: 0),
                             width: MediaQuery.of(context).size.width *
                                 0.7, // Adjust the percentage as needed
-                            height: 45,
+                            height: layout.getHeight(50),
                             child: TextFormField(
                                 controller: usernameController,
                                 decoration: InputDecoration(
@@ -90,16 +91,7 @@ class LoginPage extends StatelessWidget {
                                         6.0), // Adjust the radius as needed
                                   ),
                                 ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    loginController.setValidatedUsername(false);
-                                    return " ";
-                                  }
-                                  if (!loginController.validatedUsername.value) {
-                                    loginController.setValidatedUsername(true);
-                                  }
-                                  return null;
-                                }),
+                            ),
 
                           ),
                           const SizedBox(
@@ -108,7 +100,7 @@ class LoginPage extends StatelessWidget {
                           Container(
                             width: MediaQuery.of(context).size.width *
                                 0.7, // Adjust the percentage as needed
-                            height: 50,
+                            height: layout.getHeight(50),
                             child: TextFormField(
                                 controller: passwordController,
                                 obscureText: true,
@@ -140,16 +132,7 @@ class LoginPage extends StatelessWidget {
                                     );
                                   }),
                                 ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    loginController.setValidatedPassword(false);
-                                    return '';
-                                  }
-                                  if (!loginController.validatedPassword.value) {
-                                    loginController.setValidatedPassword(true);
-                                  }
-                                  return null;
-                                }),
+                                ),
 
                           ),
                           SizedBox(
@@ -157,14 +140,12 @@ class LoginPage extends StatelessWidget {
                           Stack(children: [
                             GestureDetector(
                               onTap: () async {
-                                if (_formKey.currentState!.validate()) {
                                   _submitForm(context); // Assuming _submitForm is an asynchronous function
-                                }
                               },
                               child: Image.asset(
                                 'assets/images/Submit tickxxxhdpi.png',
-                                width: 70, // Adjust the width as needed
-                                height: 70, // Adjust the height as needed
+                                width: layout.getHeight(70), // Adjust the width as needed
+                                height: layout.getHeight(70), // Adjust the height as needed
                               ),
                             ),
                             if (loginController.isLoading.value)
@@ -191,12 +172,23 @@ class LoginPage extends StatelessWidget {
         ),
       );
     });
-
   }
 
   void _submitForm(BuildContext context) async {
     String username = usernameController.text.trim();
     String password = passwordController.text;
+
+    if (username.isEmpty) {
+      // Handle empty username
+      _showLoginFailedDialog(context, title: 'Error', message: 'Username cannot be empty');
+      return;
+    }
+
+    if (password.isEmpty) {
+      // Handle empty password
+      _showLoginFailedDialog(context, title: 'Error', message: 'Password cannot be empty');
+      return;
+    }
 
     try {
       FocusScope.of(context).unfocus();
@@ -237,7 +229,6 @@ class LoginPage extends StatelessWidget {
     }
   }
 
-
   Future<void> saveSessionData(Map<String, dynamic> sessionData) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -249,41 +240,45 @@ class LoginPage extends StatelessWidget {
       prefs.setString("user_type_id", sessionData["user_type_id"] ?? "");
       prefs.setString("user_type_name", sessionData["user_type_name"] ?? "");
       prefs.setString("sb_name", sessionData["sb_name"] ?? "");
-      prefs.setString("designation_name", sessionData["designation_name"] ?? "");
+      prefs.setString(
+          "designation_name", sessionData["designation_name"] ?? "");
       prefs.setString("access_level", sessionData["access_level"] ?? "");
       prefs.setString("picture_name", sessionData["picture_name"] ?? "");
       prefs.setString("employee_id", sessionData["employee_id"] ?? "");
       prefs.setString("designation_id", sessionData["designation_id"] ?? "");
-      prefs.setString("employee_position_id", sessionData["employee_position_id"] ?? "");
+      prefs.setString(
+          "employee_position_id", sessionData["employee_position_id"] ?? "");
     } catch (error) {
-      print('Error saving session data: $error');
+      // print('Error saving session data: $error');
     }
   }
 
-  void _showLoginFailedDialog(BuildContext context) {
+  void _showLoginFailedDialog(BuildContext context,
+      {String? title, String? message}) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF333333),// Body color
+          backgroundColor: const Color(0xFF333333),
+          // Body color
           title: Container(
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Login Failed ',
-                  style: TextStyle(color: Colors.white),
+                  title ?? 'Login Failed ',
+                  style: const TextStyle(color: Colors.white),
                 ),
-                Icon(
+                const Icon(
                   Icons.error,
                   color: Colors.white,
                 ),
               ],
             ),
           ),
-          content: const Text(
-            'Invalid username or password. Please try again.',
-            style: TextStyle(color: Colors.white),
+          content: Text(
+            message ?? 'Invalid username or password. Please try again.',
+            style: const TextStyle(color: Colors.white),
           ),
           actions: [
             TextButton(
@@ -293,9 +288,11 @@ class LoginPage extends StatelessWidget {
               child: const Text('OK', style: TextStyle(color: Colors.white)),
             ),
           ],
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+            borderRadius:
+                BorderRadius.circular(15.0), // Adjust the radius as needed
           ),
         );
       },
