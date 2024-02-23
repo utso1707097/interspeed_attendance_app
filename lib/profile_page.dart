@@ -62,10 +62,16 @@ class ProfilePage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Image.asset(
+                        resultList[0]['picture_name'] != ""
+                            ? Image.network(
+                          'https://br-isgalleon.com/image_ops/employee/${resultList[0]['picture_name'].toString()}',
+                          width: MediaQuery.of(context).size.width * 0.2,
+                          height: MediaQuery.of(context).size.height * 0.2,
+                        )
+                            : Image.asset(
                           'assets/images/logo.jpg',
-                          width: 60,
-                          height: MediaQuery.of(context).size.height * 0.1,
+                          width: MediaQuery.of(context).size.width * 0.2,
+                          height: MediaQuery.of(context).size.height * 0.2,
                         ),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -97,6 +103,52 @@ class ProfilePage extends StatelessWidget {
                             ),
                           ],
                         ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  Container(
+                    width: double.infinity, // Take the full width
+                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xff333333),
+                      borderRadius: BorderRadius.circular(15.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          spreadRadius: 2,
+                          blurRadius: 7,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Name: ${resultList[0]['name']}',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          'Designation: ${resultList[0]['designation_name']}',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          'Date of Birth: ${resultList[0]['date_of_birth']}',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          'Date of Join: ${resultList[0]['date_of_join']}',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          'Mobile: ${resultList[0]['mobile_01']}',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        // Add more details as needed
                       ],
                     ),
                   ),
