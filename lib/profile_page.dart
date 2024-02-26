@@ -11,6 +11,7 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<String> excludedKeys = ['id','picture_name' ,'sbu_id','department_id' ,'designation_id','is_active', 'created_by', 'updated_by', 'update_time'];
     return Scaffold(
       backgroundColor: Color(0xff1a1a1a),
       drawer: FutureBuilder(
@@ -43,117 +44,102 @@ class ProfilePage extends StatelessWidget {
             // Data loaded successfully
             //return ShimmerLoading(context: context);
             final resultList = snapshot.data!;
-            return Container(
-              color: const Color(0xff1a1a1a),
-              width: double.infinity,
-              child: Column(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: MediaQuery.of(context).size.height * 0.25,
-                    decoration: const BoxDecoration(
-                      color: Color(0xff333333),
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(12),
-                        bottomRight: Radius.circular(12),
+            return SingleChildScrollView(
+              child: Container(
+                color: const Color(0xff1a1a1a),
+                width: double.infinity,
+                child: Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      height: MediaQuery.of(context).size.height * 0.25,
+                      decoration: const BoxDecoration(
+                        color: Color(0xff333333),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(12),
+                          bottomRight: Radius.circular(12),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          resultList[0]['picture_name'] != ""
+                              ? Image.network(
+                            'https://br-isgalleon.com/image_ops/employee/${resultList[0]['picture_name'].toString()}',
+                            width: MediaQuery.of(context).size.width * 0.2,
+                            height: MediaQuery.of(context).size.height * 0.2,
+                          )
+                              : Image.asset(
+                            'assets/images/logo.jpg',
+                            width: MediaQuery.of(context).size.width * 0.2,
+                            height: MediaQuery.of(context).size.height * 0.2,
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                resultList[0]['name'],
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Text(
+                                resultList[0]['designation_name'],
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 13,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const Text(
+                                "Interspeed Marketing Solutions Ltd",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        resultList[0]['picture_name'] != ""
-                            ? Image.network(
-                          'https://br-isgalleon.com/image_ops/employee/${resultList[0]['picture_name'].toString()}',
-                          width: MediaQuery.of(context).size.width * 0.2,
-                          height: MediaQuery.of(context).size.height * 0.2,
-                        )
-                            : Image.asset(
-                          'assets/images/logo.jpg',
-                          width: MediaQuery.of(context).size.width * 0.2,
-                          height: MediaQuery.of(context).size.height * 0.2,
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              resultList[0]['name'],
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.white,
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    Column(
+                      children: resultList[0].keys.where((key) => !excludedKeys.contains(key)).map((key) {
+                        String value = resultList[0][key] ?? '';
+
+                        if (value.isNotEmpty) {
+                          return Card(
+                            color: const Color(0xFF333333),
+                            child: ListTile(
+                              title: Text(
+                                key,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Text(
+                                value,
+                                style: const TextStyle(color: Colors.white),
                               ),
                             ),
-                            Text(
-                              resultList[0]['designation_name'],
-                              style: const TextStyle(
-                                fontWeight: FontWeight.normal,
-                                fontSize: 13,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const Text(
-                              "Interspeed Marketing Solutions Ltd",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                          );
+                        } else {
+                          return Container();
+                        }
+                      }).toList(),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 16,
-                  ),
-                  Container(
-                    width: double.infinity, // Take the full width
-                    padding: const EdgeInsets.all(16),
-                    margin: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xff333333),
-                      borderRadius: BorderRadius.circular(15.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.5),
-                          spreadRadius: 2,
-                          blurRadius: 7,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Name: ${resultList[0]['name']}',
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        Text(
-                          'Designation: ${resultList[0]['designation_name']}',
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        Text(
-                          'Date of Birth: ${resultList[0]['date_of_birth']}',
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        Text(
-                          'Date of Join: ${resultList[0]['date_of_join']}',
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        Text(
-                          'Mobile: ${resultList[0]['mobile_01']}',
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        // Add more details as needed
-                      ],
-                    ),
-                  ),
-                  // Add more widgets as needed based on resultList
-                ],
+                    // Add more widgets as needed based on resultList
+                  ],
+                ),
               ),
             );
           }
