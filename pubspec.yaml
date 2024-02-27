@@ -45,6 +45,7 @@ dependencies:
   shimmer: ^3.0.0
   get: ^4.6.6
   syncfusion_flutter_datepicker: ^24.2.6
+  image_picker: ^1.0.7
 
 
 dev_dependencies:

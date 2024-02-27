@@ -72,7 +72,7 @@ class LeaveApplicationListPage extends StatelessWidget {
           return resultList;
         } else {
           // Handle API response indicating failure
-          _showDialog(context, "Error", "Failed to load leave applications.",0);
+          //_showDialog(context, "Error", "Failed to load leave applications.",0);
           return [];
         }
       } else {
@@ -134,8 +134,7 @@ class LeaveApplicationListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppLayout layout = AppLayout(context: context);
-    final LeaveListController controller = Get.find<LeaveListController>();
-
+    print("Called Leave page");
     return Scaffold(
       drawer: MyDrawer(context: context,),
       backgroundColor: const Color(0xff1a1a1a),
@@ -169,7 +168,7 @@ class LeaveApplicationListPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LeaveApplicationPage(userId: userId, employeeId: employeeId),
+                            builder: (context) => LeaveApplicationPage(),
                           ),
                         );
                       },
@@ -218,7 +217,7 @@ class LeaveApplicationListPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LeaveApplicationPage(userId: userId, employeeId: employeeId),
+                            builder: (context) => LeaveApplicationPage(),
                           ),
                         );
                       },

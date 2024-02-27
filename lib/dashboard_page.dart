@@ -129,6 +129,7 @@ class DashboardPage extends StatelessWidget {
         DateTime.now().toUtc().add(const Duration(hours: 6))); // Dhaka UTC+6
    // Add this line
     return Obx((){
+      print(dashboardController.sessionData);
       final String fullName = dashboardController.sessionData['full_name'] ?? '';
       final officeName = dashboardController.sessionData['office_name'] ?? ''; // Add this line
       final designationName = dashboardController.sessionData['designation_name'] ?? '';

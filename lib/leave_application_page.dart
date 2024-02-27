@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'controller/leave_application_controller.dart';
 import 'drawer.dart';
@@ -7,21 +8,17 @@ import 'utils/layout_size.dart';
 
 class LeaveApplicationPage extends StatelessWidget {
   final LeaveApplicationController controller =
-  Get.put(LeaveApplicationController());
-  final String userId;
-  final String employeeId;
+      Get.put(LeaveApplicationController());
 
-  LeaveApplicationPage({
-    required this.userId,
-    required this.employeeId,
-  });
 
   @override
   Widget build(BuildContext context) {
+    print("Called Application page");
     final layout = AppLayout(context: context);
     final double boxWidth = MediaQuery.of(context).size.width * 0.7;
 
     return Obx(() {
+      //print("Rebuilding");
       return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: const Color(0xff1a1a1a),
@@ -62,8 +59,7 @@ class LeaveApplicationPage extends StatelessWidget {
                         child: GestureDetector(
                           onTap: () => controller.selectDate(context),
                           child: TextField(
-                            controller:
-                            controller.textEditingController.value,
+                            controller: controller.textEditingController.value,
                             enabled: false,
                             maxLines: 1,
                             style: const TextStyle(
@@ -115,20 +111,22 @@ class LeaveApplicationPage extends StatelessWidget {
                           ? 'Select Leave Type'
                           : null,
                       labelStyle:
-                      const TextStyle(color: Colors.white, fontSize: 13),
+                          const TextStyle(color: Colors.white, fontSize: 13),
                       border: const OutlineInputBorder(),
                       enabledBorder: const OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.white),
                       ),
                     ),
                     dropdownColor: const Color(0xFF333333),
-                    icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+                    icon:
+                        const Icon(Icons.arrow_drop_down, color: Colors.white),
                     items: controller.leaveTypes.map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(
                           value,
-                          style: const TextStyle(color: Colors.white, fontSize: 13),
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 13),
                         ),
                       );
                     }).toList(),
@@ -159,43 +157,43 @@ class LeaveApplicationPage extends StatelessWidget {
                 ),
               ),
 
-              Obx(() {
-                if (controller.showRemark.value) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Container(
-                      width: boxWidth,
-                      height: layout.getHeight(55),
-                      color: const Color(0xff333333),
-                      child: TextField(
-                        controller: controller.remarkController.value,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                        ),
-                        maxLines: 1,
-                        keyboardType: TextInputType.multiline,
-                        decoration: const InputDecoration(
-                          hintStyle: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xff808080),
+              (controller.showRemark.value)
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Container(
+                        width: boxWidth,
+                        height: layout.getHeight(55),
+                        color: const Color(0xff333333),
+                        child: TextField(
+                          controller: controller.remarkController.value,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
                           ),
-                          border: OutlineInputBorder(),
-                          hintText: 'Remark...',
+                          maxLines: 1,
+                          keyboardType: TextInputType.multiline,
+                          decoration: const InputDecoration(
+                            hintStyle: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xff808080),
+                            ),
+                            border: OutlineInputBorder(),
+                            hintText: 'Remark...',
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                } else {
-                  return const SizedBox(); // Return an empty widget if showRemark is false
-                }
-              }),
+                    )
+                  : const SizedBox(),
+              // Return an empty widget if showRemark is false,
 
               const SizedBox(height: 16),
 
               GestureDetector(
-                onTap: () {
+                onTap: () async{
+                  final SharedPreferences prefs = await SharedPreferences.getInstance();
+                  final String userId = prefs.getString("user_id") ?? "";
+                  final String employeeId = prefs.getString("employee_id") ?? "";
                   controller.submitLeaveApplication(userId, employeeId);
                 },
                 child: Image.asset(
@@ -209,6 +207,5 @@ class LeaveApplicationPage extends StatelessWidget {
         ),
       );
     });
-
   }
 }

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:interspeed_attendance_app/update_profile_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 import 'drawer.dart';
@@ -13,7 +14,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     List<String> excludedKeys = ['id','picture_name' ,'sbu_id','department_id' ,'designation_id','is_active', 'created_by', 'updated_by', 'update_time'];
     return Scaffold(
-      backgroundColor: Color(0xff1a1a1a),
+      backgroundColor: const Color(0xff1a1a1a),
       drawer: FutureBuilder(
         future: getFullNameFromSharedPreferences(),
         builder: (context, AsyncSnapshot<String> snapshot) {
@@ -111,33 +112,77 @@ class ProfilePage extends StatelessWidget {
                     const SizedBox(
                       height: 16,
                     ),
-                    Column(
-                      children: resultList[0].keys.where((key) => !excludedKeys.contains(key)).map((key) {
-                        String value = resultList[0][key] ?? '';
+                Column(
+                  children: resultList[0].keys
+                      .where((key) => !excludedKeys.contains(key))
+                      .map((key) {
+                    String formattedKey = key
+                        .replaceAllMapped(RegExp(r'_'), (match) => ' ')
+                        .toLowerCase();
+                    formattedKey = formattedKey
+                        .split(' ')
+                        .map((word) => word.isNotEmpty
+                        ? word[0].toUpperCase() + word.substring(1)
+                        : '')
+                        .join(' ');
 
-                        if (value.isNotEmpty) {
-                          return Card(
-                            color: const Color(0xFF333333),
-                            child: ListTile(
-                              title: Text(
-                                key,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              subtitle: Text(
-                                value,
-                                style: const TextStyle(color: Colors.white),
-                              ),
+                    String value = resultList[0][key] ?? '';
+
+                    if (value.isNotEmpty) {
+                      return Card(
+                        color: const Color(0xFF333333),
+                        child: ListTile(
+                          title: Text(
+                            formattedKey,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
                             ),
-                          );
-                        } else {
-                          return Container();
-                        }
-                      }).toList(),
+                          ),
+                          subtitle: Text(
+                            value,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      );
+                    } else {
+                      return Container();
+                    }
+                  })
+                      .toList(),
+                ),
+                    const SizedBox(
+                      height: 8,
                     ),
-                    // Add more widgets as needed based on resultList
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => UpdateProfilePage(resultList: resultList), // Replace UpdatePage with the actual name of your update page
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.red,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8), // Adjust the radius as needed
+                        ),
+                      ),
+                      child: const Text(
+                        'Update',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(
+                      height: 8,
+                    ),
+
+                // Add more widgets as needed based on resultList
                   ],
                 ),
               ),
@@ -148,23 +193,61 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget ShimmerLoading({required BuildContext context}) {
-    return Shimmer.fromColors(
-      baseColor: const Color(0xFF333333),
-      highlightColor: const Color(0xFF1a1a1a),
-      child: Container(
-        width: double.infinity,
-        height: MediaQuery.of(context).size.height * 0.25,
-        decoration: const BoxDecoration(
-          color: Color(0xff333333),
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(12),
-            bottomRight: Radius.circular(12),
+  Widget ShimmerLoading({required BuildContext context, int itemCount = 4}) {
+    return Column(
+      children: [
+        Shimmer.fromColors(
+          baseColor: const Color(0xFF333333),
+          highlightColor: const Color(0xFF1a1a1a),
+          child: Container(
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height * 0.25,
+            decoration: const BoxDecoration(
+              color: Color(0xff333333),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(12),
+                bottomRight: Radius.circular(12),
+              ),
+            ),
           ),
         ),
-      ),
+        Shimmer.fromColors(
+          baseColor: const Color(0xFF333333),
+          highlightColor: const Color(0xFF1a1a1a),
+          child: ListView.builder(
+            itemCount: itemCount,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (BuildContext context, int index) {
+              return Container(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                child: ListTile(
+                  title: Container(
+                    height: 20,
+                    width: MediaQuery.of(context).size.width * 0.6,
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                  subtitle: Container(
+                    height: 16,
+                    width: MediaQuery.of(context).size.width * 0.4,
+                    margin: const EdgeInsets.only(top: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
+
 
   // Replace this with your actual function for fetching user data
   Future<List<Map<String, dynamic>>> fetchUserData(BuildContext context) async {

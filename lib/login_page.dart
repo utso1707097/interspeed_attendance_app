@@ -230,26 +230,30 @@ class LoginPage extends StatelessWidget {
   }
 
   Future<void> saveSessionData(Map<String, dynamic> sessionData) async {
+    //print(sessionData);
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setBool("seen", true);
       print("seen: true");
-      prefs.setString("user_id", sessionData["user_id"] ?? "");
-      prefs.setString("user_name", sessionData["user_name"] ?? "");
-      prefs.setString("full_name", sessionData["full_name"] ?? "");
-      prefs.setString("user_type_id", sessionData["user_type_id"] ?? "");
-      prefs.setString("user_type_name", sessionData["user_type_name"] ?? "");
-      prefs.setString("sb_name", sessionData["sb_name"] ?? "");
+      prefs.setString("user_id", sessionData["user_id"].toString() ?? "");
+      prefs.setString("user_name", sessionData["user_name"].toString() ?? "");
+      prefs.setString("full_name", sessionData["full_name"].toString() ?? "");
+      prefs.setString("user_type_id", sessionData["user_type_id"].toString() ?? "");
+      prefs.setString("user_type_name", sessionData["user_type_name"].toString() ?? "");
+      prefs.setString("sb_name", sessionData["sb_name"].toString() ?? "");
       prefs.setString(
-          "designation_name", sessionData["designation_name"] ?? "");
-      prefs.setString("access_level", sessionData["access_level"] ?? "");
-      prefs.setString("picture_name", sessionData["picture_name"] ?? "");
-      prefs.setString("employee_id", sessionData["employee_id"] ?? "");
-      prefs.setString("designation_id", sessionData["designation_id"] ?? "");
+          "designation_name", sessionData["designation_name"].toString() ?? "");
+      prefs.setString("access_level", sessionData["access_level"].toString() ?? "");
+      prefs.setString("picture_name", sessionData["picture_name"].toString() ?? "");
+      prefs.setString("employee_id", sessionData["employee_id"].toString() ?? "");
+      prefs.setString("designation_id", sessionData["designation_id"].toString() ?? "");
       prefs.setString(
-          "employee_position_id", sessionData["employee_position_id"] ?? "");
+          "employee_position_id", sessionData["employee_position_id"].toString() ?? "");
+      print(prefs.getString("user_name"));
+      print("He HE he");
     } catch (error) {
-      // print('Error saving session data: $error');
+
+      print('Error saving session data: $error');
     }
   }
 
