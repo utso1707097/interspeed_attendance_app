@@ -12,12 +12,27 @@ class DashboardController extends GetxController {
   RxDouble latitude = RxDouble(-1.0);
   RxDouble longitude = RxDouble(-1.0);
   RxInt accuracy = 100.obs;
+  RxBool showRemark = false.obs;
+  Rx<TextEditingController> remarkController = TextEditingController().obs;
   RxMap<String, dynamic> sessionData = RxMap<String, dynamic>();
 
   @override
   void onInit() {
     super.onInit();
     fetchSessionData();
+  }
+
+  void clearData() {
+    isLoading.value = false;
+    signInBase64Image.value = '';
+    signOutBase64Image.value = '';
+    isSignInButtonClicked.value = false;
+    isSignOutButtonClicked.value = false;
+    latitude.value = -1.0;
+    longitude.value = -1.0;
+    accuracy.value = 100;
+    showRemark.value = false;
+    remarkController.value.clear();
   }
 
   Future<void> fetchSessionData() async {
@@ -44,6 +59,14 @@ class DashboardController extends GetxController {
   // Method to set loading state
   void setLoading(bool value) {
     isLoading.value = value;
+  }
+
+  void toggleShowRemark(bool value) {
+    showRemark.value = value;
+  }
+
+  void clearRemark() {
+    remarkController.value.clear();
   }
 
   // Method to set sign-in base64 image

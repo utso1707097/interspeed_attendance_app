@@ -2,7 +2,8 @@ import 'package:get/get.dart';
 
 class EmployeeUpdateController extends GetxController {
   // Employee details
-  RxInt employeeId = RxInt(0);
+  // RxInt employeeId = RxInt(0);
+  RxMap<RxString, bool> fieldModificationStatus = RxMap<RxString, bool>();
   RxString employeeName = RxString("");
   RxString dateOfBirth = RxString("");
   RxString dateOfJoin = RxString("");
@@ -28,7 +29,7 @@ class EmployeeUpdateController extends GetxController {
   RxString imagePath = RxString(""); // Path to the selected image
 
   // Methods to set values
-  void setEmployeeId(int id) => employeeId.value = id;
+  // void setEmployeeId(int id) => employeeId.value = id;
   void setEmployeeName(String name) => employeeName.value = name;
   void setDateOfBirth(String dob) => dateOfBirth.value = dob;
   void setDateOfJoin(String doj) => dateOfJoin.value = doj;
@@ -45,7 +46,17 @@ class EmployeeUpdateController extends GetxController {
   void setReligion(String religionValue) => religion.value = religionValue;
   void setRemark(String employeeRemark) => remark.value = employeeRemark;
   void setPictureName(String name) => pictureName.value = name;
-  void setIsActive(bool active) => isActive.value = active;
+
+  bool isFieldModified(RxString field) {
+    return fieldModificationStatus[field] ?? false;
+  }
+
+  void clearFieldModificationStatus(RxString field) {
+    fieldModificationStatus[field] = false;
+  }
+
+
+  // void setIsActive(bool active) => isActive.value = active;
 
   void setDesignationName(String name) => designationName.value = name;
 
@@ -55,7 +66,7 @@ class EmployeeUpdateController extends GetxController {
   // Method to clear all values
   void clearValues() {
     // Clear all values
-    employeeId.value = 0;
+    // employeeId.value = 0;
     employeeName.value = "";
     dateOfBirth.value = "";
     dateOfJoin.value = "";

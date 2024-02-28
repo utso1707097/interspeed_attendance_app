@@ -72,7 +72,7 @@ class ProfilePage extends StatelessWidget {
                             height: MediaQuery.of(context).size.height * 0.2,
                           )
                               : Image.asset(
-                            'assets/images/logo.jpg',
+                            'assets/images/person.png',
                             width: MediaQuery.of(context).size.width * 0.2,
                             height: MediaQuery.of(context).size.height * 0.2,
                           ),
@@ -257,7 +257,7 @@ class ProfilePage extends StatelessWidget {
       final Uri uri = Uri.parse(profileDataUrl);
       final map = <String, dynamic>{};
       SharedPreferences prefs = await SharedPreferences.getInstance();
-
+      String sbName = prefs.getString('sb_name') ?? '';
       map['EmployeeId'] = prefs.getString('employee_id') ?? '0';
       map['UserId'] = prefs.getString('user_id') ?? '0';
 
@@ -280,7 +280,10 @@ class ProfilePage extends StatelessWidget {
           (userData['resultList'] as List<dynamic>)
               .map((item) => Map<String, dynamic>.from(item))
               .toList();
-
+          if (resultList.isNotEmpty) {
+            resultList[0]['strategic_business_unit'] = sbName;
+          }
+          print("this is : $resultList");
           return resultList;
         } else {
           // If the server indicates failure, return an empty list or handle it accordingly

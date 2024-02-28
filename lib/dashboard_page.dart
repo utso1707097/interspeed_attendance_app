@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:interspeed_attendance_app/camera_page.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:interspeed_attendance_app/drawer.dart';
+import 'package:interspeed_attendance_app/utils/layout_size.dart';
 import 'package:intl/intl.dart';
 
 import 'controller/dashboard_controller.dart';
@@ -77,7 +78,11 @@ class DashboardPage extends StatelessWidget {
     request.fields['LatValue'] = dashboardController.latitude.value.toString();
     request.fields['Accuracy'] = dashboardController.accuracy.value.toString();
     request.fields['LonValue'] = dashboardController.longitude.value.toString();
-    request.fields['InRemark'] = "";
+    if (dashboardController.isSignInButtonClicked.value) {
+      request.fields['InRemark'] = dashboardController.remarkController.value.text;
+    } else if (dashboardController.isSignOutButtonClicked.value) {
+      request.fields['OutRemark'] = dashboardController.remarkController.value.text;
+    }
     request.fields['ImageData'] =
     dashboardController.isSignInButtonClicked.value ? dashboardController.signInBase64Image.value : dashboardController.signOutBase64Image.value;
 
@@ -92,7 +97,7 @@ class DashboardPage extends StatelessWidget {
         if (responseData['success'] && dashboardController.isSignInButtonClicked.value)
           dashboardController.showAttendanceDialog(
               Get.context!, "Success", "You have successfully entered!", 200);
-        if (responseData['success'] && dashboardController.isSignOutButtonClicked.value)
+        else if (responseData['success'] && dashboardController.isSignOutButtonClicked.value)
           dashboardController.showAttendanceDialog(
               Get.context!, "Success", "Bye bye, see you next time!", 200);
         else
@@ -101,6 +106,8 @@ class DashboardPage extends StatelessWidget {
 
         dashboardController.setSignInButtonClicked(false);
         dashboardController.setSignOutButtonClicked(false);
+        dashboardController.clearData();
+
 
         // Process the response data
         print(responseData);
@@ -125,6 +132,7 @@ class DashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final layout = AppLayout(context: context);
     var currentTime = DateFormat('h:mm a', 'en_US').format(
         DateTime.now().toUtc().add(const Duration(hours: 6))); // Dhaka UTC+6
    // Add this line
@@ -137,362 +145,487 @@ class DashboardPage extends StatelessWidget {
       print(userImage);
       return Scaffold(
         drawer: MyDrawer(context: context),
-        body: Container(
-          color: const Color(0xff1a1a1a),
-          child: Column(
-            children: [
-              // Image.asset('assets/images/ic_attendance_inactive_btn.png'),
-              Container(
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.25, // Adjust the factor as needed
-                decoration: const BoxDecoration(
-                  color: Color(0xff333333),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(12),
-                    bottomRight: Radius.circular(12),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Flex 1 - userImage section
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        height: MediaQuery.of(context).size.height * 0.1, // Set a specific height
-                        child: userImage != ""
-                            ? Image.network(
-                          'https://br-isgalleon.com/image_ops/employee/${userImage.toString()}',
-                          width: MediaQuery.of(context).size.width * 0.1,
-                          height: MediaQuery.of(context).size.height * 0.1,
-                        )
-                            : Image.asset(
-                          'assets/images/logo.jpg',
-                          width: MediaQuery.of(context).size.width * 0.2,
-                          height: MediaQuery.of(context).size.height * 0.1,
+        body: SingleChildScrollView(
+          child: Container(
+            height: MediaQuery.of(context).size.height,  // Set a specific height if needed
+            color: const Color(0xff1a1a1a),
+            child: Column(
+              children: [
+                Container(
+                  color: const Color(0xff1a1a1a),
+                  child: Column(
+                    children: [
+                      // Image.asset('assets/images/ic_attendance_inactive_btn.png'),
+                      Container(
+                        width: double.infinity,
+                        height: MediaQuery.of(context).size.height * 0.25, // Adjust the factor as needed
+                        decoration: const BoxDecoration(
+                          color: Color(0xff333333),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(12),
+                            bottomRight: Radius.circular(12),
+                          ),
                         ),
-                      ),
-                    ),
-                    // Flex 2 - Column section
-                    Expanded(
-                      flex: 2,
-                      child: Container(
-                        height: MediaQuery.of(context).size.height * 0.1, // Set a specific height
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(
-                              fullName,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.white,
+                            // Flex 1 - userImage section
+                            Expanded(
+                              flex: 1,
+                              child: Container(
+                                height: MediaQuery.of(context).size.height * 0.1, // Set a specific height
+                                child: userImage != ""
+                                    ? Image.network(
+                                  'https://br-isgalleon.com/image_ops/employee/${userImage.toString()}',
+                                  width: MediaQuery.of(context).size.width * 0.1,
+                                  height: MediaQuery.of(context).size.height * 0.1,
+                                )
+                                    : Image.asset(
+                                  'assets/images/logo.jpg',
+                                  width: MediaQuery.of(context).size.width * 0.2,
+                                  height: MediaQuery.of(context).size.height * 0.1,
+                                ),
                               ),
                             ),
-                            Text(
-                              designationName,
-                              style:const  TextStyle(
-                                fontWeight: FontWeight.normal,
-                                fontSize: 13,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const Text(
-                              "Interspeed Marketing Solutions Ltd",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                                color: Colors.white,
+                            // Flex 2 - Column section
+                            Expanded(
+                              flex: 2,
+                              child: Container(
+                                height: MediaQuery.of(context).size.height * 0.1, // Set a specific height
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      fullName,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      designationName,
+                                      style:const  TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 13,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const Text(
+                                      "Interspeed Marketing Solutions Ltd",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
 
-
-              SizedBox(
-                // color: Colors.white,
-                height: 200,
-                width: double.infinity,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.32,
-                      height: MediaQuery.of(context).size.width * 0.40,
-                      decoration: BoxDecoration(
-                        color: const Color(0xff3a473e),
-                        borderRadius: BorderRadius.circular(16.0),
-                      ),
-                      child: Column(
+                      Column(
                         children: [
-                          Container(
-                            decoration: const BoxDecoration(
-                              color: Color(0xff00a0b0),
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(16.0),
-                                topRight: Radius.circular(16.0),
-                              ),
-                            ),
+                          SizedBox(
+                            // color: Colors.white,
+                            height: layout.getHeight(200),
                             width: double.infinity,
-                            height: 25,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Container(
+                                  width: MediaQuery.of(context).size.width * 0.32,
+                                  height: MediaQuery.of(context).size.width * 0.40,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xff3a473e),
+                                    borderRadius: BorderRadius.circular(16.0),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xff00a0b0),
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(16.0),
+                                            topRight: Radius.circular(16.0),
+                                          ),
+                                        ),
+                                        width: double.infinity,
+                                        height: 25,
+                                      ),
+                                      const SizedBox(
+                                        height: 12,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          getCurrentLocation();
+                                          dashboardController.setSignInButtonClicked(true);
+                                          dashboardController.setSignOutButtonClicked(false);
+                                          // Add your custom logic here
+                                        },
+                                        child: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Image.asset('assets/images/entry_button.png',
+                                                height: 70, width: 70),
+                                            const Text(
+                                              'Entry',
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Container(
+                                        width: double.infinity,
+                                        alignment: Alignment.bottomCenter,
+                                        child: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Image.asset('assets/images/entry_time_box.png',
+                                                height: 13),
+                                            Text(
+                                              currentTime,
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  width: MediaQuery.of(context).size.width * 0.32,
+                                  height: MediaQuery.of(context).size.width * 0.40,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xff3a473e),
+                                    borderRadius: BorderRadius.circular(16.0),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xfffec34f),
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(16.0),
+                                            topRight: Radius.circular(16.0),
+                                          ),
+                                        ),
+                                        width: double.infinity,
+                                        height: 25,
+                                      ),
+                                      const SizedBox(
+                                        height: 12,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          getCurrentLocation();
+                                          dashboardController.setSignOutButtonClicked(true);
+                                          dashboardController.setSignInButtonClicked(false);
+                                          // Add your custom logic here
+                                        },
+                                        child: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Image.asset('assets/images/exit_button.png',
+                                                height: 70, width: 70),
+                                            const Text(
+                                              'Exit',
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Container(
+                                        width: double.infinity,
+                                        alignment: Alignment.bottomCenter,
+                                        child: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Image.asset('assets/images/exit_time_box.png',
+                                                height: 13),
+                                            Text(
+                                              currentTime,
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
-                          const SizedBox(
-                            height: 12,
-                          ),
+
+                          dashboardController.isSignInButtonClicked.value
+                              ? Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 26),
+                            child: Container(
+                              padding: const EdgeInsets.all(10.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Container(
+                                        width: MediaQuery.of(context).size.width * 0.35,
+                                        height: MediaQuery.of(context).size.width * 0.40,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            navigateToCameraPage();
+                                          },
+                                          child: _buildCard(
+                                            color: 0xff74c2c6,
+                                            image: 'assets/images/ic_camera.png',
+                                            title: 'Camera',
+                                            description: dashboardController.signInBase64Image.value != ""
+                                                ? 'Image Captured'
+                                                : 'Capture Image',
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: MediaQuery.of(context).size.width *0.1,
+                                      ),
+                                      Container(
+                                        width: MediaQuery.of(context).size.width * 0.35,
+                                        height: MediaQuery.of(context).size.width * 0.40,
+                                        child: _buildCard(
+                                          color: 0xff74c2c6,
+                                          image: 'assets/images/ic_gps.png',
+                                          title: 'GPS',
+                                          description: dashboardController.accuracy.value == 100
+                                              ? 'Loading!'
+                                              : 'Accuracy: ${dashboardController.accuracy.value.toString()}',
+
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Checkbox(
+                                          value: dashboardController.showRemark.value,
+                                          onChanged: (value) {
+                                            dashboardController.toggleShowRemark(value ?? false);
+                                          },
+                                        ),
+                                        const Text(
+                                          "Write remarks",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+
+                                  (dashboardController.showRemark.value)
+                                      ? Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width * 0.9,
+                                      height: MediaQuery.of(context).size.height * 0.07,
+                                      color: const Color(0xff333333),
+                                      child: TextField(
+                                        controller: dashboardController.remarkController.value,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 13,
+                                        ),
+                                        maxLines: 1,
+                                        keyboardType: TextInputType.multiline,
+                                        decoration: const InputDecoration(
+                                          hintStyle: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(0xff808080),
+                                          ),
+                                          border: OutlineInputBorder(),
+                                          hintText: 'Remark...',
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                      : const SizedBox(),
+                                  // Return an empty widget if showRemark is false,
+
+                                  const SizedBox(height: 16),
+                                ],
+                              ),
+
+
+                            ),
+                          )
+                              : const SizedBox.shrink(),
+
+                          dashboardController.isSignOutButtonClicked.value
+                              ? Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 26),
+                            child: Container(
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Container(
+                                          width: MediaQuery.of(context).size.width * 0.35,
+                                          height: MediaQuery.of(context).size.width * 0.40,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              navigateToCameraPage();
+                                            },
+                                            child: _buildCard(
+                                              image: 'assets/images/ic_camera.png',
+                                              title: 'Camera',
+                                              description: dashboardController.signOutBase64Image.value != ""
+                                                  ? 'Image Captured'
+                                                  : 'Capture Image',
+                                              color: 0xfffed593,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: MediaQuery.of(context).size.width *0.1,
+                                        ),
+                                        Container(
+                                          width: MediaQuery.of(context).size.width * 0.35,
+                                          height: MediaQuery.of(context).size.width * 0.40,
+                                          child: _buildCard(
+                                            image: 'assets/images/ic_gps.png',
+                                            title: 'GPS',
+                                            description: dashboardController.accuracy.value == 100
+                                                ? 'Loading!'
+                                                : 'Accuracy: ${dashboardController.accuracy.value.toString()}',
+
+                                            color: 0xfffed593,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Checkbox(
+                                            value: dashboardController.showRemark.value,
+                                            onChanged: (value) {
+                                              dashboardController.toggleShowRemark(value ?? false);
+                                            },
+                                          ),
+                                          const Text(
+                                            "Write remarks",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+
+                                    (dashboardController.showRemark.value)
+                                        ? Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                      child: Container(
+                                        width: MediaQuery.of(context).size.width * 0.8,
+                                        height: MediaQuery.of(context).size.height * 0.07,
+                                        color: const Color(0xff333333),
+                                        child: TextField(
+                                          controller: dashboardController.remarkController.value,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 13,
+                                          ),
+                                          maxLines: 1,
+                                          keyboardType: TextInputType.multiline,
+                                          decoration: const InputDecoration(
+                                            hintStyle: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xff808080),
+                                            ),
+                                            border: OutlineInputBorder(),
+                                            hintText: 'Remark...',
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                        : const SizedBox(),
+                                    // Return an empty widget if showRemark is false,
+
+                                    const SizedBox(height: 16),
+                                  ],
+                                )),
+                          )
+                              : const SizedBox.shrink(),
                           GestureDetector(
                             onTap: () {
-                              getCurrentLocation();
-                              dashboardController.setSignInButtonClicked(true);
-                              dashboardController.setSignOutButtonClicked(false);
-                              // Add your custom logic here
+                              // Handle button click here
+                              dashboardController.setLoading(true);
+                              sendAttendanceData(context);
+                              print('Button Clicked');
+                              // Add your custom logic or navigation here
                             },
                             child: Stack(
                               alignment: Alignment.center,
                               children: [
-                                Image.asset('assets/images/entry_button.png',
-                                    height: 70, width: 70),
-                                const Text(
-                                  'Entry',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                Image.asset(
+                                  'assets/images/Submit tickxxxhdpi.png',
+                                  width: 70,
+                                  height: 70,
+                                  fit: BoxFit.cover,
                                 ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Container(
-                            width: double.infinity,
-                            alignment: Alignment.bottomCenter,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Image.asset('assets/images/entry_time_box.png',
-                                    height: 13),
-                                Text(
-                                  currentTime,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.normal,
+                                if (dashboardController.isLoading.value)
+                                  const CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
                                   ),
-                                ),
                               ],
                             ),
                           )
                         ],
                       ),
-                    ),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.32,
-                      height: MediaQuery.of(context).size.width * 0.40,
-                      decoration: BoxDecoration(
-                        color: const Color(0xff3a473e),
-                        borderRadius: BorderRadius.circular(16.0),
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            decoration: const BoxDecoration(
-                              color: Color(0xfffec34f),
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(16.0),
-                                topRight: Radius.circular(16.0),
-                              ),
-                            ),
-                            width: double.infinity,
-                            height: 25,
-                          ),
-                          const SizedBox(
-                            height: 12,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              getCurrentLocation();
-                              dashboardController.setSignOutButtonClicked(true);
-                              dashboardController.setSignInButtonClicked(false);
-                              // Add your custom logic here
-                            },
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Image.asset('assets/images/exit_button.png',
-                                    height: 70, width: 70),
-                                const Text(
-                                  'Exit',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Container(
-                            width: double.infinity,
-                            alignment: Alignment.bottomCenter,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Image.asset('assets/images/exit_time_box.png',
-                                    height: 13),
-                                Text(
-                                  currentTime,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
 
-              dashboardController.isSignInButtonClicked.value
-                  ? Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 26),
-                child: Container(
-                  padding: const EdgeInsets.all(10.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.35,
-                          height: MediaQuery.of(context).size.width * 0.40,
-                        child: GestureDetector(
-                          onTap: () {
-                            navigateToCameraPage();
-                          },
-                          child: _buildCard(
-                            color: 0xff74c2c6,
-                            image: 'assets/images/ic_camera.png',
-                            title: 'Camera',
-                            description: dashboardController.signInBase64Image.value != ""
-                                ? 'Image Captured'
-                                : 'Capture Image',
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width *0.1,
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.35,
-                        height: MediaQuery.of(context).size.width * 0.40,
-                        child: _buildCard(
-                          color: 0xff74c2c6,
-                          image: 'assets/images/ic_gps.png',
-                          title: 'GPS',
-                          description: dashboardController.accuracy.value == 100
-                              ? 'Loading!'
-                              : 'Accuracy: ${dashboardController.accuracy.value.toString()}',
 
-                        ),
-                      ),
                     ],
                   ),
                 ),
-              )
-                  : const SizedBox.shrink(),
-
-              dashboardController.isSignOutButtonClicked.value
-                  ? Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 26),
-                child: Container(
-                    padding: const EdgeInsets.all(10.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.35,
-                              height: MediaQuery.of(context).size.width * 0.40,
-                              child: GestureDetector(
-                                onTap: () {
-                                  navigateToCameraPage();
-                                },
-                                child: _buildCard(
-                                  image: 'assets/images/ic_camera.png',
-                                  title: 'Camera',
-                                  description: dashboardController.signOutBase64Image.value != ""
-                                      ? 'Image Captured'
-                                      : 'Capture Image',
-                                  color: 0xfffed593,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width *0.1,
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.35,
-                              height: MediaQuery.of(context).size.width * 0.40,
-                              child: _buildCard(
-                                image: 'assets/images/ic_gps.png',
-                                title: 'GPS',
-                                description: dashboardController.accuracy.value == 100
-                                    ? 'Loading!'
-                                    : 'Accuracy: ${dashboardController.accuracy.value.toString()}',
-
-                                color: 0xfffed593,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    )),
-              )
-                  : const SizedBox.shrink(),
-              GestureDetector(
-                onTap: () {
-                  // Handle button click here
-                  dashboardController.setLoading(true);
-                  sendAttendanceData(context);
-                  print('Button Clicked');
-                  // Add your custom logic or navigation here
-                },
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/images/Submit tickxxxhdpi.png',
-                      width: 70,
-                      height: 70,
-                      fit: BoxFit.cover,
-                    ),
-                    if (dashboardController.isLoading.value)
-                      const CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-                      ),
-                  ],
-                ),
-              )
-            ],
+              ],
+            ),
           ),
         ),
       );
