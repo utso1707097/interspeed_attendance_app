@@ -9,7 +9,6 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'dart:typed_data';
 import 'dart:convert';
-import 'dart:io';
 import 'package:image/image.dart' as img;
 
 class UpdateProfilePage extends StatelessWidget {
@@ -559,7 +558,7 @@ class UpdateProfilePage extends StatelessWidget {
     return base64Image;
   }
 
-  Future<void> updateProfile(BuildContext context) async {
+  void updateProfile(BuildContext context) async {
     final url =
     Uri.parse('https://br-isgalleon.com/api/employee/insert_employee.php');
     final photoUploadUrl = Uri.parse(
@@ -572,6 +571,10 @@ class UpdateProfilePage extends StatelessWidget {
     // Check if userId is null, handle accordingly
     if (userId == null) {
       print('Error: user_id is null');
+      return;
+    }
+    if(employeeId == null){
+      print('Error: employee_id is null');
       return;
     }
 
@@ -626,33 +629,19 @@ class UpdateProfilePage extends StatelessWidget {
           : (resultList[0]['remark'] ?? ''),
     };
 
-    print(formData);
-    formData.forEach((key, value) {
-      print('$key: ${value.runtimeType}');
-    });
+    // print(formData);
+    // formData.forEach((key, value) {
+    //   print('$key: ${value.runtimeType}');
+    // });
     // print('${controller.imagePath.value}');
     String base64Image = '';
-    if (controller.imagePath.value != '') {
-      base64Image =
-      await convertImageToBase64(controller.imagePath.value);
-    }
-    final photoFormData = {
-      'UserId': userId.toString(),
-      'TargetEmployeeId': employeeId.toString(),
-      'ImageData': base64Image,
-    };
+    // if (controller.imagePath.value != '') {
+    //   base64Image =
+    //   await convertImageToBase64(controller.imagePath.value);
+    // }
     final request = http.MultipartRequest('POST', url);
 
     try {
-      // Upload photo
-      if (controller.imagePath.value != '') {
-        request.files.add(await http.MultipartFile.fromPath(
-          'ImageData',
-          controller.imagePath.value,
-          filename: 'profile_image.jpg',
-        ));
-      }
-
       // Add other form fields
       formData.forEach((key, value) {
         request.fields[key] = value.toString();
@@ -660,16 +649,23 @@ class UpdateProfilePage extends StatelessWidget {
 
       // Send the multipart request
       final response = await http.Response.fromStream(await request.send());
+      // Add this print statement to check the response body
+      print('Response body: ${response.body}');
+      print('Response code: ${response.statusCode}');
 
       if (response.statusCode == 200) {
-        // Request was successful
-        Map<String, dynamic> responseData = jsonDecode(response.body);
-        // Process the response data
-        if (responseData['success']) {
-          // Handle success
-          print('Update successful');
+        // Directly handle the response body
+        print('Response body: ${response.body}');
 
-          // Show success dialog or handle success scenario as needed
+        // Process the response data as needed
+        // For example, you may directly use the response body without decoding
+        String responseBody = response.body;
+        if (responseBody.contains('"success":true')) {
+          // Handle success
+          if(controller.imagePath.value != ''){
+            updateImage(context, userId, employeeId, photoUploadUrl);
+          }
+          print('Update successful');
           _showAttendacneDialog(
             context,
             "Success",
@@ -678,17 +674,15 @@ class UpdateProfilePage extends StatelessWidget {
           );
         } else {
           // Handle failure
-          print('Update failed: ${responseData['error_message']}');
-
-          // Show failure dialog or handle failure scenario as needed
+          print('Update failed: $responseBody');
           _showAttendacneDialog(
             context,
             "Failed",
-            responseData['error_message'] ?? "Profile update failed!",
+            "Profile update failed!",
             0,
           );
         }
-      } else {
+      }else {
         // Request failed
         print('Request failed with status: ${response.statusCode}');
         // print('${response.body}');
@@ -706,7 +700,32 @@ class UpdateProfilePage extends StatelessWidget {
 
       // Show failure dialog or handle error scenario as needed
       _showAttendacneDialog(
-          context, "Failed", "Check your internet connection", 0);
+          context, "Failed", "Check your internet connection from outside", 0);
+    }
+  }
+
+  void updateImage(BuildContext context, String userId,String employeeId,Uri photoUploadUrl) async{
+    print(userId);
+    print(employeeId);
+    final imageRequest = http.MultipartRequest('POST', photoUploadUrl);
+    imageRequest.fields['UserId'] = userId.toString();
+    imageRequest.fields['TargetEmployeeId'] = employeeId.toString();
+
+    // Add image data to the request
+    if (controller.imagePath.value.isNotEmpty) {
+      String base64Image = await convertImageToBase64(controller.imagePath.value);
+      imageRequest.fields['ImageData'] = base64Image;
+
+      final imageResponse = await http.Response.fromStream(await imageRequest.send());
+
+      // Handle the image update response
+      print('Image Update Response code: ${imageResponse.statusCode}');
+      print('Image Update Response body: ${imageResponse.body}');
+      if (imageResponse.statusCode == 200) {
+        print('Profile image updated successfully!');
+      } else {
+        print('Failed to update profile image: ${imageResponse.body}');
+      }
     }
   }
 
