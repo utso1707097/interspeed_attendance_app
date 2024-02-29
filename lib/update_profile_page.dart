@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:interspeed_attendance_app/profile_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'camera_page_with_galary.dart';
@@ -119,6 +120,14 @@ class UpdateProfilePage extends StatelessWidget {
                     controller.fieldModificationStatus,
                     TextInputType.number),
                 buildTextField(
+                    "Personal Mobile",
+                    controller.personalMobile,
+                    resultList.isNotEmpty
+                        ? resultList[0]['mobile_personal']
+                        : null,
+                    controller.fieldModificationStatus,
+                    TextInputType.number),
+                buildTextField(
                   "Present Address",
                   controller.presentAddress,
                   resultList.isNotEmpty
@@ -147,6 +156,13 @@ class UpdateProfilePage extends StatelessWidget {
                   "Mother Name",
                   controller.motherName,
                   resultList.isNotEmpty ? resultList[0]['mother_name'] : null,
+                  controller.fieldModificationStatus,
+                  TextInputType.text,
+                ),
+                buildTextField(
+                  "Spouse Name",
+                  controller.spouseName,
+                  resultList.isNotEmpty ? resultList[0]['spouse_name'] : null,
                   controller.fieldModificationStatus,
                   TextInputType.text,
                 ),
@@ -217,25 +233,53 @@ class UpdateProfilePage extends StatelessWidget {
                 ),
 
                 // Save Button
-                Container(
-                  alignment: Alignment.center,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      updateProfile(context);
-                      // Implement logic to save the updated profile
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      alignment: Alignment.center,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          updateProfile(context);
+                          // Implement logic to save the updated profile
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.green,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text(
+                          "Update",
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ),
-                    child: const Text(
-                      "Update",
-                      style: TextStyle(color: Colors.white),
+
+                    Container(
+                      alignment: Alignment.center,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => ProfilePage()),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.red,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text(
+                          "Cancel",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
+
               ],
             ),
           ),
@@ -385,9 +429,6 @@ class UpdateProfilePage extends StatelessWidget {
     }
 
     // Set the initial value after the widget has been built
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
-      textController.text = initialValue ?? '';
-    });
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -404,7 +445,7 @@ class UpdateProfilePage extends StatelessWidget {
         InkWell(
           onTap: () {
             if (title == 'Date of Birth') {
-              selectDate(context, value, textController);
+              selectDate(context, value, textController,rxString);
             }
           },
           child: AbsorbPointer(
@@ -433,7 +474,7 @@ class UpdateProfilePage extends StatelessWidget {
   }
 
   Future<void> selectDate(BuildContext context, RxString value,
-      TextEditingController textController) async {
+      TextEditingController textController,RxString rxString) async {
     final DateTime? pickedDate = await showDialog<DateTime>(
       context: context,
       builder: (BuildContext context) {
@@ -517,6 +558,8 @@ class UpdateProfilePage extends StatelessWidget {
                       final formattedDate =
                           DateFormat('yyyy-MM-dd').format(args.value);
                       print(formattedDate);
+                      controller.fieldModificationStatus[rxString] = true;
+                      value.value = formattedDate;
 
                       // Update the text field with the formatted date
                       textController.text = formattedDate;
@@ -525,6 +568,7 @@ class UpdateProfilePage extends StatelessWidget {
                       Navigator.of(context).pop(null);
                     },
                     onSubmit: (dynamic value) {
+                      controller.fieldModificationStatus[rxString] = true;
                       Navigator.of(context).pop(value);
                     },
                   ),
@@ -553,7 +597,7 @@ class UpdateProfilePage extends StatelessWidget {
     img.Image image = img.decodeImage(Uint8List.fromList(imageBytes))!;
 
     // Encode the image to base64
-    String base64Image = base64Encode(img.encodePng(image));
+    String base64Image = base64Encode(img.encodeJpg(image));
 
     return base64Image;
   }
@@ -594,6 +638,9 @@ class UpdateProfilePage extends StatelessWidget {
       'EmployeeMobileOfficial': controller.officialMobile.value.isNotEmpty
           ? controller.officialMobile.value
           : (resultList[0]['mobile_offical'] ?? ''),
+      'EmployeeMobilePersonal': controller.personalMobile.value.isNotEmpty
+          ? controller.personalMobile.value
+          : (resultList[0]['mobile_personal'] ?? ''),
       'PresentAddress': controller.presentAddress.value.isNotEmpty
           ? controller.presentAddress.value
           : (resultList[0]['present_address'] ?? ''),
@@ -606,6 +653,9 @@ class UpdateProfilePage extends StatelessWidget {
       'FatherName': controller.fatherName.value.isNotEmpty
           ? controller.fatherName.value
           : (resultList[0]['father_name'] ?? ''),
+      'SpousedName': controller.spouseName.value.isNotEmpty
+          ? controller.spouseName.value
+          : (resultList[0]['spouse_name'] ?? ''),
       'MartialStatus': controller.maritalStatus.value.isNotEmpty
           ? controller.maritalStatus.value.toString()
           : (resultList[0]['marital_status'] ?? ''),
@@ -629,12 +679,12 @@ class UpdateProfilePage extends StatelessWidget {
           : (resultList[0]['remark'] ?? ''),
     };
 
-    // print(formData);
+    print("Hey I am formdata: $formData");
     // formData.forEach((key, value) {
     //   print('$key: ${value.runtimeType}');
     // });
     // print('${controller.imagePath.value}');
-    String base64Image = '';
+    // String base64Image = '';
     // if (controller.imagePath.value != '') {
     //   base64Image =
     //   await convertImageToBase64(controller.imagePath.value);
@@ -664,8 +714,19 @@ class UpdateProfilePage extends StatelessWidget {
           // Handle success
           if(controller.imagePath.value != ''){
             updateImage(context, userId, employeeId, photoUploadUrl);
+            controller.clearValues();
           }
-          print('Update successful');
+          else{
+            print('Update successful');
+            controller.clearValues();
+          }
+          Navigator.pop(context);
+
+          // Push the previous page with replacement
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => ProfilePage()),
+          );
           _showAttendacneDialog(
             context,
             "Success",

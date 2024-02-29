@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -19,156 +20,161 @@ class LoginPage extends StatelessWidget {
       return Scaffold(
         backgroundColor: const Color(0xff1a1a1a),
         resizeToAvoidBottomInset: true,
-        body: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              height: layout.getHeight(250),
-              decoration: BoxDecoration(
-                color: const Color(0xff333333),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(layout.getHeight(120)),
+        body: DoubleBackToCloseApp(
+          snackBar: const SnackBar(
+            content: Text('Tap again to exit'),
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                height: layout.getHeight(250),
+                decoration: BoxDecoration(
+                  color: const Color(0xff333333),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(layout.getHeight(120)),
+                  ),
+                ),
+                child: Center(
+                  child: Image.asset(
+                    'assets/images/logo.jpg',
+                    width: layout.getwidth(70),
+                    height: layout.getHeight(70),
+                  ),
                 ),
               ),
-              child: Center(
-                child: Image.asset(
-                  'assets/images/logo.jpg',
-                  width: layout.getwidth(70),
-                  height: layout.getHeight(70),
-                ),
+              // Image.asset('assets/interspeed/logo_white.jpg'),
+              SizedBox(
+                height: layout.getHeight(8),
               ),
-            ),
-            // Image.asset('assets/interspeed/logo_white.jpg'),
-            SizedBox(
-              height: layout.getHeight(8),
-            ),
 
-            Expanded(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: SingleChildScrollView(
-                  child: AnimatedPadding(
-                    padding: MediaQuery.of(context).viewInsets,
-                    duration: const Duration(milliseconds: 200),
-                    curve: Curves.decelerate,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 0, horizontal: 0),
-                            width: MediaQuery.of(context).size.width *
-                                0.7, // Adjust the percentage as needed
-                            height: layout.getHeight(50),
-                            child: TextFormField(
-                                controller: usernameController,
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  hintText: "your id",
-                                  hintStyle: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xff808080),
-                                  ),
-                                  focusedBorder: const OutlineInputBorder(
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  suffixIcon: Obx(() {
-                                    return loginController.validatedUsername.value
-                                        ? const SizedBox()
-                                        : const Icon(
-                                      Icons.error,
-                                      color: Colors.red,
-                                    );
-                                  }),
-                                  errorStyle: const TextStyle(height: 0.01),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        6.0), // Adjust the radius as needed
-                                  ),
-                                ),
-                            ),
-
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width *
-                                0.7, // Adjust the percentage as needed
-                            height: layout.getHeight(50),
-                            child: TextFormField(
-                                controller: passwordController,
-                                obscureText: true,
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  hintText: "password",
-                                  hintStyle: const TextStyle(
+              Expanded(
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: SingleChildScrollView(
+                    child: AnimatedPadding(
+                      padding: MediaQuery.of(context).viewInsets,
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.decelerate,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 0, horizontal: 0),
+                              width: MediaQuery.of(context).size.width *
+                                  0.7, // Adjust the percentage as needed
+                              height: layout.getHeight(50),
+                              child: TextFormField(
+                                  controller: usernameController,
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    hintText: "your id",
+                                    hintStyle: const TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w500,
-                                      color: Color(0xff808080)),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        6.0), // Adjust the radius as needed
-                                  ),
-                                  focusedBorder: const OutlineInputBorder(
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  errorStyle: const TextStyle(height: 0.01),
-                                  suffixIcon: Obx(() {
-                                    return loginController.validatedPassword.value
-                                        ? const SizedBox()
-                                        : const Tooltip(
-                                      message: 'required',
-                                      child: Icon(
+                                      color: Color(0xff808080),
+                                    ),
+                                    focusedBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    suffixIcon: Obx(() {
+                                      return loginController.validatedUsername.value
+                                          ? const SizedBox()
+                                          : const Icon(
                                         Icons.error,
                                         color: Colors.red,
-                                      ),
-                                    );
-                                  }),
-                                ),
-                                ),
-
-                          ),
-                          SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.07),
-                          Stack(children: [
-                            GestureDetector(
-                              onTap: () async {
-                                  _submitForm(context); // Assuming _submitForm is an asynchronous function
-                              },
-                              child: Image.asset(
-                                'assets/images/Submit tickxxxhdpi.png',
-                                width: layout.getHeight(70), // Adjust the width as needed
-                                height: layout.getHeight(70), // Adjust the height as needed
+                                      );
+                                    }),
+                                    errorStyle: const TextStyle(height: 0.01),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          6.0), // Adjust the radius as needed
+                                    ),
+                                  ),
                               ),
+
                             ),
-                            if (loginController.isLoading.value)
-                              Positioned.fill(
-                                child: Container(
-                                  color: Colors.black.withOpacity(0.5),
-                                  child: const Center(
-                                    child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          Color(0xff010080)),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            Container(
+                              width: MediaQuery.of(context).size.width *
+                                  0.7, // Adjust the percentage as needed
+                              height: layout.getHeight(50),
+                              child: TextFormField(
+                                  controller: passwordController,
+                                  obscureText: true,
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    hintText: "password",
+                                    hintStyle: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xff808080)),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          6.0), // Adjust the radius as needed
+                                    ),
+                                    focusedBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    errorStyle: const TextStyle(height: 0.01),
+                                    suffixIcon: Obx(() {
+                                      return loginController.validatedPassword.value
+                                          ? const SizedBox()
+                                          : const Tooltip(
+                                        message: 'required',
+                                        child: Icon(
+                                          Icons.error,
+                                          color: Colors.red,
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                  ),
+
+                            ),
+                            SizedBox(
+                                height: MediaQuery.of(context).size.height * 0.07),
+                            Stack(children: [
+                              GestureDetector(
+                                onTap: () async {
+                                    _submitForm(context); // Assuming _submitForm is an asynchronous function
+                                },
+                                child: Image.asset(
+                                  'assets/images/Submit tickxxxhdpi.png',
+                                  width: layout.getHeight(70), // Adjust the width as needed
+                                  height: layout.getHeight(70), // Adjust the height as needed
+                                ),
+                              ),
+                              if (loginController.isLoading.value)
+                                Positioned.fill(
+                                  child: Container(
+                                    color: Colors.black.withOpacity(0.5),
+                                    child: const Center(
+                                      child: CircularProgressIndicator(
+                                        valueColor: AlwaysStoppedAnimation<Color>(
+                                            Color(0xff010080)),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                          ]),
-                        ],
+                            ]),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     });
@@ -207,16 +213,22 @@ class LoginPage extends StatelessWidget {
       if (response.statusCode == 200) {
         bool loginSuccess = json.decode(response.body)['success'];
         if (loginSuccess) {
-          print('Login successful! Response: ${response.body}');
+          // print('Login successful! Response: ${response.body}');
           var sessionData = jsonResponse['sessionData'];
-          print("My session data is: ${sessionData}");
-          await saveSessionData(sessionData);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => DashboardPage(),
-            ),
-          );
+          if(sessionData["user_type_id"].toString() != "4"){
+            // print("Executed");
+            _showLoginFailedDialog(context);
+          }
+          else{
+            // print("My session data is: ${sessionData}");
+            await saveSessionData(sessionData);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DashboardPage(),
+              ),
+            );
+          }
         } else {
           _showLoginFailedDialog(context);
         }
@@ -235,6 +247,7 @@ class LoginPage extends StatelessWidget {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setBool("seen", true);
       print("seen: true");
+      prefs.setString("user_password", passwordController.text);
       prefs.setString("user_id", sessionData["user_id"].toString() ?? "");
       prefs.setString("user_name", sessionData["user_name"].toString() ?? "");
       prefs.setString("full_name", sessionData["full_name"].toString() ?? "");

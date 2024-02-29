@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+
 
 class PasswordChangeController extends GetxController {
   final RxString userId = ''.obs;
@@ -32,7 +35,23 @@ class PasswordChangeController extends GetxController {
     confirmObscureText.value = !confirmObscureText.value;
   }
 
-  bool validateFields(BuildContext context) {
+  Future<bool> validateFields(BuildContext context) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // print(prefs.get("user_password")?? '');
+
+    if(oldPasswordController.text != prefs.get("user_password")){
+      print("old password not matched!");
+      print(prefs.get("user_password"));
+      _showAttendacneDialog(
+          context,
+          "Failed",
+          "Password mismatch. Please contact your administrator to reset your password.",
+          0
+      );
+
+      return false;
+    }
+
     if (newPasswordController.text.isEmpty || confirmNewPasswordController.text.isEmpty) {
       print('Please fill in all fields');
       _showAttendacneDialog(context,"Failed","Please fill in all fields",0);
@@ -54,7 +73,7 @@ class PasswordChangeController extends GetxController {
       currentFocus.unfocus();
     }
 
-    if (validateFields(context)) {
+    if (await validateFields(context)) {
       // Access values using controllers
       String userIdValue = userId.value;
       String oldPasswordValue = oldPasswordController.text;
@@ -71,14 +90,27 @@ class PasswordChangeController extends GetxController {
       request.fields['OldPassword'] = oldPasswordValue;
       request.fields['NewPassword'] = newPasswordValue;
 
+      // SharedPreferences prefs = await SharedPreferences.getInstance();
+      // print(prefs.get("user_password")?? '');
       // Send the request
       try {
-        var response = await request.send();
+        final response = await http.Response.fromStream(await request.send());
         if (response.statusCode == 200) {
-          // Handle successful response
-          clearFields();
-          _showAttendacneDialog(context, "Success", "Password changed successfully", 200);
-          // print('Password change logic for user ID: $userIdValue');
+          // Parse the JSON response
+          Map<String, dynamic> jsonResponse = json.decode(response.body);
+          // Check the 'success' field in the response
+          bool success = jsonResponse['success'];
+
+          if (success) {
+            // Handle successful response
+            clearFields();
+            print(response.body);
+            _showAttendacneDialog(context, "Success", "Password changed successfully", 200);
+          } else {
+            // Handle failure response
+            String message = jsonResponse['message'];
+            _showAttendacneDialog(context, "Failed", message, 0);
+          }
         } else {
           // Handle error response
           _showAttendacneDialog(context, "Failed", "Error: ${response.statusCode}", 0);

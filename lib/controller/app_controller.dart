@@ -1,8 +1,10 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 class AppController extends GetxController {
   RxBool isFirstScreen = false.obs;
+
 
   @override
   void onInit() {

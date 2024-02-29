@@ -7,6 +7,8 @@ class EmployeeUpdateController extends GetxController {
   RxString employeeName = RxString("");
   RxString dateOfBirth = RxString("");
   RxString dateOfJoin = RxString("");
+  RxString personalMobile = RxString("");
+  RxString spouseName = RxString("");
   RxString officialMobile = RxString("");
   RxString presentAddress = RxString("");
   RxString permanentAddress = RxString("");
@@ -33,6 +35,8 @@ class EmployeeUpdateController extends GetxController {
   void setEmployeeName(String name) => employeeName.value = name;
   void setDateOfBirth(String dob) => dateOfBirth.value = dob;
   void setDateOfJoin(String doj) => dateOfJoin.value = doj;
+  void setPersonalMobile(String mobile) => personalMobile.value = mobile;
+  void setSpouseName(String name) => spouseName.value = name;
   void setOfficialMobile(String mobile) => officialMobile.value = mobile;
   void setPresentAddress(String address) => presentAddress.value = address;
   void setPermanentAddress(String address) => permanentAddress.value = address;
@@ -67,6 +71,9 @@ class EmployeeUpdateController extends GetxController {
   void clearValues() {
     // Clear all values
     // employeeId.value = 0;
+    fieldModificationStatus.clear();
+    spouseName.value = "";
+    personalMobile.value = "";
     employeeName.value = "";
     dateOfBirth.value = "";
     dateOfJoin.value = "";

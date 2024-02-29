@@ -62,14 +62,15 @@ class ProfilePage extends StatelessWidget {
                         ),
                       ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           resultList[0]['picture_name'] != ""
                               ? Image.network(
                             'https://br-isgalleon.com/image_ops/employee/${resultList[0]['picture_name'].toString()}',
-                            width: MediaQuery.of(context).size.width * 0.2,
-                            height: MediaQuery.of(context).size.height * 0.2,
+                            width: MediaQuery.of(context).size.width * 0.3,
+                            height: MediaQuery.of(context).size.width * 0.2,
+                            fit: BoxFit.contain,
                           )
                               : Image.asset(
                             'assets/images/person.png',
@@ -170,7 +171,7 @@ class ProfilePage extends StatelessWidget {
                         ),
                       ),
                       child: const Text(
-                        'Update',
+                        'Edit',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -266,9 +267,9 @@ class ProfilePage extends StatelessWidget {
         body: map,
       );
 
-      print("Request data: $map");
-      print('Response status code: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      // print("Request data: $map");
+      // print('Response status code: ${response.statusCode}');
+      // print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         // If the server returns a 200 OK response, parse the data
@@ -283,7 +284,7 @@ class ProfilePage extends StatelessWidget {
           if (resultList.isNotEmpty) {
             resultList[0]['strategic_business_unit'] = sbName;
           }
-          print("this is : $resultList");
+          // print("this is : $resultList");
           return resultList;
         } else {
           // If the server indicates failure, return an empty list or handle it accordingly
