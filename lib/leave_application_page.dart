@@ -25,9 +25,11 @@ class LeaveApplicationPage extends StatelessWidget {
         drawer: MyDrawer(context: context),
         body: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            // crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              const Spacer(),
+              const Spacer(),
               const Padding(
                 padding: EdgeInsets.all(16),
                 child: Text(
@@ -39,98 +41,96 @@ class LeaveApplicationPage extends StatelessWidget {
                 ),
               ),
 
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Container(
-                  width: boxWidth,
-                  height: layout.getHeight(55),
-                  decoration: BoxDecoration(
-                    color: const Color(0xff333333),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.calendar_today),
-                        color: Colors.white,
-                        onPressed: () => controller.selectDate(context),
-                      ),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => controller.selectDate(context),
-                          child: TextField(
-                            controller: controller.textEditingController.value,
-                            enabled: false,
-                            maxLines: 1,
-                            style: const TextStyle(
-                              color: Colors.white,
+              Container(
+                width: boxWidth,
+                // height: layout.getHeight(55),
+                decoration: BoxDecoration(
+                  color: const Color(0xffffffff),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.calendar_today),
+                      color: Colors.blueAccent,
+                      onPressed: () => controller.selectDate(context),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => controller.selectDate(context),
+                        child: TextField(
+                          controller: controller.textEditingController.value,
+                          enabled: false,
+                          maxLines: 1,
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 13,
+                          ),
+                          decoration: const InputDecoration(
+                            contentPadding: EdgeInsets.all(8),
+                            border: OutlineInputBorder(),
+                            hintText: 'Select dates',
+                            hintStyle: TextStyle(
                               fontSize: 13,
-                            ),
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              hintText: 'Select dates',
-                              hintStyle: TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                              ),
                             ),
                           ),
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.clear),
-                        color: Colors.white,
-                        onPressed: () {
-                          controller.clearSelectedDates();
-                        },
-                      ),
-                    ],
-                  ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.clear),
+                      color: Colors.redAccent,
+                      onPressed: () {
+                        controller.clearSelectedDates();
+                      },
+                    ),
+                  ],
                 ),
               ),
 
+
               const SizedBox(height: 12),
 
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Container(
-                  color: const Color(0xff333333),
-                  width: boxWidth,
-                  height: layout.getHeight(55),
-                  padding: const EdgeInsets.all(0),
-                  child: DropdownButtonFormField<String>(
-                    onChanged: (String? newValue) {
-                      controller.selectLeaveType(newValue ?? '');
-                    },
-                    style: const TextStyle(fontSize: 13),
-                    value: controller.selectedLeaveType.value.isNotEmpty
-                        ? controller.selectedLeaveType.value
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xffffffff),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                width: boxWidth,
+                padding: const EdgeInsets.all(0),
+                child: DropdownButtonFormField<String>(
+                  onChanged: (String? newValue) {
+                    controller.selectLeaveType(newValue ?? '');
+                  },
+                  style: const TextStyle(fontSize: 13),
+                  value: controller.selectedLeaveType.value.isNotEmpty
+                      ? controller.selectedLeaveType.value
+                      : null,
+                  decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.all(8),
+                    labelText: controller.selectedLeaveType.value.isEmpty
+                        ? 'Select Leave Type'
                         : null,
-                    decoration: InputDecoration(
-                      labelText: controller.selectedLeaveType.value.isEmpty
-                          ? 'Select Leave Type'
-                          : null,
-                      labelStyle:
-                          const TextStyle(color: Colors.white, fontSize: 13),
-                      border: const OutlineInputBorder(),
-                      enabledBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
+                    labelStyle:
+                        const TextStyle(color: Colors.black, fontSize: 13),
+                    border: const OutlineInputBorder(),
+                    enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black),
                     ),
-                    dropdownColor: const Color(0xFF333333),
-                    icon:
-                        const Icon(Icons.arrow_drop_down, color: Colors.white),
-                    items: controller.leaveTypes.map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(
-                          value,
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 13),
-                        ),
-                      );
-                    }).toList(),
                   ),
+                  dropdownColor: const Color(0xFFffffff),
+                  icon:
+                      const Icon(Icons.arrow_drop_down, color: Colors.black),
+                  items: controller.leaveTypes.map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(
+                        value,
+                        style: const TextStyle(
+                            color: Colors.black, fontSize: 13),
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
 
@@ -162,8 +162,11 @@ class LeaveApplicationPage extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Container(
                         width: boxWidth,
-                        height: layout.getHeight(55),
-                        color: const Color(0xff333333),
+                        //height: layout.getHeight(55),
+                        decoration: BoxDecoration(
+                          color: const Color(0xffffffff),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                         child: TextField(
                           controller: controller.remarkController.value,
                           style: const TextStyle(
@@ -173,6 +176,7 @@ class LeaveApplicationPage extends StatelessWidget {
                           maxLines: 1,
                           keyboardType: TextInputType.multiline,
                           decoration: const InputDecoration(
+                            contentPadding: EdgeInsets.all(8),
                             hintStyle: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
@@ -186,8 +190,7 @@ class LeaveApplicationPage extends StatelessWidget {
                     )
                   : const SizedBox(),
               // Return an empty widget if showRemark is false,
-
-              const SizedBox(height: 16),
+              const Spacer(),
 
               GestureDetector(
                 onTap: () async{
@@ -201,7 +204,8 @@ class LeaveApplicationPage extends StatelessWidget {
                   width: 70,
                   height: 70,
                 ),
-              )
+              ),
+              const Spacer(),
             ],
           ),
         ),

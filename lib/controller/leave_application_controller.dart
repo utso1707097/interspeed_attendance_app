@@ -239,6 +239,4 @@ class LeaveApplicationController extends GetxController {
       return {'LeaveDate': date.toLocal().toString().split(' ')[0]};
     }).toList();
   }
-
-
 }

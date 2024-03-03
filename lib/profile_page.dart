@@ -12,7 +12,7 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<String> excludedKeys = ['id','picture_name' ,'sbu_id','department_id' ,'designation_id','is_active', 'created_by', 'updated_by', 'update_time'];
+    List<String> excludedKeys = ['id','picture_name' ,'sbu_id','department_id' ,'designation_id','is_active', 'created_by', 'updated_by', 'update_time','is_identification_verified'];
     return Scaffold(
       backgroundColor: const Color(0xff1a1a1a),
       drawer: FutureBuilder(
@@ -71,6 +71,10 @@ class ProfilePage extends StatelessWidget {
                             width: MediaQuery.of(context).size.width * 0.3,
                             height: MediaQuery.of(context).size.width * 0.2,
                             fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              // Handle image loading error
+                              return Image.asset('assets/images/person.png');
+                            },
                           )
                               : Image.asset(
                             'assets/images/person.png',
@@ -113,45 +117,46 @@ class ProfilePage extends StatelessWidget {
                     const SizedBox(
                       height: 16,
                     ),
-                Column(
-                  children: resultList[0].keys
-                      .where((key) => !excludedKeys.contains(key))
-                      .map((key) {
-                    String formattedKey = key
-                        .replaceAllMapped(RegExp(r'_'), (match) => ' ')
-                        .toLowerCase();
-                    formattedKey = formattedKey
-                        .split(' ')
-                        .map((word) => word.isNotEmpty
-                        ? word[0].toUpperCase() + word.substring(1)
-                        : '')
-                        .join(' ');
+                    Column(
+                      children: resultList[0].keys
+                          .where((key) => !excludedKeys.contains(key))
+                          .map((key) {
+                        String formattedKey = key
+                            .replaceAllMapped(RegExp(r'_'), (match) => ' ')
+                            .toLowerCase();
+                        formattedKey = formattedKey
+                            .split(' ')
+                            .map((word) => word.isNotEmpty
+                            ? word[0].toUpperCase() + word.substring(1)
+                            : '')
+                            .join(' ');
 
-                    String value = resultList[0][key] ?? '';
+                        String value = resultList[0][key].toString(); // Convert to string
 
-                    if (value.isNotEmpty) {
-                      return Card(
-                        color: const Color(0xFF333333),
-                        child: ListTile(
-                          title: Text(
-                            formattedKey,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                        if (value.isNotEmpty && value != 'null') {
+                          return Card(
+                            color: const Color(0xFF333333),
+                            child: ListTile(
+                              title: Text(
+                                formattedKey,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Text(
+                                value,
+                                style: const TextStyle(color: Colors.white),
+                              ),
                             ),
-                          ),
-                          subtitle: Text(
-                            value,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      );
-                    } else {
-                      return Container();
-                    }
-                  })
-                      .toList(),
-                ),
+                          );
+                        } else {
+                          return Container();
+                        }
+                      })
+                          .toList(),
+                    ),
+
                     const SizedBox(
                       height: 8,
                     ),
@@ -261,7 +266,7 @@ class ProfilePage extends StatelessWidget {
       String sbName = prefs.getString('sb_name') ?? '';
       map['EmployeeId'] = prefs.getString('employee_id') ?? '0';
       map['UserId'] = prefs.getString('user_id') ?? '0';
-
+      // print("Request data: $map");
       final http.Response response = await http.post(
         uri,
         body: map,
@@ -279,14 +284,22 @@ class ProfilePage extends StatelessWidget {
         if (userData['success'] == true) {
           List<Map<String, dynamic>> resultList =
           (userData['resultList'] as List<dynamic>)
-              .map((item) => Map<String, dynamic>.from(item))
+              .map((item) {
+            // Convert all keys to strings
+            return Map<String, dynamic>.from(
+              item.map((key, value) => MapEntry(key.toString(), value)),
+            );
+          })
               .toList();
+
           if (resultList.isNotEmpty) {
             resultList[0]['strategic_business_unit'] = sbName;
           }
-          // print("this is : $resultList");
+
+          //  print("this is : $resultList");
           return resultList;
-        } else {
+        }
+        else {
           // If the server indicates failure, return an empty list or handle it accordingly
           print('Failed to load user data. Success is false.');
           _showAttendacneDialog(context,"Failed", "User data not available", 0);

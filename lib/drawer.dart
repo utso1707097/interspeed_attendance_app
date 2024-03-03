@@ -60,7 +60,8 @@ class MyDrawer extends StatelessWidget {
               style: TextStyle(color: Colors.white),
             ),
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.pop(context);
+              Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => DashboardPage(),
@@ -78,8 +79,9 @@ class MyDrawer extends StatelessWidget {
               style: TextStyle(color: Colors.white),
             ),
             onTap: () {
+              Navigator.pop(context);
               // Fetch user data when the ListTile is tapped
-              Navigator.pushReplacement(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const ProfilePage(),
@@ -97,7 +99,8 @@ class MyDrawer extends StatelessWidget {
               style: TextStyle(color: Colors.white),
             ),
             onTap: (){
-              Navigator.pushReplacement(
+              Navigator.pop(context);
+              Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => LeaveApplicationListPage(userId: user_id,
@@ -116,7 +119,8 @@ class MyDrawer extends StatelessWidget {
               style: TextStyle(color: Colors.white),
             ),
             onTap: (){
-              Navigator.pushReplacement(
+              Navigator.pop(context);
+              Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => PasswordChangeForm(userId: user_id,),
@@ -141,75 +145,6 @@ class MyDrawer extends StatelessWidget {
       ),
     );
   }
-
-  // void sendUserDataToProfile() async {
-  //   try {
-  //
-  //     // final Uri uri = Uri.parse('https://na57.salesforce.com/services/oauth2/token');
-  //     // final map = <String, dynamic>{};
-  //     // map['grant_type'] = 'password';
-  //     // map['client_id'] = '3MVG9dZJodJWITSviqdj3EnW.LrZ81MbuGBqgIxxxdD6u7Mru2NOEs8bHFoFyNw_nVKPhlF2EzDbNYI0rphQL';
-  //     // map['client_secret'] = '42E131F37E4E05313646E1ED1D3788D76192EBECA7486D15BDDB8408B9726B42';
-  //     // map['username'] = 'example@mail.com.us';
-  //     // map['password'] = 'ABC1234563Af88jesKxPLVirJRW8wXvj3D';
-  //
-  //     // http.Response response = await http.post(
-  //     //   uri,
-  //     //   body: map,
-  //     // );
-  //     final String profileDataUrl = 'https://br-isgalleon.com/api/employee/get_employee_by_id.php';
-  //     final Uri uri = Uri.parse(profileDataUrl);
-  //     final map = <String, dynamic>{};
-  //     SharedPreferences prefs = await SharedPreferences.getInstance();
-  //     // Add parameters for the user data
-  //     // print(prefs.getString('employee_id'));
-  //     map['EmployeeId'] = prefs.getString('employee_id') ?? '0';
-  //     map['UserId'] = prefs.getString('user_id') ?? '0';
-  //
-  //     // print("employee_id:${map['EmployeeId']},user_id:${map['UserId']}.");
-  //
-  //     // Send the combined data request
-  //     final http.Response response =
-  //     await http.post(
-  //       uri,
-  //       body: map,
-  //     );
-  //     print("Request data: $map");
-  //     print('Response status code: ${response.statusCode}');
-  //     print('Response body: ${response.body}');
-  //
-  //     if (response.statusCode == 200) {
-  //       // If the server returns a 200 OK response, parse the data
-  //       final Map<String, dynamic> userData = json.decode(response.body);
-  //       print('User data: ${userData}');
-  //
-  //       // Navigate to the profile page and pass the user data
-  //       if (userData['success'] == true) {
-  //         List<Map<String, dynamic>> resultList = (userData['resultList'] as List<dynamic>)
-  //             .map((item) => Map<String, dynamic>.from(item))
-  //             .toList();
-  //         // Navigate to the profile page and pass the user data
-  //         Navigator.push(
-  //           context,
-  //           MaterialPageRoute(
-  //             builder: (context) => ProfilePage(),
-  //           ),
-  //         );
-  //       } else {
-  //         // Show the attendance dialog with a failure message
-  //         _showAttendacneDialog("Failed", "User data not available", 0);
-  //       }
-  //
-  //     } else {
-  //       // If the server did not return a 200 OK response,
-  //       // handle the error accordingly (you might want to show an error message)
-  //       print('Failed to load user data. Status code: ${response.statusCode}');
-  //     }
-  //   } catch (error) {
-  //     // Handle errors
-  //     print('Error getting combined data: $error');
-  //   }
-  // }
 
   void _showLogoutDialog() {
     showDialog(

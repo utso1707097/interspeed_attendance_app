@@ -4,15 +4,17 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
-
 class PasswordChangeController extends GetxController {
   final RxString userId = ''.obs;
   final TextEditingController oldPasswordController = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController confirmNewPasswordController = TextEditingController();
+  final TextEditingController confirmNewPasswordController =
+  TextEditingController();
   final RxBool oldObscureText = true.obs;
   final RxBool newObscureText = true.obs;
   final RxBool confirmObscureText = true.obs;
+
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   @override
   void onInit() {
@@ -35,95 +37,80 @@ class PasswordChangeController extends GetxController {
     confirmObscureText.value = !confirmObscureText.value;
   }
 
-  Future<bool> validateFields(BuildContext context) async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    // print(prefs.get("user_password")?? '');
-
-    if(oldPasswordController.text != prefs.get("user_password")){
-      print("old password not matched!");
-      print(prefs.get("user_password"));
-      _showAttendacneDialog(
-          context,
-          "Failed",
-          "Password mismatch. Please contact your administrator to reset your password.",
-          0
-      );
-
-      return false;
-    }
-
-    if (newPasswordController.text.isEmpty || confirmNewPasswordController.text.isEmpty) {
-      print('Please fill in all fields');
-      _showAttendacneDialog(context,"Failed","Please fill in all fields",0);
+  bool validateFields(BuildContext context) {
+    if (oldPasswordController.text.isEmpty || newPasswordController.text.isEmpty || confirmNewPasswordController.text.isEmpty) {
+      _showAttendanceDialog(context, "Error", "Please enter required fields", 0);
       return false;
     }
 
     if (newPasswordController.text != confirmNewPasswordController.text) {
-      print('New password and confirm password do not match');
-      _showAttendacneDialog(context,"Failed","New password and confirm password do not match",0);
+      _showAttendanceDialog(context, "Error", "New Password and Confirm New Password do not match", 0);
       return false;
     }
 
     return true;
   }
 
-  void submitForm(BuildContext context) async {
+
+  Future<void> submitForm(BuildContext context) async {
     FocusScopeNode currentFocus = FocusScope.of(context);
     if (!currentFocus.hasPrimaryFocus) {
       currentFocus.unfocus();
     }
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userPassword = prefs.getString("user_password") ?? "";
 
-    if (await validateFields(context)) {
-      // Access values using controllers
-      String userIdValue = userId.value;
-      String oldPasswordValue = oldPasswordController.text;
-      String newPasswordValue = newPasswordController.text;
-
-      // Create a multipart request
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse('https://br-isgalleon.com/api/login/new_pass.php'),
-      );
-
-      // Add fields to the request
-      request.fields['UserId'] = userIdValue;
-      request.fields['OldPassword'] = oldPasswordValue;
-      request.fields['NewPassword'] = newPasswordValue;
-
-      // SharedPreferences prefs = await SharedPreferences.getInstance();
-      // print(prefs.get("user_password")?? '');
-      // Send the request
-      try {
-        final response = await http.Response.fromStream(await request.send());
-        if (response.statusCode == 200) {
-          // Parse the JSON response
-          Map<String, dynamic> jsonResponse = json.decode(response.body);
-          // Check the 'success' field in the response
-          bool success = jsonResponse['success'];
-
-          if (success) {
-            // Handle successful response
-            clearFields();
-            print(response.body);
-            _showAttendacneDialog(context, "Success", "Password changed successfully", 200);
-          } else {
-            // Handle failure response
-            String message = jsonResponse['message'];
-            _showAttendacneDialog(context, "Failed", message, 0);
-          }
-        } else {
-          // Handle error response
-          _showAttendacneDialog(context, "Failed", "Error: ${response.statusCode}", 0);
-          // print('Error: ${response.statusCode}');
-        }
-      } catch (error) {
-        // Handle network or other errors
-        _showAttendacneDialog(context, "Error", "Network or other error occurred", 0);
-        //print('Error: $error');
+    if (validateFields(context)){
+      print("true");
+      if(userPassword != oldPasswordController.text){
+        _showAttendanceDialog(
+            context, "Failure", "Enter correct password. If you forget the password, please contact with administration for recovery.", 0);
+        return ;
       }
-    }
-  }
+        // Access values using controllers
+        String userIdValue = userId.value;
+        String oldPasswordValue = oldPasswordController.text;
+        String newPasswordValue = newPasswordController.text;
 
+        // Create a multipart request
+        var request = http.MultipartRequest(
+          'POST',
+          Uri.parse('https://br-isgalleon.com/api/login/new_pass.php'),
+        );
+
+        // Add fields to the request
+        request.fields['UserId'] = userIdValue;
+        request.fields['OldPassword'] = oldPasswordValue;
+        request.fields['NewPassword'] = newPasswordValue;
+
+        try {
+          final response =
+          await http.Response.fromStream(await request.send());
+          if (response.statusCode == 200) {
+            // Parse the JSON response
+            Map<String, dynamic> jsonResponse = json.decode(response.body);
+            bool success = jsonResponse['success'];
+
+            if (success) {
+              prefs.setString("user_password", newPasswordController.text);
+              print(newPasswordController.text);
+              clearFields();
+              _showAttendanceDialog(
+                  context, "Success", "Password changed successfully", 200);
+            } else {
+              String message = jsonResponse['message'];
+              _showAttendanceDialog(context, "Failed", message, 0);
+            }
+          } else {
+            _showAttendanceDialog(
+                context, "Failed", "Error: ${response.statusCode}", 0);
+          }
+        } catch (error) {
+          _showAttendanceDialog(
+              context, "Error", "Network or other error occurred", 0);
+        }
+      }
+  }
 
   void clearFields() {
     oldPasswordController.clear();
@@ -133,7 +120,6 @@ class PasswordChangeController extends GetxController {
 
   @override
   void dispose() {
-    // Dispose of controllers to avoid memory leaks
     clearFields();
     oldPasswordController.dispose();
     newPasswordController.dispose();
@@ -141,15 +127,14 @@ class PasswordChangeController extends GetxController {
     super.dispose();
   }
 
-  void _showAttendacneDialog(BuildContext context,String title, String message, int statusCode) {
+  void _showAttendanceDialog(
+      BuildContext context, String title, String message, int statusCode) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: const Color(0xFF333333),
-          // Body color
           title: Container(
-            // color: const Color(0xFF1a1a1a), // Header area color
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -179,8 +164,7 @@ class PasswordChangeController extends GetxController {
           contentPadding:
           const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           shape: RoundedRectangleBorder(
-            borderRadius:
-            BorderRadius.circular(15.0), // Adjust the radius as needed
+            borderRadius: BorderRadius.circular(15.0),
           ),
         );
       },
