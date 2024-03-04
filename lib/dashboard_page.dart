@@ -254,10 +254,10 @@ class DashboardPage extends StatelessWidget {
                                       ),
                                     ),
                                     width: double.infinity,
-                                    height: 25,
+                                    height: layout.getHeight(25),
                                   ),
-                                  const SizedBox(
-                                    height: 12,
+                                  SizedBox(
+                                    height: layout.getHeight(12),
                                   ),
                                   GestureDetector(
                                     onTap: () {
@@ -270,7 +270,7 @@ class DashboardPage extends StatelessWidget {
                                       alignment: Alignment.center,
                                       children: [
                                         Image.asset('assets/images/entry_button.png',
-                                            height: 70, width: 70),
+                                            height: layout.getHeight(70), width: layout.getwidth(70)),
                                         const Text(
                                           'Entry',
                                           style: TextStyle(
@@ -282,7 +282,7 @@ class DashboardPage extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(height: 6),
+                                  SizedBox(height: layout.getHeight(6)),
                                   Container(
                                     width: double.infinity,
                                     alignment: Alignment.bottomCenter,
@@ -290,7 +290,7 @@ class DashboardPage extends StatelessWidget {
                                       alignment: Alignment.center,
                                       children: [
                                         Image.asset('assets/images/entry_time_box.png',
-                                            height: 13),
+                                            height: layout.getHeight(13)),
                                         Text(
                                           currentTime,
                                           style: const TextStyle(
@@ -323,10 +323,10 @@ class DashboardPage extends StatelessWidget {
                                       ),
                                     ),
                                     width: double.infinity,
-                                    height: 25,
+                                    height: layout.getHeight(25),
                                   ),
-                                  const SizedBox(
-                                    height: 12,
+                                  SizedBox(
+                                    height: layout.getHeight(12),
                                   ),
                                   GestureDetector(
                                     onTap: () {
@@ -339,7 +339,7 @@ class DashboardPage extends StatelessWidget {
                                       alignment: Alignment.center,
                                       children: [
                                         Image.asset('assets/images/exit_button.png',
-                                            height: 70, width: 70),
+                                            height: layout.getHeight(70), width: layout.getwidth(70)),
                                         const Text(
                                           'Exit',
                                           style: TextStyle(
@@ -359,7 +359,7 @@ class DashboardPage extends StatelessWidget {
                                       alignment: Alignment.center,
                                       children: [
                                         Image.asset('assets/images/exit_time_box.png',
-                                            height: 13),
+                                            height: layout.getHeight(13)),
                                         Text(
                                           currentTime,
                                           style: const TextStyle(
@@ -399,6 +399,7 @@ class DashboardPage extends StatelessWidget {
                                         navigateToCameraPage();
                                       },
                                       child: _buildCard(
+                                        layout: layout,
                                         color: 0xff74c2c6,
                                         image: 'assets/images/ic_camera.png',
                                         title: 'Camera',
@@ -415,6 +416,7 @@ class DashboardPage extends StatelessWidget {
                                     width: MediaQuery.of(context).size.width * 0.35,
                                     height: MediaQuery.of(context).size.width * 0.40,
                                     child: _buildCard(
+                                      layout: layout,
                                       color: 0xff74c2c6,
                                       image: 'assets/images/ic_gps.png',
                                       title: 'GPS',
@@ -448,29 +450,25 @@ class DashboardPage extends StatelessWidget {
                               ),
 
                               (dashboardController.showRemark.value)
-                                  ? Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                child: Container(
-                                  width: MediaQuery.of(context).size.width * 0.9,
-                                  height: MediaQuery.of(context).size.height * 0.07,
-                                  color: const Color(0xff333333),
-                                  child: TextField(
-                                    controller: dashboardController.remarkController.value,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 13,
+                                  ? Container(
+                                color: Color(0xff333333),
+                                child: TextField(
+                                  controller: dashboardController.remarkController.value,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                  ),
+                                  maxLines: 1,
+                                  keyboardType: TextInputType.multiline,
+                                  decoration: const InputDecoration(
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 16,vertical: 8),
+                                    hintStyle: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xff808080),
                                     ),
-                                    maxLines: 1,
-                                    keyboardType: TextInputType.multiline,
-                                    decoration: const InputDecoration(
-                                      hintStyle: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xff808080),
-                                      ),
-                                      border: OutlineInputBorder(),
-                                      hintText: 'Remark...',
-                                    ),
+                                    border: OutlineInputBorder(),
+                                    hintText: 'Remark...',
                                   ),
                                 ),
                               )
@@ -507,6 +505,7 @@ class DashboardPage extends StatelessWidget {
                                           navigateToCameraPage();
                                         },
                                         child: _buildCard(
+                                          layout: layout,
                                           image: 'assets/images/ic_camera.png',
                                           title: 'Camera',
                                           description: dashboardController.signOutBase64Image.value != ""
@@ -523,6 +522,7 @@ class DashboardPage extends StatelessWidget {
                                       width: MediaQuery.of(context).size.width * 0.35,
                                       height: MediaQuery.of(context).size.width * 0.40,
                                       child: _buildCard(
+                                        layout: layout,
                                         image: 'assets/images/ic_gps.png',
                                         title: 'GPS',
                                         description: dashboardController.accuracy.value == 100
@@ -556,32 +556,28 @@ class DashboardPage extends StatelessWidget {
                                 ),
 
                                 (dashboardController.showRemark.value)
-                                    ? Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                  child: Container(
-                                    width: MediaQuery.of(context).size.width * 0.8,
-                                    height: MediaQuery.of(context).size.height * 0.07,
-                                    color: const Color(0xff333333),
-                                    child: TextField(
-                                      controller: dashboardController.remarkController.value,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 13,
-                                      ),
-                                      maxLines: 1,
-                                      keyboardType: TextInputType.multiline,
-                                      decoration: const InputDecoration(
-                                        hintStyle: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xff808080),
+                                    ? Container(
+                                        color: Color(0xff333333),
+                                      child: TextField(
+                                        controller: dashboardController.remarkController.value,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 13,
                                         ),
-                                        border: OutlineInputBorder(),
-                                        hintText: 'Remark...',
+                                        maxLines: 1,
+                                        keyboardType: TextInputType.multiline,
+                                        decoration: const InputDecoration(
+                                          contentPadding: EdgeInsets.symmetric(horizontal: 16,vertical: 8),
+                                          hintStyle: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(0xff808080),
+                                          ),
+                                          border: OutlineInputBorder(),
+                                          hintText: 'Remark...',
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                )
+                                    )
                                     : const SizedBox(),
                                 // Return an empty widget if showRemark is false,
 
@@ -610,8 +606,8 @@ class DashboardPage extends StatelessWidget {
                       children: [
                         Image.asset(
                           'assets/images/Submit tickxxxhdpi.png',
-                          width: 70,
-                          height: 70,
+                          width: layout.getwidth(70),
+                          height: layout.getHeight(70),
                           fit: BoxFit.cover,
                         ),
                         if (dashboardController.isLoading.value)
@@ -621,6 +617,9 @@ class DashboardPage extends StatelessWidget {
                           ),
                       ],
                     ),
+                  ),
+                  SizedBox(
+                    height: layout.getHeight(16),
                   ),
 
 
@@ -634,7 +633,7 @@ class DashboardPage extends StatelessWidget {
   }
 
   Widget _buildCard(
-      {required String image,
+      {required AppLayout layout,required String image,
       required String title,
       required String description,
       required int color}) {
@@ -664,8 +663,8 @@ class DashboardPage extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(25, 0, 25, 0),
               child: Image.asset(
                 image,
-                height: 70,
-                width:  70,
+                height: layout.getHeight(70),
+                width:  layout.getwidth(70),
                 color: Color(color),
                 fit: BoxFit.fill,
                 // Adjust the fit based on your requirement

@@ -4,6 +4,10 @@ class EmployeeUpdateController extends GetxController {
   // Employee details
   // RxInt employeeId = RxInt(0);
   RxMap<RxString, bool> fieldModificationStatus = RxMap<RxString, bool>();
+  RxString genderType = RxString("");
+  RxString identityTypeId = RxString("");
+  RxString identityNumber = RxString("");
+  RxString tinNumber = RxString("");
   RxString employeeName = RxString("");
   RxString dateOfBirth = RxString("");
   RxString dateOfJoin = RxString("");
@@ -32,6 +36,10 @@ class EmployeeUpdateController extends GetxController {
 
   // Methods to set values
   // void setEmployeeId(int id) => employeeId.value = id;
+  void setGender(String gender) => genderType.value = gender;
+  void setIdentityTypeId(String id) => identityTypeId.value = id;
+  void setIdentityNumber(String nid) => identityNumber.value = nid;
+  void setTinNumber(String tin) => tinNumber.value = tin;
   void setEmployeeName(String name) => employeeName.value = name;
   void setDateOfBirth(String dob) => dateOfBirth.value = dob;
   void setDateOfJoin(String doj) => dateOfJoin.value = doj;
@@ -75,6 +83,10 @@ class EmployeeUpdateController extends GetxController {
     spouseName.value = "";
     personalMobile.value = "";
     employeeName.value = "";
+    genderType.value = "";
+    identityTypeId.value = "";
+    identityNumber.value = "";
+    tinNumber.value = "";
     dateOfBirth.value = "";
     dateOfJoin.value = "";
     officialMobile.value = "";

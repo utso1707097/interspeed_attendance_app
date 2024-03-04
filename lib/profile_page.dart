@@ -12,24 +12,14 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<String> excludedKeys = ['id','picture_name' ,'sbu_id','department_id' ,'designation_id','is_active', 'created_by', 'updated_by', 'update_time','is_identification_verified'];
+    List<String> excludedKeysPersonal = ['identity_number','department_name','date_of_join','contact_number_emergency','contact_number','email','present_address','permanent_address','tin_number','remark','designation_name','sbu_name','identity_type_name','office_name','department','designation','strategic_business_unit','identity_type','office','id','picture_name' ,'sbu_id','department_id' ,'designation_id','is_active', 'created_by', 'updated_by', 'update_time','is_identification_verified','identity_type_id'];
+    List<String> excludedKeysContact = ['identity_number','name','date_of_birth','gender','father_name','mother_name','marital_status','blood_group','religion','department_name','date_of_join','tin_number','remark','designation_name','sbu_name','identity_type_name','office_name','department','designation','strategic_business_unit','identity_type','office','id','picture_name' ,'sbu_id','department_id' ,'designation_id','is_active', 'created_by', 'updated_by', 'update_time','is_identification_verified','identity_type_id'];
+    List<String> excludedKeysIdentity = ['name','date_of_birth','gender','father_name','mother_name','marital_status','blood_group','religion','department_name','date_of_join','contact_number_emergency','contact_number','email','identity_type_name','present_address','permanent_address','remark','designation_name','sbu_name','office_name','department','designation','strategic_business_unit','office','id','picture_name' ,'sbu_id','department_id' ,'designation_id','is_active', 'created_by', 'updated_by', 'update_time','is_identification_verified','identity_type_id'];
+    List<String> excludedKeysOfficial= ['identity_number','name','date_of_birth','gender','father_name','mother_name','marital_status','blood_group','religion','department_name','contact_number_emergency','contact_number','email','present_address','permanent_address','tin_number','remark','designation_name','sbu_name','identity_type_name','office_name','identity_type','id','picture_name' ,'sbu_id','department_id' ,'designation_id','is_active', 'created_by', 'updated_by', 'update_time','is_identification_verified','identity_type_id'];
+
     return Scaffold(
       backgroundColor: const Color(0xff1a1a1a),
-      drawer: FutureBuilder(
-        future: getFullNameFromSharedPreferences(),
-        builder: (context, AsyncSnapshot<String> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            // Loading state
-            return ShimmerLoading(context: context);
-          } else if (snapshot.hasError) {
-            // Error state
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else {
-            // Data loaded successfully
-            return MyDrawer(context: context,);
-          }
-        },
-      ),
+      drawer: MyDrawer(context: context,),
 
       body: FutureBuilder(
         future: fetchUserData(context),
@@ -45,6 +35,7 @@ class ProfilePage extends StatelessWidget {
             // Data loaded successfully
             //return ShimmerLoading(context: context);
             final resultList = snapshot.data!;
+            print(resultList[0]);
             return SingleChildScrollView(
               child: Container(
                 color: const Color(0xff1a1a1a),
@@ -115,11 +106,204 @@ class ProfilePage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(
-                      height: 16,
+                      height: 8,
+                    ),
+                    Container(
+                      alignment: Alignment.center,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        color:const Color(0xff74c2c6),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+
+                      padding: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.symmetric(horizontal: 8,vertical: 8),
+                      child: const Text(
+                        "Personal Info",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 25,
+                        ),
+                      ),
+                    ),
+
+
+                    Column(
+                      children: resultList[0].keys
+                          .where((key) => !excludedKeysPersonal.contains(key))
+                          .map((key) {
+                        String formattedKey = key
+                            .replaceAllMapped(RegExp(r'_'), (match) => ' ')
+                            .toLowerCase();
+                        formattedKey = formattedKey
+                            .split(' ')
+                            .map((word) => word.isNotEmpty
+                            ? word[0].toUpperCase() + word.substring(1)
+                            : '')
+                            .join(' ');
+
+                        String value = resultList[0][key].toString(); // Convert to string
+
+                        if (value.isNotEmpty && value != 'null') {
+                          return Card(
+                            color: const Color(0xFF333333),
+                            child: ListTile(
+                              title: Text(
+                                formattedKey,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Text(
+                                value,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          );
+                        } else {
+                          return Container();
+                        }
+                      })
+                          .toList(),
+                    ),
+                    Container(
+                      alignment: Alignment.center,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        color:const Color(0xff74c2c6),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+
+                      padding: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.symmetric(horizontal: 8,vertical: 8),
+                      child: const Text(
+                        "Contact Info",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 25,
+                        ),
+                      ),
                     ),
                     Column(
                       children: resultList[0].keys
-                          .where((key) => !excludedKeys.contains(key))
+                          .where((key) => !excludedKeysContact.contains(key))
+                          .map((key) {
+                        String formattedKey = key
+                            .replaceAllMapped(RegExp(r'_'), (match) => ' ')
+                            .toLowerCase();
+                        formattedKey = formattedKey
+                            .split(' ')
+                            .map((word) => word.isNotEmpty
+                            ? word[0].toUpperCase() + word.substring(1)
+                            : '')
+                            .join(' ');
+
+                        String value = resultList[0][key].toString(); // Convert to string
+
+                        if (value.isNotEmpty && value != 'null') {
+                          return Card(
+                            color: const Color(0xFF333333),
+                            child: ListTile(
+                              title: Text(
+                                formattedKey,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Text(
+                                value,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          );
+                        } else {
+                          return Container();
+                        }
+                      })
+                          .toList(),
+                    ),
+                    Container(
+                      alignment: Alignment.center,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        color:const Color(0xff74c2c6),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+
+                      padding: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.symmetric(horizontal: 8,vertical: 8),
+                      child: const Text(
+                        "Indentity Info",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 25,
+                        ),
+                      ),
+                    ),
+
+                    Column(
+                      children: resultList[0].keys
+                          .where((key) => !excludedKeysIdentity.contains(key))
+                          .map((key) {
+                        String formattedKey = key
+                            .replaceAllMapped(RegExp(r'_'), (match) => ' ')
+                            .toLowerCase();
+                        formattedKey = formattedKey
+                            .split(' ')
+                            .map((word) => word.isNotEmpty
+                            ? word[0].toUpperCase() + word.substring(1)
+                            : '')
+                            .join(' ');
+
+                        String value = resultList[0][key].toString(); // Convert to string
+
+                        if (value.isNotEmpty && value != 'null') {
+                          return Card(
+                            color: const Color(0xFF333333),
+                            child: ListTile(
+                              title: Text(
+                                formattedKey,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Text(
+                                value,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          );
+                        } else {
+                          return Container();
+                        }
+                      })
+                          .toList(),
+                    ),
+
+                    Container(
+                      alignment: Alignment.center,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        color:const Color(0xff74c2c6),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+
+                      padding: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.symmetric(horizontal: 8,vertical: 8),
+                      child: const Text(
+                        "Official Info",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 25,
+                        ),
+                      ),
+                    ),
+                    Column(
+                      children: resultList[0].keys
+                          .where((key) => !excludedKeysOfficial.contains(key))
                           .map((key) {
                         String formattedKey = key
                             .replaceAllMapped(RegExp(r'_'), (match) => ' ')
@@ -280,24 +464,33 @@ class ProfilePage extends StatelessWidget {
         // If the server returns a 200 OK response, parse the data
         final Map<String, dynamic> userData = json.decode(response.body);
         print('User data: $userData');
-
         if (userData['success'] == true) {
           List<Map<String, dynamic>> resultList =
           (userData['resultList'] as List<dynamic>)
               .map((item) {
-            // Convert all keys to strings
+            // Convert all keys to strings and handle null values
             return Map<String, dynamic>.from(
-              item.map((key, value) => MapEntry(key.toString(), value)),
+              item.map((key, value) => MapEntry(key.toString(), value ?? '')),
             );
           })
               .toList();
 
           if (resultList.isNotEmpty) {
-            resultList[0]['strategic_business_unit'] = sbName;
+            resultList[0]['department'] = resultList[0]['department_name'] ?? resultList[0]['department'];
+            resultList[0]['designation'] = resultList[0]['designation_name'] ?? resultList[0]['designation'];
+            resultList[0]['strategic_business_unit'] = resultList[0]['sbu_name'] ?? resultList[0]['strategic_business_unit'];
+            resultList[0]['identity_type'] = resultList[0]['identity_type_name'] ?? resultList[0]['identity_type'];
+            resultList[0]['office'] = resultList[0]['office_name'] ?? resultList[0]['office'];
+
+            // Remove keys with null values
+            resultList[0].removeWhere((key, value) => value == null);
+
+            print("this is: $resultList");
+            return resultList;
           }
 
-          //  print("this is : $resultList");
-          return resultList;
+          print("Empty resultList");
+          return [];
         }
         else {
           // If the server indicates failure, return an empty list or handle it accordingly

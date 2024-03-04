@@ -100,30 +100,30 @@ class UpdateProfilePage extends StatelessWidget {
                 buildTextField(
                   "Name",
                   controller.employeeName,
-                  resultList.isNotEmpty ? resultList[0]['name'] : null,
+                  resultList.isNotEmpty ? resultList[0]['name'].toString() : null,
                   controller.fieldModificationStatus,
                   TextInputType.text,
                 ),
                 buildDateField(
                   "Date of Birth",
                   controller.dateOfBirth,
-                  resultList.isNotEmpty ? resultList[0]['date_of_birth'] : null,
+                  resultList.isNotEmpty ? resultList[0]['date_of_birth'].toString()  : null,
                   context,
                   controller.fieldModificationStatus,
                 ),
                 buildTextField(
-                    "Official Mobile",
+                    "Emergency Contact Number",
                     controller.officialMobile,
                     resultList.isNotEmpty
-                        ? resultList[0]['mobile_offical']
+                        ? resultList[0]['contact_number_emergency'].toString()
                         : null,
                     controller.fieldModificationStatus,
                     TextInputType.number),
                 buildTextField(
-                    "Personal Mobile",
+                    "Contact Number",
                     controller.personalMobile,
                     resultList.isNotEmpty
-                        ? resultList[0]['mobile_personal']
+                        ? resultList[0]['contact_number'].toString()
                         : null,
                     controller.fieldModificationStatus,
                     TextInputType.number),
@@ -131,7 +131,7 @@ class UpdateProfilePage extends StatelessWidget {
                   "Present Address",
                   controller.presentAddress,
                   resultList.isNotEmpty
-                      ? resultList[0]['present_address']
+                      ? resultList[0]['present_address'].toString()
                       : null,
                   controller.fieldModificationStatus,
                   TextInputType.text,
@@ -140,7 +140,7 @@ class UpdateProfilePage extends StatelessWidget {
                   "Permanent Address",
                   controller.permanentAddress,
                   resultList.isNotEmpty
-                      ? resultList[0]['permanent_address']
+                      ? resultList[0]['permanent_address'].toString()
                       : null,
                   controller.fieldModificationStatus,
                   TextInputType.text,
@@ -148,24 +148,24 @@ class UpdateProfilePage extends StatelessWidget {
                 buildTextField(
                   "Father Name",
                   controller.fatherName,
-                  resultList.isNotEmpty ? resultList[0]['father_name'] : null,
+                  resultList.isNotEmpty ? resultList[0]['father_name'].toString()  : null,
                   controller.fieldModificationStatus,
                   TextInputType.text,
                 ),
                 buildTextField(
                   "Mother Name",
                   controller.motherName,
-                  resultList.isNotEmpty ? resultList[0]['mother_name'] : null,
+                  resultList.isNotEmpty ? resultList[0]['mother_name'].toString()  : null,
                   controller.fieldModificationStatus,
                   TextInputType.text,
                 ),
-                buildTextField(
-                  "Spouse Name",
-                  controller.spouseName,
-                  resultList.isNotEmpty ? resultList[0]['spouse_name'] : null,
-                  controller.fieldModificationStatus,
-                  TextInputType.text,
-                ),
+                // buildTextField(
+                //   "Spouse Name",
+                //   controller.spouseName,
+                //   resultList.isNotEmpty ? resultList[0]['spouse_name'] : null,
+                //   controller.fieldModificationStatus,
+                //   TextInputType.text,
+                // ),
                 // buildTextField(
                 //   "Marital Status",
                 //   controller.maritalStatus,
@@ -179,55 +179,109 @@ class UpdateProfilePage extends StatelessWidget {
                   "Marital Status",
                   controller.maritalStatus,
                   resultList.isNotEmpty
-                      ? resultList[0]['marital_status']
+                      ? resultList[0]['marital_status'].toString()
                       : "",
                   controller.fieldModificationStatus,
                   ["Single", "Married", "Divorced", "Widowed"],
                 ),
 
+                buildDropdownField(
+                  "Gender",
+                  controller.genderType,
+                  resultList.isNotEmpty
+                      ? resultList[0]['gender'].toString()
+                      : "",
+                  controller.fieldModificationStatus,
+                  ["Male","Female","Third Gender","Prefer not to say"],
+                ),
+
+                Obx(()=> Visibility(
+                    visible: resultList.isNotEmpty && resultList[0]['is_identification_verified'].toString() == "0",
+            child: Column(
+              children: [
+                // Dropdown field for gender
+                buildDropdownField(
+                  "Identification type",
+                  controller.identityTypeId,
+                  resultList.isNotEmpty ? resultList[0]['identity_type_id'].toString() : "",
+                  controller.fieldModificationStatus,
+                  ["0", "1"],
+                ),
+
+                // First text field
+                Visibility(
+                  visible: controller.identityTypeId.value.toString() == "0",
+                  child: buildTextField(
+                    "National Identification Number",
+                    controller.identityNumber,
+                    resultList.isNotEmpty ? resultList[0]['identity_number'].toString() : null,
+                    controller.fieldModificationStatus,
+                    TextInputType.number,
+                  ),
+                ),
+
+                // Text field for Tax Identification Number (TIN)
+                Visibility(
+                  visible: controller.identityTypeId.value.toString() == "1",
+                  child: buildTextField(
+                    "Tax Identification Number",
+                    controller.tinNumber,
+                    resultList.isNotEmpty ? resultList[0]['tin_number'] : null,
+                    controller.fieldModificationStatus,
+                    TextInputType.number,
+                  ),
+                ),
+              ],
+            ),
+          ),
+                ),
+
+
+
+
                 buildTextField(
-                  "Email Personal",
+                  "Email",
                   controller.emailPersonal,
                   resultList.isNotEmpty
-                      ? resultList[0]['email_personal']
+                      ? resultList[0]['email'].toString()
                       : null,
                   controller.fieldModificationStatus,
                   TextInputType.emailAddress,
                 ),
-                buildTextField(
-                  "Email Business",
-                  controller.emailBusiness,
-                  resultList.isNotEmpty
-                      ? resultList[0]['email_business']
-                      : null,
-                  controller.fieldModificationStatus,
-                  TextInputType.emailAddress,
-                ),
-                buildTextField(
-                  "Identity Mark",
-                  controller.identityMark,
-                  resultList.isNotEmpty ? resultList[0]['identity_mark'] : null,
-                  controller.fieldModificationStatus,
-                  TextInputType.text,
-                ),
+                // buildTextField(
+                //   "Email Business",
+                //   controller.emailBusiness,
+                //   resultList.isNotEmpty
+                //       ? resultList[0]['email_business']
+                //       : null,
+                //   controller.fieldModificationStatus,
+                //   TextInputType.emailAddress,
+                // ),
+                // buildTextField(
+                //   "Identity Mark",
+                //   controller.identityMark,
+                //   resultList.isNotEmpty ? resultList[0]['identity_mark'] : null,
+                //   controller.fieldModificationStatus,
+                //   TextInputType.text,
+                // ),
                 buildTextField(
                   "Blood Group",
                   controller.bloodGroup,
-                  resultList.isNotEmpty ? resultList[0]['blood_group'] : null,
+                  resultList.isNotEmpty ? resultList[0]['blood_group'].toString()  : null,
                   controller.fieldModificationStatus,
                   TextInputType.text,
                 ),
                 buildTextField(
                   "Religion",
                   controller.religion,
-                  resultList.isNotEmpty ? resultList[0]['religion'] : null,
+                  resultList.isNotEmpty ? resultList[0]['religion'].toString()  : null,
                   controller.fieldModificationStatus,
                   TextInputType.text,
                 ),
                 buildTextField(
                   "Remark",
                   controller.remark,
-                  resultList.isNotEmpty ? resultList[0]['remark'] : null,
+                  resultList.isNotEmpty ? resultList[0]['remark'].toString()  : null,
                   controller.fieldModificationStatus,
                   TextInputType.text,
                 ),
@@ -346,7 +400,7 @@ class UpdateProfilePage extends StatelessWidget {
     );
   }
 
-  Widget buildDropdownField(String title, RxString value, String? initialValue, RxMap<RxString, bool> fieldModificationStatus, List<String> dropdownItems) {
+  Widget buildDropdownField(String title, RxString value, String? initialValue, RxMap<RxString, bool> fieldModificationStatus, List<String> dropdownItems,{bool? identity_type_field}) {
     RxString rxString = RxString(title);
 
     // Ensure that initialValue is in the dropdownItems list
@@ -411,7 +465,6 @@ class UpdateProfilePage extends StatelessWidget {
       ],
     );
   }
-
 
 
   Widget buildDateField(String title, RxString value, String? initialValue,
@@ -631,16 +684,17 @@ class UpdateProfilePage extends StatelessWidget {
           : (resultList[0]['name'] ?? ''),
       'DateOfBirth': controller.dateOfBirth.value.isNotEmpty
           ? controller.dateOfBirth.value.toString()
-          : (resultList[0]['date_of_birth'] != null
-          ? resultList[0]['date_of_birth']
-          : ''),
+          : (resultList[0]['date_of_birth'] ?? ''),
 
-      'EmployeeMobileOfficial': controller.officialMobile.value.isNotEmpty
+      'ContactNumberEmergency': controller.officialMobile.value.isNotEmpty
           ? controller.officialMobile.value
-          : (resultList[0]['mobile_offical'] ?? ''),
-      'EmployeeMobilePersonal': controller.personalMobile.value.isNotEmpty
+          : (resultList[0]['contact_number_emergency'] ?? ''),
+      'ContactNumber': controller.personalMobile.value.isNotEmpty
           ? controller.personalMobile.value
-          : (resultList[0]['mobile_personal'] ?? ''),
+          : (resultList[0]['contact_number'] ?? ''),
+      'Gender': controller.genderType.value.isNotEmpty
+          ? controller.genderType.value
+          : (resultList[0]['gender'] ?? ''),
       'PresentAddress': controller.presentAddress.value.isNotEmpty
           ? controller.presentAddress.value
           : (resultList[0]['present_address'] ?? ''),
@@ -653,21 +707,32 @@ class UpdateProfilePage extends StatelessWidget {
       'FatherName': controller.fatherName.value.isNotEmpty
           ? controller.fatherName.value
           : (resultList[0]['father_name'] ?? ''),
-      'SpousedName': controller.spouseName.value.isNotEmpty
-          ? controller.spouseName.value
-          : (resultList[0]['spouse_name'] ?? ''),
+      // 'SpousedName': controller.spouseName.value.isNotEmpty
+      //     ? controller.spouseName.value
+      //     : (resultList[0]['spouse_name'] ?? ''),
       'MartialStatus': controller.maritalStatus.value.isNotEmpty
           ? controller.maritalStatus.value.toString()
           : (resultList[0]['marital_status'] ?? ''),
-      'EmailAddressPersonal': controller.emailPersonal.value.isNotEmpty
+      'Email': controller.emailPersonal.value.isNotEmpty
           ? controller.emailPersonal.value
-          : (resultList[0]['email_personal'] ?? ''),
-      'EmailAddressBusiness': controller.emailBusiness.value.isNotEmpty
-          ? controller.emailBusiness.value
-          : (resultList[0]['email_business'] ?? ''),
-      'IdentityMark': controller.identityMark.value.isNotEmpty
-          ? controller.identityMark.value
-          : (resultList[0]['identity_mark'] ?? ''),
+          : (resultList[0]['email'] ?? ''),
+      // 'EmailAddressBusiness': controller.emailBusiness.value.isNotEmpty
+      //     ? controller.emailBusiness.value
+      //     : (resultList[0]['email_business'] ?? ''),
+      // 'IdentityMark': controller.identityMark.value.isNotEmpty
+      //     ? controller.identityMark.value
+      //     : (resultList[0]['identity_mark'] ?? ''),
+      'IdentityTypeId': controller.identityTypeId.value.isNotEmpty
+          ? controller.identityTypeId.value
+          : (resultList[0]['identity_type_id'] ?? ''),
+      'IdentityNumber': controller.identityNumber.value.isNotEmpty
+          ? controller.identityNumber.value
+          : (resultList[0]['identity_number'] ?? ''),
+      'TinNumber': controller.tinNumber.value.isNotEmpty
+          ? controller.tinNumber.value
+          : (resultList[0]['tin_number'] ?? ''),
+
+
       'BloodGroup': controller.bloodGroup.value.isNotEmpty
           ? controller.bloodGroup.value
           : (resultList[0]['blood_group'] ?? ''),

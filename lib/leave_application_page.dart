@@ -170,7 +170,7 @@ class LeaveApplicationPage extends StatelessWidget {
                         child: TextField(
                           controller: controller.remarkController.value,
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: Colors.black,
                             fontSize: 13,
                           ),
                           maxLines: 1,
