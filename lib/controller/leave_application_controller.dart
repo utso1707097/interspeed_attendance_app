@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
+import '../utils/custom_loading_indicator.dart';
+
 class LeaveApplicationController extends GetxController {
   RxList<DateTime> selectedDates = <DateTime>[].obs;
   RxBool showRemark = false.obs;
@@ -144,10 +146,18 @@ class LeaveApplicationController extends GetxController {
     remarkController.value.clear();
   }
 
-  void submitLeaveApplication(String userId, String employeeId) async {
+  void submitLeaveApplication(String userId, String employeeId,BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomLoadingIndicator();
+      },
+    );
     if (selectedDates.isEmpty) {
+      Navigator.pop(context);
       _showAlertDialog('Error', 'Please select dates.', 0);
     } else if (selectedLeaveType.value.isEmpty) {
+      Navigator.pop(context);
       _showAlertDialog('Error', 'Please select leave type.', 0);
     } else {
       try {
@@ -174,20 +184,24 @@ class LeaveApplicationController extends GetxController {
         if (response.statusCode == 200) {
           Map<String, dynamic> responseData = jsonDecode(response.body);
           if (responseData['success'] == true) {
+            Navigator.pop(context);
             _showAlertDialog('Success', responseData['message'], 200);
             clearSelectedDates();
             selectedLeaveType.value = '';
             remarkController.value.clear();
             textEditingController.value.clear();
           } else {
+            Navigator.pop(context);
             _showAlertDialog('Failure', responseData['message'], 0);
           }
         } else {
+          Navigator.pop(context);
           _showAlertDialog('Failed',
               'Failed to submit leave request. Status code: ${response.statusCode}',
               response.statusCode);
         }
       } catch (error) {
+        Navigator.pop(context);
         _showAlertDialog('Failed', 'Error submitting leave request: $error', 0);
       }
     }

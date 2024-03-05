@@ -7,6 +7,7 @@ import 'package:interspeed_attendance_app/dashboard_page.dart';
 import 'package:interspeed_attendance_app/utils/layout_size.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'controller/login_controller.dart';
+import 'utils/custom_loading_indicator.dart';
 
 class LoginPage extends StatelessWidget {
   final LoginController loginController = Get.put(LoginController());
@@ -181,18 +182,26 @@ class LoginPage extends StatelessWidget {
   }
 
   void _submitForm(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomLoadingIndicator();
+      },
+    );
     String username = usernameController.text.trim();
     String password = passwordController.text;
 
     if (username.isEmpty) {
       // Handle empty username
-      _showLoginFailedDialog(context, title: 'Error', message: 'Username cannot be empty');
+      Navigator.pop(context);
+      _showLoginFailedDialog(context,  'Error', 'Username cannot be empty');
       return;
     }
 
     if (password.isEmpty) {
       // Handle empty password
-      _showLoginFailedDialog(context, title: 'Error', message: 'Password cannot be empty');
+      Navigator.pop(context);
+      _showLoginFailedDialog(context, 'Error', 'Password cannot be empty');
       return;
     }
 
@@ -215,13 +224,10 @@ class LoginPage extends StatelessWidget {
         if (loginSuccess) {
           // print('Login successful! Response: ${response.body}');
           var sessionData = jsonResponse['sessionData'];
-          if(sessionData["user_type_id"].toString() != "4"){
+          if(sessionData["user_type_id"].toString() == "4"){
             // print("Executed");
-            _showLoginFailedDialog(context);
-          }
-          else{
-            // print("My session data is: ${sessionData}");
             await saveSessionData(sessionData);
+            Navigator.pop(context);
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -229,15 +235,25 @@ class LoginPage extends StatelessWidget {
               ),
             );
           }
+          else{
+            // print("My session data is: ${sessionData}");
+            Navigator.pop(context);
+            _showLoginFailedDialog(context,  'Failed',"This account is an admin account. Admins cannot log in.");
+          }
         } else {
-          _showLoginFailedDialog(context);
+          Navigator.pop(context);
+          print("${response.statusCode} ${response.body}");
+          _showLoginFailedDialog(context,  'Failed',json.decode(response.body)['message']);
+
         }
       } else {
-        print('Login failed! Status Code: ${response.statusCode}');
+        Navigator.pop(context);
+        _showLoginFailedDialog(context, 'Failed', json.decode(response.body)['message']);
       }
     } catch (error) {
       print('Error: $error');
-      loginController.setLoading(false);
+      Navigator.pop(context);
+      _showLoginFailedDialog(context,  'Failed', "An unexpected error occurred. Please try again later.");
     }
   }
 
@@ -270,8 +286,7 @@ class LoginPage extends StatelessWidget {
     }
   }
 
-  void _showLoginFailedDialog(BuildContext context,
-      {String? title, String? message}) {
+  void _showLoginFailedDialog(BuildContext context,String title, String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -283,7 +298,7 @@ class LoginPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  title ?? 'Login Failed ',
+                  title,
                   style: const TextStyle(color: Colors.white),
                 ),
                 const Icon(
@@ -294,7 +309,7 @@ class LoginPage extends StatelessWidget {
             ),
           ),
           content: Text(
-            message ?? 'Invalid username or password. Please try again.',
+            message,
             style: const TextStyle(color: Colors.white),
           ),
           actions: [

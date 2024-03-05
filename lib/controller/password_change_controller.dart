@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
+import '../utils/custom_loading_indicator.dart';
+
 class PasswordChangeController extends GetxController {
   final RxString userId = ''.obs;
   final TextEditingController oldPasswordController = TextEditingController();
@@ -39,11 +41,13 @@ class PasswordChangeController extends GetxController {
 
   bool validateFields(BuildContext context) {
     if (oldPasswordController.text.isEmpty || newPasswordController.text.isEmpty || confirmNewPasswordController.text.isEmpty) {
+      Navigator.pop(context);
       _showAttendanceDialog(context, "Error", "Please enter required fields", 0);
       return false;
     }
 
     if (newPasswordController.text != confirmNewPasswordController.text) {
+      Navigator.pop(context);
       _showAttendanceDialog(context, "Error", "New Password and Confirm New Password do not match", 0);
       return false;
     }
@@ -53,6 +57,13 @@ class PasswordChangeController extends GetxController {
 
 
   Future<void> submitForm(BuildContext context) async {
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomLoadingIndicator();
+      },
+    );
     FocusScopeNode currentFocus = FocusScope.of(context);
     if (!currentFocus.hasPrimaryFocus) {
       currentFocus.unfocus();
@@ -63,6 +74,7 @@ class PasswordChangeController extends GetxController {
     if (validateFields(context)){
       print("true");
       if(userPassword != oldPasswordController.text){
+        Navigator.pop(context);
         _showAttendanceDialog(
             context, "Failure", "Enter correct password. If you forget the password, please contact with administration for recovery.", 0);
         return ;
@@ -92,20 +104,24 @@ class PasswordChangeController extends GetxController {
             bool success = jsonResponse['success'];
 
             if (success) {
+              Navigator.pop(context);
               prefs.setString("user_password", newPasswordController.text);
               print(newPasswordController.text);
               clearFields();
               _showAttendanceDialog(
                   context, "Success", "Password changed successfully", 200);
             } else {
+              Navigator.pop(context);
               String message = jsonResponse['message'];
               _showAttendanceDialog(context, "Failed", message, 0);
             }
           } else {
+            Navigator.pop(context);
             _showAttendanceDialog(
                 context, "Failed", "Error: ${response.statusCode}", 0);
           }
         } catch (error) {
+          Navigator.pop(context);
           _showAttendanceDialog(
               context, "Error", "Network or other error occurred", 0);
         }

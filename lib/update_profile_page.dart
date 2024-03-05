@@ -12,6 +12,8 @@ import 'dart:typed_data';
 import 'dart:convert';
 import 'package:image/image.dart' as img;
 
+import 'utils/custom_loading_indicator.dart';
+
 class UpdateProfilePage extends StatelessWidget {
   final List<Map<String, dynamic>> resultList;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -25,317 +27,329 @@ class UpdateProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xff1a1a1a),
+      // resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey, // Add a GlobalKey<FormState> for the Form
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Image Card
-                // Image Card
-                Container(
-                  alignment: Alignment.center,
-                  margin: const EdgeInsets.symmetric(vertical: 20.0),
-                  child: Stack(
-                    alignment: Alignment.bottomRight,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  // Unfocus the text field when tapping outside
+                  FocusScope.of(context).unfocus();
+                },
+                child: Form(
+                  key: _formKey, // Add a GlobalKey<FormState> for the Form
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Card(
-                        elevation: 4.0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: Container(
-                          width: 100.0,
-                          height: 100.0,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Obx(
-                                () => ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: controller.imagePath.value.isEmpty
-                                  ? resultList[0]['picture_name'] != ""
-                                  ? Image.network(
-                                'https://br-isgalleon.com/image_ops/employee/${resultList[0]['picture_name'].toString()}',
-                                width: MediaQuery.of(context).size.width * 0.2,
-                                height: MediaQuery.of(context).size.height * 0.2,
-                                fit: BoxFit.cover,
-                              )
-                                  : Image.asset(
-                                'assets/images/person.png',
-                                fit: BoxFit.cover,
-                              )
-                                  : Image.file(
-                                File(controller.imagePath.value),
-                                fit: BoxFit.cover,
+                      // Image Card
+                      // Image Card
+                      Container(
+                        alignment: Alignment.center,
+                        margin: const EdgeInsets.symmetric(vertical: 20.0),
+                        child: Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            Card(
+                              elevation: 4.0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: Container(
+                                width: 100.0,
+                                height: 100.0,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Obx(
+                                      () => ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: controller.imagePath.value.isEmpty
+                                        ? resultList[0]['picture_name'] != ""
+                                        ? Image.network(
+                                      'https://br-isgalleon.com/image_ops/employee/${resultList[0]['picture_name'].toString()}',
+                                      width: MediaQuery.of(context).size.width * 0.2,
+                                      height: MediaQuery.of(context).size.height * 0.2,
+                                      fit: BoxFit.cover,
+                                    )
+                                        : Image.asset(
+                                      'assets/images/person.png',
+                                      fit: BoxFit.cover,
+                                    )
+                                        : Image.file(
+                                      File(controller.imagePath.value),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                )
+                                ,
                               ),
                             ),
-                          )
-                          ,
+                            IconButton(
+                              icon: const Icon(Icons.camera_alt, color: Colors.red),
+                              onPressed: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        CameraPageWithGallery(controller: controller),
+                                  ),
+                                );
+
+                                if (result != null) {
+                                  print('Image picked from gallery: $result');
+                                }
+                              },
+                            ),
+                          ],
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.camera_alt, color: Colors.red),
-                        onPressed: () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  CameraPageWithGallery(controller: controller),
-                            ),
-                          );
 
-                          if (result != null) {
-                            print('Image picked from gallery: $result');
-                          }
-                        },
+                      // Text Fields
+                      buildTextField(
+                        "Name",
+                        controller.employeeName,
+                        resultList.isNotEmpty ? resultList[0]['name'].toString() : null,
+                        controller.fieldModificationStatus,
+                        TextInputType.text,
+                      ),
+                      buildDateField(
+                        "Date of Birth",
+                        controller.dateOfBirth,
+                        resultList.isNotEmpty ? resultList[0]['date_of_birth'].toString()  : null,
+                        context,
+                        controller.fieldModificationStatus,
+                      ),
+                      buildTextField(
+                          "Emergency Contact Number",
+                          controller.officialMobile,
+                          resultList.isNotEmpty
+                              ? resultList[0]['contact_number_emergency'].toString()
+                              : null,
+                          controller.fieldModificationStatus,
+                          TextInputType.number),
+                      buildTextField(
+                          "Contact Number",
+                          controller.personalMobile,
+                          resultList.isNotEmpty
+                              ? resultList[0]['contact_number'].toString()
+                              : null,
+                          controller.fieldModificationStatus,
+                          TextInputType.number),
+                      buildTextField(
+                        "Present Address",
+                        controller.presentAddress,
+                        resultList.isNotEmpty
+                            ? resultList[0]['present_address'].toString()
+                            : null,
+                        controller.fieldModificationStatus,
+                        TextInputType.text,
+                      ),
+                      buildTextField(
+                        "Permanent Address",
+                        controller.permanentAddress,
+                        resultList.isNotEmpty
+                            ? resultList[0]['permanent_address'].toString()
+                            : null,
+                        controller.fieldModificationStatus,
+                        TextInputType.text,
+                      ),
+                      buildTextField(
+                        "Father Name",
+                        controller.fatherName,
+                        resultList.isNotEmpty ? resultList[0]['father_name'].toString()  : null,
+                        controller.fieldModificationStatus,
+                        TextInputType.text,
+                      ),
+                      buildTextField(
+                        "Mother Name",
+                        controller.motherName,
+                        resultList.isNotEmpty ? resultList[0]['mother_name'].toString()  : null,
+                        controller.fieldModificationStatus,
+                        TextInputType.text,
+                      ),
+                      // buildTextField(
+                      //   "Spouse Name",
+                      //   controller.spouseName,
+                      //   resultList.isNotEmpty ? resultList[0]['spouse_name'] : null,
+                      //   controller.fieldModificationStatus,
+                      //   TextInputType.text,
+                      // ),
+                      // buildTextField(
+                      //   "Marital Status",
+                      //   controller.maritalStatus,
+                      //   resultList.isNotEmpty
+                      //       ? resultList[0]['marital_status']
+                      //       : null,
+                      //   controller.fieldModificationStatus,
+                      //   TextInputType.text,
+                      // ),
+                      buildDropdownField(
+                        "Marital Status",
+                        controller.maritalStatus,
+                        resultList.isNotEmpty
+                            ? resultList[0]['marital_status'].toString()
+                            : "",
+                        controller.fieldModificationStatus,
+                        ["Single", "Married", "Divorced", "Widowed"],
+                      ),
+
+                      buildDropdownField(
+                        "Gender",
+                        controller.genderType,
+                        resultList.isNotEmpty
+                            ? resultList[0]['gender'].toString()
+                            : "",
+                        controller.fieldModificationStatus,
+                        ["Male","Female","Third Gender","Prefer not to say"],
+                      ),
+
+                      Obx(()=> Visibility(
+                          visible: resultList.isNotEmpty && resultList[0]['is_identification_verified'].toString() == "0",
+                  child: Column(
+                    children: [
+                      // Dropdown field for gender
+                      buildDropdownField(
+                        "Identification type",
+                        controller.identityTypeId,
+                        resultList.isNotEmpty ? resultList[0]['identity_type_id'].toString() : "",
+                        controller.fieldModificationStatus,
+                        ["0", "1"],
+                      ),
+
+                      // First text field
+                      Visibility(
+                        visible: controller.identityTypeId.value.toString() == "0",
+                        child: buildTextField(
+                          "National Identification Number",
+                          controller.identityNumber,
+                          resultList.isNotEmpty ? resultList[0]['identity_number'].toString() : null,
+                          controller.fieldModificationStatus,
+                          TextInputType.number,
+                        ),
+                      ),
+
+                      // Text field for Tax Identification Number (TIN)
+                      Visibility(
+                        visible: controller.identityTypeId.value.toString() == "1",
+                        child: buildTextField(
+                          "Tax Identification Number",
+                          controller.tinNumber,
+                          resultList.isNotEmpty ? resultList[0]['tin_number'] : null,
+                          controller.fieldModificationStatus,
+                          TextInputType.number,
+                        ),
                       ),
                     ],
                   ),
                 ),
+                      ),
 
-                // Text Fields
-                buildTextField(
-                  "Name",
-                  controller.employeeName,
-                  resultList.isNotEmpty ? resultList[0]['name'].toString() : null,
-                  controller.fieldModificationStatus,
-                  TextInputType.text,
-                ),
-                buildDateField(
-                  "Date of Birth",
-                  controller.dateOfBirth,
-                  resultList.isNotEmpty ? resultList[0]['date_of_birth'].toString()  : null,
-                  context,
-                  controller.fieldModificationStatus,
-                ),
-                buildTextField(
-                    "Emergency Contact Number",
-                    controller.officialMobile,
-                    resultList.isNotEmpty
-                        ? resultList[0]['contact_number_emergency'].toString()
-                        : null,
-                    controller.fieldModificationStatus,
-                    TextInputType.number),
-                buildTextField(
-                    "Contact Number",
-                    controller.personalMobile,
-                    resultList.isNotEmpty
-                        ? resultList[0]['contact_number'].toString()
-                        : null,
-                    controller.fieldModificationStatus,
-                    TextInputType.number),
-                buildTextField(
-                  "Present Address",
-                  controller.presentAddress,
-                  resultList.isNotEmpty
-                      ? resultList[0]['present_address'].toString()
-                      : null,
-                  controller.fieldModificationStatus,
-                  TextInputType.text,
-                ),
-                buildTextField(
-                  "Permanent Address",
-                  controller.permanentAddress,
-                  resultList.isNotEmpty
-                      ? resultList[0]['permanent_address'].toString()
-                      : null,
-                  controller.fieldModificationStatus,
-                  TextInputType.text,
-                ),
-                buildTextField(
-                  "Father Name",
-                  controller.fatherName,
-                  resultList.isNotEmpty ? resultList[0]['father_name'].toString()  : null,
-                  controller.fieldModificationStatus,
-                  TextInputType.text,
-                ),
-                buildTextField(
-                  "Mother Name",
-                  controller.motherName,
-                  resultList.isNotEmpty ? resultList[0]['mother_name'].toString()  : null,
-                  controller.fieldModificationStatus,
-                  TextInputType.text,
-                ),
-                // buildTextField(
-                //   "Spouse Name",
-                //   controller.spouseName,
-                //   resultList.isNotEmpty ? resultList[0]['spouse_name'] : null,
-                //   controller.fieldModificationStatus,
-                //   TextInputType.text,
-                // ),
-                // buildTextField(
-                //   "Marital Status",
-                //   controller.maritalStatus,
-                //   resultList.isNotEmpty
-                //       ? resultList[0]['marital_status']
-                //       : null,
-                //   controller.fieldModificationStatus,
-                //   TextInputType.text,
-                // ),
-                buildDropdownField(
-                  "Marital Status",
-                  controller.maritalStatus,
-                  resultList.isNotEmpty
-                      ? resultList[0]['marital_status'].toString()
-                      : "",
-                  controller.fieldModificationStatus,
-                  ["Single", "Married", "Divorced", "Widowed"],
-                ),
 
-                buildDropdownField(
-                  "Gender",
-                  controller.genderType,
-                  resultList.isNotEmpty
-                      ? resultList[0]['gender'].toString()
-                      : "",
-                  controller.fieldModificationStatus,
-                  ["Male","Female","Third Gender","Prefer not to say"],
-                ),
 
-                Obx(()=> Visibility(
-                    visible: resultList.isNotEmpty && resultList[0]['is_identification_verified'].toString() == "0",
-            child: Column(
-              children: [
-                // Dropdown field for gender
-                buildDropdownField(
-                  "Identification type",
-                  controller.identityTypeId,
-                  resultList.isNotEmpty ? resultList[0]['identity_type_id'].toString() : "",
-                  controller.fieldModificationStatus,
-                  ["0", "1"],
-                ),
 
-                // First text field
-                Visibility(
-                  visible: controller.identityTypeId.value.toString() == "0",
-                  child: buildTextField(
-                    "National Identification Number",
-                    controller.identityNumber,
-                    resultList.isNotEmpty ? resultList[0]['identity_number'].toString() : null,
-                    controller.fieldModificationStatus,
-                    TextInputType.number,
+                      buildTextField(
+                        "Email",
+                        controller.emailPersonal,
+                        resultList.isNotEmpty
+                            ? resultList[0]['email'].toString()
+                            : null,
+                        controller.fieldModificationStatus,
+                        TextInputType.emailAddress,
+                      ),
+                      // buildTextField(
+                      //   "Email Business",
+                      //   controller.emailBusiness,
+                      //   resultList.isNotEmpty
+                      //       ? resultList[0]['email_business']
+                      //       : null,
+                      //   controller.fieldModificationStatus,
+                      //   TextInputType.emailAddress,
+                      // ),
+                      // buildTextField(
+                      //   "Identity Mark",
+                      //   controller.identityMark,
+                      //   resultList.isNotEmpty ? resultList[0]['identity_mark'] : null,
+                      //   controller.fieldModificationStatus,
+                      //   TextInputType.text,
+                      // ),
+                      buildTextField(
+                        "Blood Group",
+                        controller.bloodGroup,
+                        resultList.isNotEmpty ? resultList[0]['blood_group'].toString()  : null,
+                        controller.fieldModificationStatus,
+                        TextInputType.text,
+                      ),
+                      buildTextField(
+                        "Religion",
+                        controller.religion,
+                        resultList.isNotEmpty ? resultList[0]['religion'].toString()  : null,
+                        controller.fieldModificationStatus,
+                        TextInputType.text,
+                      ),
+                      buildTextField(
+                        "Remark",
+                        controller.remark,
+                        resultList.isNotEmpty ? resultList[0]['remark'].toString()  : null,
+                        controller.fieldModificationStatus,
+                        TextInputType.text,
+                      ),
+
+                      // Save Button
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Container(
+                            alignment: Alignment.center,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                updateProfile(context);
+                                // Implement logic to save the updated profile
+                              },
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.green,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: const Text(
+                                "Update",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+
+                          Container(
+                            alignment: Alignment.center,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => ProfilePage()),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.red,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: const Text(
+                                "Cancel",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                    ],
                   ),
                 ),
-
-                // Text field for Tax Identification Number (TIN)
-                Visibility(
-                  visible: controller.identityTypeId.value.toString() == "1",
-                  child: buildTextField(
-                    "Tax Identification Number",
-                    controller.tinNumber,
-                    resultList.isNotEmpty ? resultList[0]['tin_number'] : null,
-                    controller.fieldModificationStatus,
-                    TextInputType.number,
-                  ),
-                ),
-              ],
-            ),
-          ),
-                ),
-
-
-
-
-                buildTextField(
-                  "Email",
-                  controller.emailPersonal,
-                  resultList.isNotEmpty
-                      ? resultList[0]['email'].toString()
-                      : null,
-                  controller.fieldModificationStatus,
-                  TextInputType.emailAddress,
-                ),
-                // buildTextField(
-                //   "Email Business",
-                //   controller.emailBusiness,
-                //   resultList.isNotEmpty
-                //       ? resultList[0]['email_business']
-                //       : null,
-                //   controller.fieldModificationStatus,
-                //   TextInputType.emailAddress,
-                // ),
-                // buildTextField(
-                //   "Identity Mark",
-                //   controller.identityMark,
-                //   resultList.isNotEmpty ? resultList[0]['identity_mark'] : null,
-                //   controller.fieldModificationStatus,
-                //   TextInputType.text,
-                // ),
-                buildTextField(
-                  "Blood Group",
-                  controller.bloodGroup,
-                  resultList.isNotEmpty ? resultList[0]['blood_group'].toString()  : null,
-                  controller.fieldModificationStatus,
-                  TextInputType.text,
-                ),
-                buildTextField(
-                  "Religion",
-                  controller.religion,
-                  resultList.isNotEmpty ? resultList[0]['religion'].toString()  : null,
-                  controller.fieldModificationStatus,
-                  TextInputType.text,
-                ),
-                buildTextField(
-                  "Remark",
-                  controller.remark,
-                  resultList.isNotEmpty ? resultList[0]['remark'].toString()  : null,
-                  controller.fieldModificationStatus,
-                  TextInputType.text,
-                ),
-
-                // Save Button
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      alignment: Alignment.center,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          updateProfile(context);
-                          // Implement logic to save the updated profile
-                        },
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.green,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: const Text(
-                          "Update",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-
-                    Container(
-                      alignment: Alignment.center,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => ProfilePage()),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.red,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: const Text(
-                          "Cancel",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -656,6 +670,12 @@ class UpdateProfilePage extends StatelessWidget {
   }
 
   void updateProfile(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomLoadingIndicator();
+      },
+    );
     final url =
     Uri.parse('https://br-isgalleon.com/api/employee/insert_employee.php');
     final photoUploadUrl = Uri.parse(
@@ -667,10 +687,12 @@ class UpdateProfilePage extends StatelessWidget {
     final String? employeeId = prefs.getString('employee_id');
     // Check if userId is null, handle accordingly
     if (userId == null) {
+      Navigator.pop(context);
       print('Error: user_id is null');
       return;
     }
     if(employeeId == null){
+      Navigator.pop(context);
       print('Error: employee_id is null');
       return;
     }
@@ -744,7 +766,7 @@ class UpdateProfilePage extends StatelessWidget {
           : (resultList[0]['remark'] ?? ''),
     };
 
-    print("Hey I am formdata: $formData");
+    // print("Hey I am formdata: $formData");
     // formData.forEach((key, value) {
     //   print('$key: ${value.runtimeType}');
     // });
@@ -779,9 +801,11 @@ class UpdateProfilePage extends StatelessWidget {
           // Handle success
           if(controller.imagePath.value != ''){
             updateImage(context, userId, employeeId, photoUploadUrl);
+            Navigator.pop(context);
             controller.clearValues();
           }
           else{
+            Navigator.pop(context);
             print('Update successful');
             controller.clearValues();
           }
@@ -800,6 +824,7 @@ class UpdateProfilePage extends StatelessWidget {
           );
         } else {
           // Handle failure
+          Navigator.pop(context);
           print('Update failed: $responseBody');
           _showAttendacneDialog(
             context,
@@ -810,6 +835,7 @@ class UpdateProfilePage extends StatelessWidget {
         }
       }else {
         // Request failed
+        Navigator.pop(context);
         print('Request failed with status: ${response.statusCode}');
         // print('${response.body}');
         // Show failure dialog or handle failure scenario as needed
@@ -822,6 +848,7 @@ class UpdateProfilePage extends StatelessWidget {
       }
     } catch (error) {
       // Handle errors
+      Navigator.pop(context);
       print('Error sending request: $error');
 
       // Show failure dialog or handle error scenario as needed

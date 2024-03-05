@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:interspeed_attendance_app/camera_page.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:interspeed_attendance_app/drawer.dart';
+import 'package:interspeed_attendance_app/utils/custom_loading_indicator.dart';
 import 'package:interspeed_attendance_app/utils/layout_size.dart';
 import 'package:intl/intl.dart';
 
@@ -16,6 +17,7 @@ import 'controller/dashboard_controller.dart';
 
 class DashboardPage extends StatelessWidget {
   final DashboardController dashboardController = Get.put(DashboardController());
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   DashboardPage(){
     dashboardController.fetchSessionData();
@@ -38,11 +40,19 @@ class DashboardPage extends StatelessWidget {
     }
   }
 
-  Future<void> sendAttendanceData(BuildContext context) async {
+  Future<void> sendAttendanceData(BuildContext context, AppLayout layout) async {
     // Set up the URL
     final String url = dashboardController.isSignInButtonClicked.value
         ? 'https://br-isgalleon.com/api/attendance/insert_daily_attendance_in.php'
         : 'https://br-isgalleon.com/api/attendance/insert_daily_attendance_out.php';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomLoadingIndicator();
+      },
+    );
+
 
 
     // Create the multipart request
@@ -52,7 +62,7 @@ class DashboardPage extends StatelessWidget {
     //Validate the request
     if (dashboardController.isSignOutButtonClicked.value && dashboardController.signOutBase64Image.value.isEmpty) {
       // Handle the case when _base64Image is empty
-      dashboardController.setLoading(false);
+      Navigator.pop(context);
       print('Error: Image data is empty');
       _showAttendacneDialog(context,"Failed", "Required selfie! please click a selfie", 0);
       return;
@@ -60,7 +70,7 @@ class DashboardPage extends StatelessWidget {
 
     if (dashboardController.isSignInButtonClicked.value && (dashboardController.signInBase64Image.value == null || dashboardController.signInBase64Image.value.isEmpty)) {
       // Handle the case when _base64Image is empty
-      dashboardController.setLoading(false);
+      Navigator.pop(context);
       print('Error: Image data is empty');
       _showAttendacneDialog(context,"Failed", "Required selfie! please click a selfie", 0);
       return;
@@ -68,7 +78,7 @@ class DashboardPage extends StatelessWidget {
 
     if (dashboardController.latitude.value == -1 || dashboardController.longitude.value == -1) {
       // Handle the case when latitude or longitude is not set
-      dashboardController.setLoading(false);
+      Navigator.pop(context);
       _showAttendacneDialog(context,"Failed", "Location is mandatory for this action! Make sure location service is enabled", 0);
       print('Error: Latitude or longitude not set');
       return;
@@ -94,6 +104,7 @@ class DashboardPage extends StatelessWidget {
           await http.Response.fromStream(await request.send());
       if (response.statusCode == 200) {
         // Request was successful
+        Navigator.pop(context);
         Map<String, dynamic> responseData = jsonDecode(response.body);
         if (responseData['success'] && dashboardController.isSignInButtonClicked.value)
           dashboardController.showAttendanceDialog(
@@ -115,16 +126,21 @@ class DashboardPage extends StatelessWidget {
       }
       else {
         // Request failed
+        Navigator.pop(context);
         _showAttendacneDialog(
             context,"Failed", "Check your internet connection or login again!", 0);
         print('Request failed with status: ${response.statusCode}');
       }
     } catch (error) {
       // Handle errors
+      Navigator.pop(context);
       _showAttendacneDialog(context,"Failed", "Check your internet connection", 0);
       print('Error sending request: $error');
     } finally {
-      dashboardController.setLoading(false);
+      // Future.delayed(Duration(seconds: 5), () {
+      //   Navigator.pop(context);
+      // });
+      // dashboardController.setLoading(false);
     }
   }
 
@@ -138,12 +154,9 @@ class DashboardPage extends StatelessWidget {
         DateTime.now().toUtc().add(const Duration(hours: 6))); // Dhaka UTC+6
    // Add this line
     return Obx((){
-      print(dashboardController.sessionData);
+      // print(dashboardController.sessionData);
       final String fullName = dashboardController.sessionData['full_name'] ?? '';
-      final officeName = dashboardController.sessionData['office_name'] ?? ''; // Add this line
       final designationName = dashboardController.sessionData['designation_name'] ?? '';
-      final userImage = dashboardController.sessionData['picture_name'] ?? '';
-      print(userImage);
       return Scaffold(
         drawer: MyDrawer(context: context),
         body: DoubleBackToCloseApp(
@@ -181,38 +194,39 @@ class DashboardPage extends StatelessWidget {
                             'assets/images/logo.jpg',
                             width: MediaQuery.of(context).size.width * 0.2,
                             height: MediaQuery.of(context).size.height * 0.1,
+                            fit: BoxFit.contain
                           ),
                         ),
                         // Flex 2 - Column section
                         Expanded(
                           flex: 2,
                           child: Container(
-                            height: MediaQuery.of(context).size.height * 0.1, // Set a specific height
+                            height: MediaQuery.of(context).size.height * 0.2, // Set a specific height
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   fullName,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 16,
+                                    fontSize:  MediaQuery.of(context).size.width/360*16,
                                     color: Colors.white,
                                   ),
                                 ),
                                 Text(
                                   designationName,
-                                  style:const  TextStyle(
+                                  style:TextStyle(
                                     fontWeight: FontWeight.normal,
-                                    fontSize: 13,
+                                    fontSize: MediaQuery.of(context).size.width/360*13,
                                     color: Colors.white,
                                   ),
                                 ),
-                                const Text(
+                                Text(
                                   "Interspeed Marketing Solutions Ltd",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 13,
+                                    fontSize: MediaQuery.of(context).size.width/360*13,
                                     color: Colors.white,
                                   ),
                                 ),
@@ -227,7 +241,7 @@ class DashboardPage extends StatelessWidget {
                   Column(
                     children: [
                       SizedBox(
-                        height: layout.getHeight(60),
+                        height: layout.getHeight(100),
                       ),
                       SizedBox(
                         // color: Colors.white,
@@ -270,12 +284,12 @@ class DashboardPage extends StatelessWidget {
                                       alignment: Alignment.center,
                                       children: [
                                         Image.asset('assets/images/entry_button.png',
-                                            height: layout.getHeight(70), width: layout.getwidth(70)),
-                                        const Text(
+                                            height: MediaQuery.of(context).size.width * 0.2, width: MediaQuery.of(context).size.width * 0.2),
+                                        Text(
                                           'Entry',
                                           style: TextStyle(
                                             color: Colors.black,
-                                            fontSize: 14,
+                                            fontSize: MediaQuery.of(context).size.width/360*14,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -293,9 +307,9 @@ class DashboardPage extends StatelessWidget {
                                             height: layout.getHeight(13)),
                                         Text(
                                           currentTime,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             color: Colors.black,
-                                            fontSize: 12,
+                                            fontSize: MediaQuery.of(context).size.width/360*12,
                                             fontWeight: FontWeight.normal,
                                           ),
                                         ),
@@ -339,19 +353,19 @@ class DashboardPage extends StatelessWidget {
                                       alignment: Alignment.center,
                                       children: [
                                         Image.asset('assets/images/exit_button.png',
-                                            height: layout.getHeight(70), width: layout.getwidth(70)),
-                                        const Text(
+                                        height: MediaQuery.of(context).size.width * 0.2, width: MediaQuery.of(context).size.width * 0.2),
+                                        Text(
                                           'Exit',
                                           style: TextStyle(
                                             color: Colors.black,
-                                            fontSize: 14,
+                                            fontSize: MediaQuery.of(context).size.width/360*14,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(height: 6),
+                                  SizedBox(height: layout.getHeight(6),),
                                   Container(
                                     width: double.infinity,
                                     alignment: Alignment.bottomCenter,
@@ -362,9 +376,9 @@ class DashboardPage extends StatelessWidget {
                                             height: layout.getHeight(13)),
                                         Text(
                                           currentTime,
-                                          style: const TextStyle(
+                                          style:  TextStyle(
                                             color: Colors.black,
-                                            fontSize: 12,
+                                            fontSize: MediaQuery.of(context).size.width/360*12,
                                             fontWeight: FontWeight.normal,
                                           ),
                                         ),
@@ -451,23 +465,23 @@ class DashboardPage extends StatelessWidget {
 
                               (dashboardController.showRemark.value)
                                   ? Container(
-                                color: Color(0xff333333),
+                                color: const Color(0xff333333),
                                 child: TextField(
                                   controller: dashboardController.remarkController.value,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 13,
+                                    fontSize: MediaQuery.of(context).size.width/360*13,
                                   ),
                                   maxLines: 1,
                                   keyboardType: TextInputType.multiline,
-                                  decoration: const InputDecoration(
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 16,vertical: 8),
+                                  decoration: InputDecoration(
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16,vertical: 8),
                                     hintStyle: TextStyle(
-                                      fontSize: 15,
+                                      fontSize: MediaQuery.of(context).size.width/360*15,
                                       fontWeight: FontWeight.w500,
-                                      color: Color(0xff808080),
+                                      color: const Color(0xff808080),
                                     ),
-                                    border: OutlineInputBorder(),
+                                    border: const OutlineInputBorder(),
                                     hintText: 'Remark...',
                                   ),
                                 ),
@@ -475,7 +489,7 @@ class DashboardPage extends StatelessWidget {
                                   : const SizedBox(),
                               // Return an empty widget if showRemark is false,
 
-                              const SizedBox(height: 16),
+                              SizedBox(height: layout.getHeight(16)),
                             ],
                           ),
 
@@ -557,23 +571,23 @@ class DashboardPage extends StatelessWidget {
 
                                 (dashboardController.showRemark.value)
                                     ? Container(
-                                        color: Color(0xff333333),
+                                        color: const Color(0xff333333),
                                       child: TextField(
                                         controller: dashboardController.remarkController.value,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           color: Colors.white,
-                                          fontSize: 13,
+                                          fontSize: MediaQuery.of(context).size.width/360*13,
                                         ),
                                         maxLines: 1,
                                         keyboardType: TextInputType.multiline,
-                                        decoration: const InputDecoration(
-                                          contentPadding: EdgeInsets.symmetric(horizontal: 16,vertical: 8),
+                                        decoration: InputDecoration(
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 16,vertical: 8),
                                           hintStyle: TextStyle(
-                                            fontSize: 15,
+                                            fontSize:  MediaQuery.of(context).size.width/360*15,
                                             fontWeight: FontWeight.w500,
-                                            color: Color(0xff808080),
+                                            color: const Color(0xff808080),
                                           ),
-                                          border: OutlineInputBorder(),
+                                          border: const OutlineInputBorder(),
                                           hintText: 'Remark...',
                                         ),
                                       ),
@@ -581,7 +595,7 @@ class DashboardPage extends StatelessWidget {
                                     : const SizedBox(),
                                 // Return an empty widget if showRemark is false,
 
-                                const SizedBox(height: 16),
+                                SizedBox(height: layout.getHeight(16)),
                               ],
                             )),
                       )
@@ -590,14 +604,13 @@ class DashboardPage extends StatelessWidget {
                     ],
                   ),
                   dashboardController.isSignInButtonClicked.value || dashboardController.isSignOutButtonClicked.value?
-                      SizedBox.shrink():
+                      const SizedBox.shrink():
                       SizedBox(height: layout.getHeight(130),),
 
                   GestureDetector(
                     onTap: () {
                       // Handle button click here
-                      dashboardController.setLoading(true);
-                      sendAttendanceData(context);
+                      sendAttendanceData(context,layout);
                       print('Button Clicked');
                       // Add your custom logic or navigation here
                     },
@@ -610,11 +623,6 @@ class DashboardPage extends StatelessWidget {
                           height: layout.getHeight(70),
                           fit: BoxFit.cover,
                         ),
-                        if (dashboardController.isLoading.value)
-                          const CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-                          ),
                       ],
                     ),
                   ),

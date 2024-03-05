@@ -197,7 +197,7 @@ class LeaveApplicationPage extends StatelessWidget {
                   final SharedPreferences prefs = await SharedPreferences.getInstance();
                   final String userId = prefs.getString("user_id") ?? "";
                   final String employeeId = prefs.getString("employee_id") ?? "";
-                  controller.submitLeaveApplication(userId, employeeId);
+                  controller.submitLeaveApplication(userId, employeeId,context);
                 },
                 child: Image.asset(
                   'assets/images/Submit tickxxxhdpi.png',
