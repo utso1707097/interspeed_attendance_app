@@ -27,6 +27,7 @@ class LeaveApplicationController extends GetxController {
 
   Future<void> selectDate(BuildContext context) async {
     final double dialogHeight = MediaQuery.of(context).size.height * 0.5;
+    final double dialogWidth = MediaQuery.of(context).size.width *0.9;
 
     await showDialog(
       context: context,
@@ -34,86 +35,90 @@ class LeaveApplicationController extends GetxController {
         return Center(
           child: AlertDialog(
             backgroundColor: const Color(0xFF333333),
-            content: Padding(
-              padding: const EdgeInsets.all(0),
-              child: Container(
-                padding: const EdgeInsets.all(0),
-                height: dialogHeight,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: Theme(
-                  data: Theme.of(context).copyWith(
-                    colorScheme: const ColorScheme.light(
-                      primary: Colors.red,
-                      onPrimary: Colors.black,
-                      onSurface: Colors.white,
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
-                    textButtonTheme: TextButtonThemeData(
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.green,
+                    height: dialogHeight,
+                    width: dialogWidth,
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        colorScheme: const ColorScheme.light(
+                          primary: Colors.red,
+                          onPrimary: Colors.black,
+                          onSurface: Colors.white,
+                        ),
+                        textButtonTheme: TextButtonThemeData(
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.green,
+                          ),
+                        ),
+                      ),
+                      child: SfDateRangePicker(
+                        view: DateRangePickerView.month,
+                        monthViewSettings: DateRangePickerMonthViewSettings(
+                          blackoutDates: [DateTime(2020, 03, 26)],
+                          weekendDays: [5],
+                          firstDayOfWeek: 1,
+                        ),
+                        monthCellStyle: DateRangePickerMonthCellStyle(
+                          textStyle: const TextStyle(color: Colors.white),
+                          blackoutDatesDecoration: BoxDecoration(
+                            color: Colors.red,
+                            border: Border.all(color: const Color(0xFFF44436), width: 1),
+                            shape: BoxShape.circle,
+                          ),
+                          weekendDatesDecoration: BoxDecoration(
+                            color: Colors.red,
+                            border: Border.all(color: const Color(0xFFB6B6B6), width: 1),
+                            shape: BoxShape.circle,
+                          ),
+                          specialDatesDecoration: BoxDecoration(
+                            color: Colors.green,
+                            border: Border.all(color: const Color(0xFF2B732F), width: 1),
+                            shape: BoxShape.circle,
+                          ),
+                          blackoutDateTextStyle: const TextStyle(color: Colors.white, decoration: TextDecoration.lineThrough),
+                          specialDatesTextStyle: const TextStyle(color: Colors.white),
+                          todayCellDecoration: BoxDecoration(
+                            color: const Color(0xFFDFDFDF),
+                            border: Border.all(color: const Color(0xFFB6B6B6), width: 1),
+                            shape: BoxShape.circle,
+                          ),
+                          todayTextStyle: const TextStyle(color: Colors.black),
+                        ),
+                        selectionMode: DateRangePickerSelectionMode.multiple,
+                        onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
+                          selectedDates.value = args.value.cast<DateTime>();
+                          textEditingController.value.text = _getFormattedDates(selectedDates.value);
+                          print(selectedDates.value);
+                        },
+                        headerStyle: const DateRangePickerHeaderStyle(
+                          textAlign: TextAlign.center,
+                          textStyle: TextStyle(color: Colors.white),
+                        ),
+                        showActionButtons: true,
+                        selectionColor: Colors.green,
+                        rangeSelectionColor: Colors.white.withOpacity(0.3),
+                        onCancel: () {
+                          selectedDates.value = [];
+                          textEditingController.value.text = '';
+                          //print(selectedDates.value);
+                          Navigator.of(context).pop();
+                        },
+                        onSubmit: (dynamic value) {
+                          textEditingController.value.text = _getFormattedDates(selectedDates.value);
+                          //print(selectedDates.value);
+                          Navigator.of(context).pop();
+                        },
                       ),
                     ),
                   ),
-                  child: SfDateRangePicker(
-                    view: DateRangePickerView.month,
-                    monthViewSettings: DateRangePickerMonthViewSettings(
-                      blackoutDates: [DateTime(2020, 03, 26)],
-                      weekendDays: [5],
-                      firstDayOfWeek: 1,
-                    ),
-                    monthCellStyle: DateRangePickerMonthCellStyle(
-                      textStyle: const TextStyle(color: Colors.white),
-                      blackoutDatesDecoration: BoxDecoration(
-                        color: Colors.red,
-                        border: Border.all(color: const Color(0xFFF44436), width: 1),
-                        shape: BoxShape.circle,
-                      ),
-                      weekendDatesDecoration: BoxDecoration(
-                        color: Colors.red,
-                        border: Border.all(color: const Color(0xFFB6B6B6), width: 1),
-                        shape: BoxShape.circle,
-                      ),
-                      specialDatesDecoration: BoxDecoration(
-                        color: Colors.green,
-                        border: Border.all(color: const Color(0xFF2B732F), width: 1),
-                        shape: BoxShape.circle,
-                      ),
-                      blackoutDateTextStyle: const TextStyle(color: Colors.white, decoration: TextDecoration.lineThrough),
-                      specialDatesTextStyle: const TextStyle(color: Colors.white),
-                      todayCellDecoration: BoxDecoration(
-                        color: const Color(0xFFDFDFDF),
-                        border: Border.all(color: const Color(0xFFB6B6B6), width: 1),
-                        shape: BoxShape.circle,
-                      ),
-                      todayTextStyle: const TextStyle(color: Colors.black),
-                    ),
-                    selectionMode: DateRangePickerSelectionMode.multiple,
-                    onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
-                      selectedDates.value = args.value.cast<DateTime>();
-                      textEditingController.value.text = _getFormattedDates(selectedDates.value);
-                      print(selectedDates.value);
-                    },
-                    headerStyle: const DateRangePickerHeaderStyle(
-                      textAlign: TextAlign.center,
-                      textStyle: TextStyle(color: Colors.white),
-                    ),
-                    showActionButtons: true,
-                    selectionColor: Colors.green,
-                    rangeSelectionColor: Colors.white.withOpacity(0.3),
-                    onCancel: () {
-                      selectedDates.value = [];
-                      textEditingController.value.text = '';
-                      //print(selectedDates.value);
-                      Navigator.of(context).pop();
-                    },
-                    onSubmit: (dynamic value) {
-                      textEditingController.value.text = _getFormattedDates(selectedDates.value);
-                      //print(selectedDates.value);
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ),
+                ],
               ),
             ),
           ),

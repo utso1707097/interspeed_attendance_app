@@ -16,7 +16,7 @@ import 'utils/custom_loading_indicator.dart';
 
 class UpdateProfilePage extends StatelessWidget {
   final List<Map<String, dynamic>> resultList;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKeyUpdate = GlobalKey<FormState>();
 
   UpdateProfilePage({required this.resultList});
 
@@ -40,7 +40,7 @@ class UpdateProfilePage extends StatelessWidget {
                   FocusScope.of(context).unfocus();
                 },
                 child: Form(
-                  key: _formKey, // Add a GlobalKey<FormState> for the Form
+                  key: _formKeyUpdate, // Add a GlobalKey<FormState> for the Form
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -545,101 +545,107 @@ class UpdateProfilePage extends StatelessWidget {
     final DateTime? pickedDate = await showDialog<DateTime>(
       context: context,
       builder: (BuildContext context) {
+        final double dialogHeight = MediaQuery.of(context).size.height * 0.5;
+        final double dialogWidth = MediaQuery.of(context).size.width *0.9;
         return Center(
           child: AlertDialog(
             backgroundColor: const Color(0xFF333333),
-            content: Padding(
-              padding: const EdgeInsets.all(0),
-              child: Container(
-                padding: const EdgeInsets.all(0),
-                height: MediaQuery.of(context).size.height * 0.5,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: Theme(
-                  data: Theme.of(context).copyWith(
-                    colorScheme: const ColorScheme.light(
-                      primary: Colors.red,
-                      onPrimary: Colors.black,
-                      onSurface: Colors.white,
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(0),
+                    height: dialogHeight,
+                    width: dialogWidth,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
-                    textButtonTheme: TextButtonThemeData(
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.green,
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        colorScheme: const ColorScheme.light(
+                          primary: Colors.red,
+                          onPrimary: Colors.black,
+                          onSurface: Colors.white,
+                        ),
+                        textButtonTheme: TextButtonThemeData(
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.green,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  child: SfDateRangePicker(
-                    view: DateRangePickerView.decade,
-                    monthViewSettings: DateRangePickerMonthViewSettings(
-                      blackoutDates: [DateTime(2020, 03, 26)],
-                      weekendDays: [5],
-                      firstDayOfWeek: 1,
-                    ),
-                    monthCellStyle: DateRangePickerMonthCellStyle(
-                      textStyle: const TextStyle(color: Colors.white),
-                      blackoutDatesDecoration: BoxDecoration(
-                        color: Colors.red,
-                        border: Border.all(
-                            color: const Color(0xFFF44436), width: 1),
-                        shape: BoxShape.circle,
-                      ),
-                      weekendDatesDecoration: BoxDecoration(
-                        color: Colors.red,
-                        border: Border.all(
-                            color: const Color(0xFFB6B6B6), width: 1),
-                        shape: BoxShape.circle,
-                      ),
-                      specialDatesDecoration: BoxDecoration(
-                        color: Colors.green,
-                        border: Border.all(
-                            color: const Color(0xFF2B732F), width: 1),
-                        shape: BoxShape.circle,
-                      ),
-                      blackoutDateTextStyle: const TextStyle(
-                          color: Colors.white,
-                          decoration: TextDecoration.lineThrough),
-                      specialDatesTextStyle:
-                          const TextStyle(color: Colors.white),
-                      todayCellDecoration: BoxDecoration(
-                        color: const Color(0xFFDFDFDF),
-                        border: Border.all(
-                            color: const Color(0xFFB6B6B6), width: 1),
-                        shape: BoxShape.circle,
-                      ),
-                      todayTextStyle: const TextStyle(color: Colors.black),
-                    ),
-                    selectionMode: DateRangePickerSelectionMode.single,
-                    headerStyle: const DateRangePickerHeaderStyle(
-                      textAlign: TextAlign.center,
-                      textStyle: TextStyle(color: Colors.white),
-                    ),
-                    showActionButtons: true,
-                    selectionColor: Colors.green,
-                    rangeSelectionColor: Colors.white.withOpacity(0.3),
-                    onSelectionChanged:
-                        (DateRangePickerSelectionChangedArgs args) {
-                      // Update the value and text field when a date is selected
-                      value.value = args.value.toString();
-                      // Format the selected date to "yyyy-MM-dd"
-                      final formattedDate =
-                          DateFormat('yyyy-MM-dd').format(args.value);
-                      print(formattedDate);
-                      controller.fieldModificationStatus[rxString] = true;
-                      value.value = formattedDate;
+                      child: SfDateRangePicker(
+                        view: DateRangePickerView.decade,
+                        monthViewSettings: DateRangePickerMonthViewSettings(
+                          blackoutDates: [DateTime(2020, 03, 26)],
+                          weekendDays: [5],
+                          firstDayOfWeek: 1,
+                        ),
+                        monthCellStyle: DateRangePickerMonthCellStyle(
+                          textStyle: const TextStyle(color: Colors.white),
+                          blackoutDatesDecoration: BoxDecoration(
+                            color: Colors.red,
+                            border: Border.all(
+                                color: const Color(0xFFF44436), width: 1),
+                            shape: BoxShape.circle,
+                          ),
+                          weekendDatesDecoration: BoxDecoration(
+                            color: Colors.red,
+                            border: Border.all(
+                                color: const Color(0xFFB6B6B6), width: 1),
+                            shape: BoxShape.circle,
+                          ),
+                          specialDatesDecoration: BoxDecoration(
+                            color: Colors.green,
+                            border: Border.all(
+                                color: const Color(0xFF2B732F), width: 1),
+                            shape: BoxShape.circle,
+                          ),
+                          blackoutDateTextStyle: const TextStyle(
+                              color: Colors.white,
+                              decoration: TextDecoration.lineThrough),
+                          specialDatesTextStyle:
+                              const TextStyle(color: Colors.white),
+                          todayCellDecoration: BoxDecoration(
+                            color: const Color(0xFFDFDFDF),
+                            border: Border.all(
+                                color: const Color(0xFFB6B6B6), width: 1),
+                            shape: BoxShape.circle,
+                          ),
+                          todayTextStyle: const TextStyle(color: Colors.black),
+                        ),
+                        selectionMode: DateRangePickerSelectionMode.single,
+                        headerStyle: const DateRangePickerHeaderStyle(
+                          textAlign: TextAlign.center,
+                          textStyle: TextStyle(color: Colors.white),
+                        ),
+                        showActionButtons: true,
+                        selectionColor: Colors.green,
+                        rangeSelectionColor: Colors.white.withOpacity(0.3),
+                        onSelectionChanged:
+                            (DateRangePickerSelectionChangedArgs args) {
+                          // Update the value and text field when a date is selected
+                          value.value = args.value.toString();
+                          // Format the selected date to "yyyy-MM-dd"
+                          final formattedDate =
+                              DateFormat('yyyy-MM-dd').format(args.value);
+                          print(formattedDate);
+                          controller.fieldModificationStatus[rxString] = true;
+                          value.value = formattedDate;
 
-                      // Update the text field with the formatted date
-                      textController.text = formattedDate;
-                    },
-                    onCancel: () {
-                      Navigator.of(context).pop(null);
-                    },
-                    onSubmit: (dynamic value) {
-                      controller.fieldModificationStatus[rxString] = true;
-                      Navigator.of(context).pop(value);
-                    },
+                          // Update the text field with the formatted date
+                          textController.text = formattedDate;
+                        },
+                        onCancel: () {
+                          Navigator.of(context).pop(null);
+                        },
+                        onSubmit: (dynamic value) {
+                          controller.fieldModificationStatus[rxString] = true;
+                          Navigator.of(context).pop(value);
+                        },
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ),
