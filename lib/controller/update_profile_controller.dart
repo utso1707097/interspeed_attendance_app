@@ -5,7 +5,7 @@ class EmployeeUpdateController extends GetxController {
   // RxInt employeeId = RxInt(0);
   RxMap<RxString, bool> fieldModificationStatus = RxMap<RxString, bool>();
   RxString genderType = RxString("");
-  RxString identityTypeId = RxString("");
+  RxString identityTypeName = RxString("");
   RxString identityNumber = RxString("");
   RxString tinNumber = RxString("");
   RxString employeeName = RxString("");
@@ -37,7 +37,7 @@ class EmployeeUpdateController extends GetxController {
   // Methods to set values
   // void setEmployeeId(int id) => employeeId.value = id;
   void setGender(String gender) => genderType.value = gender;
-  void setIdentityTypeId(String id) => identityTypeId.value = id;
+  void setIdentityTypeName(String name) => identityTypeName.value = name;
   void setIdentityNumber(String nid) => identityNumber.value = nid;
   void setTinNumber(String tin) => tinNumber.value = tin;
   void setEmployeeName(String name) => employeeName.value = name;
@@ -84,7 +84,7 @@ class EmployeeUpdateController extends GetxController {
     personalMobile.value = "";
     employeeName.value = "";
     genderType.value = "";
-    identityTypeId.value = "";
+    identityTypeName.value = "";
     identityNumber.value = "";
     tinNumber.value = "";
     dateOfBirth.value = "";

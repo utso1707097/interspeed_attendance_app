@@ -68,10 +68,11 @@ class LoginPage extends StatelessWidget {
                                   vertical: 0, horizontal: 0),
                               width: MediaQuery.of(context).size.width *
                                   0.7, // Adjust the percentage as needed
-                              height: layout.getHeight(50),
+                              //height: layout.getHeight(50),
                               child: TextFormField(
                                   controller: usernameController,
                                   decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.symmetric(vertical: 16,horizontal: 8),
                                     filled: true,
                                     fillColor: Colors.white,
                                     hintText: "your id",
@@ -106,11 +107,12 @@ class LoginPage extends StatelessWidget {
                             Container(
                               width: MediaQuery.of(context).size.width *
                                   0.7, // Adjust the percentage as needed
-                              height: layout.getHeight(50),
+                              //height: layout.getHeight(50),
                               child: TextFormField(
                                   controller: passwordController,
                                   obscureText: true,
                                   decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.symmetric(vertical: 16,horizontal: 8),
                                     filled: true,
                                     fillColor: Colors.white,
                                     hintText: "password",
@@ -227,6 +229,7 @@ class LoginPage extends StatelessWidget {
           if(sessionData["user_type_id"].toString() == "4"){
             // print("Executed");
             await saveSessionData(sessionData);
+            print(sessionData);
             Navigator.pop(context);
             Navigator.pushReplacement(
               context,

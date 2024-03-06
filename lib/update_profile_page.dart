@@ -73,6 +73,13 @@ class UpdateProfilePage extends StatelessWidget {
                                       width: MediaQuery.of(context).size.width * 0.2,
                                       height: MediaQuery.of(context).size.height * 0.2,
                                       fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        // Handle image loading error
+                                        return Image.asset('assets/images/person.png',
+                                          width: MediaQuery.of(context).size.width * 0.3,
+                                          height: MediaQuery.of(context).size.width * 0.2,
+                                        );
+                                      },
                                     )
                                         : Image.asset(
                                       'assets/images/person.png',
@@ -213,15 +220,15 @@ class UpdateProfilePage extends StatelessWidget {
                       // Dropdown field for gender
                       buildDropdownField(
                         "Identification type",
-                        controller.identityTypeId,
-                        resultList.isNotEmpty ? resultList[0]['identity_type_id'].toString() : "",
+                        controller.identityTypeName,
+                        resultList.isNotEmpty ? resultList[0]['identity_type_name'].toString() : "Not Provided",
                         controller.fieldModificationStatus,
-                        ["0", "1"],
+                        ["NID", "TIN"],
                       ),
 
                       // First text field
                       Visibility(
-                        visible: controller.identityTypeId.value.toString() == "0",
+                        visible: controller.identityTypeName.value.toString() == "NID",
                         child: buildTextField(
                           "National Identification Number",
                           controller.identityNumber,
@@ -233,7 +240,7 @@ class UpdateProfilePage extends StatelessWidget {
 
                       // Text field for Tax Identification Number (TIN)
                       Visibility(
-                        visible: controller.identityTypeId.value.toString() == "1",
+                        visible: controller.identityTypeName.value.toString() == "TIN",
                         child: buildTextField(
                           "Tax Identification Number",
                           controller.tinNumber,
@@ -750,9 +757,12 @@ class UpdateProfilePage extends StatelessWidget {
       // 'IdentityMark': controller.identityMark.value.isNotEmpty
       //     ? controller.identityMark.value
       //     : (resultList[0]['identity_mark'] ?? ''),
-      'IdentityTypeId': controller.identityTypeId.value.isNotEmpty
-          ? controller.identityTypeId.value
-          : (resultList[0]['identity_type_id'] ?? ''),
+      'IdentityTypeId': controller.identityTypeName.value.isNotEmpty
+          ? (controller.identityTypeName.value == 'NID' ? '1' : (controller.identityTypeName.value == 'TIN' ? '0' : ''))
+          : (resultList.isNotEmpty ? (resultList[0]['identity_type_id'] ?? '') : ''),
+      'IdentityTypeName': controller.identityTypeName.value.isNotEmpty
+          ? controller.identityTypeName.value
+          : (resultList.isNotEmpty ? (resultList[0]['identity_type_name'] ?? '') : ''),
       'IdentityNumber': controller.identityNumber.value.isNotEmpty
           ? controller.identityNumber.value
           : (resultList[0]['identity_number'] ?? ''),

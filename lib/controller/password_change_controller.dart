@@ -16,7 +16,7 @@ class PasswordChangeController extends GetxController {
   final RxBool newObscureText = true.obs;
   final RxBool confirmObscureText = true.obs;
 
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> passwordFormKey = GlobalKey<FormState>();
 
   @override
   void onInit() {

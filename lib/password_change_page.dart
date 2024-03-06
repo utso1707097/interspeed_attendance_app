@@ -15,7 +15,7 @@ class PasswordChangeForm extends StatelessWidget {
     controller.setUserId(userId);
     final layout = AppLayout(context: context);
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       drawer: MyDrawer(context: context),
       backgroundColor: Color(0xff1a1a1a),
       body: Center(
@@ -24,7 +24,7 @@ class PasswordChangeForm extends StatelessWidget {
             height: layout.getScreenHeight(),
             width: MediaQuery.sizeOf(context).width * 0.7,
             child: Form(
-              key: controller.formKey,
+              key: controller.passwordFormKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -76,7 +76,7 @@ class PasswordChangeForm extends StatelessWidget {
         obscureText: obscureText.value,
         cursorColor: Colors.black,
         decoration: InputDecoration(
-          contentPadding: EdgeInsets.all(8),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16,vertical: 8),
           suffixIcon: GestureDetector(
             onTap: () {
               obscureText.toggle();

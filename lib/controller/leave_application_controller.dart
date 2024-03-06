@@ -190,6 +190,7 @@ class LeaveApplicationController extends GetxController {
           Map<String, dynamic> responseData = jsonDecode(response.body);
           if (responseData['success'] == true) {
             Navigator.pop(context);
+            Navigator.pop(context);
             _showAlertDialog('Success', responseData['message'], 200);
             clearSelectedDates();
             selectedLeaveType.value = '';

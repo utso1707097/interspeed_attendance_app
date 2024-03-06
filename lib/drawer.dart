@@ -6,6 +6,7 @@ import 'package:interspeed_attendance_app/leave_page.dart';
 import 'package:interspeed_attendance_app/login_page.dart';
 import 'package:interspeed_attendance_app/password_change_page.dart';
 import 'package:interspeed_attendance_app/profile_page.dart';
+import 'package:interspeed_attendance_app/utils/layout_size.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'controller/dashboard_controller.dart';
@@ -23,7 +24,17 @@ class MyDrawer extends StatelessWidget {
   }) : super(key: key);
 
   @override
+
+  Widget _buildPlaceholderImage() {
+    return Image.asset(
+      'assets/images/person.png', // Replace 'assets/placeholder_image.png' with the path to your placeholder image asset
+      fit: BoxFit.fill
+      ,
+    );
+  }
+
   Widget build(BuildContext context){
+    AppLayout layout = AppLayout(context: context);
     DashboardController dashboardController = Get.find<DashboardController>();
     String fullName = dashboardController.sessionData['full_name'] ?? '';
     String sbName = dashboardController.sessionData['sb_name'] ?? '';
@@ -37,19 +48,35 @@ class MyDrawer extends StatelessWidget {
       width: MediaQuery.of(context).size.width * 0.75,
       child: ListView(
         children: [
-          DrawerHeader(
-            padding: const EdgeInsets.all(0),
-            margin: const EdgeInsets.all(0),
-            child: UserAccountsDrawerHeader(
-              margin: const EdgeInsets.all(0),
-              decoration: const BoxDecoration(color: Color(0xff333333)),
-              accountName: Text(fullName),
-              accountEmail: Text(sbName),
-              currentAccountPicture: Image.network(
-                picture_name != ''? 'https://br-isgalleon.com/image_ops/employee/${picture_name.toString()}' : "https://winaero.com/blog/wp-content/uploads/2017/12/User-icon-256-blue.png",
-              ),
+        DrawerHeader(
+        padding: EdgeInsets.zero,
+        margin: EdgeInsets.zero,
+        decoration: BoxDecoration(color: Color(0xff333333)),
+        child: UserAccountsDrawerHeader(
+          margin: EdgeInsets.zero,
+          decoration: BoxDecoration(color: Color(0xff333333)),
+          accountName: Text(fullName),
+          accountEmail: Text(sbName),
+          currentAccountPicture: ClipOval(
+            child: Container(
+              width: layout.getwidth(70),
+              height: layout.getwidth(70),
+              child: picture_name != ''
+                  ? Image.network(
+                'https://br-isgalleon.com/image_ops/employee/${picture_name.toString()}',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  // Handle network-related errors here
+                  print('Error loading image: $error');
+                  // Return a placeholder widget as a fallback
+                  return _buildPlaceholderImage();
+                },
+              )
+                  : _buildPlaceholderImage(), // Fallback for empty picture_name
             ),
           ),
+        ),
+      ),
           ListTile(
             leading: const Icon(
               Icons.home,
