@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:interspeed_attendance_app/login_page.dart';
 import 'package:get/get.dart';
 
-void main() {
+void main() async {
   runApp(MyApp());
 }
 

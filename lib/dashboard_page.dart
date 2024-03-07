@@ -18,10 +18,6 @@ class DashboardPage extends StatelessWidget {
       Get.put(DashboardController());
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  DashboardPage() {
-    dashboardController.fetchSessionData();
-  }
-
   getCurrentLocation() async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied ||
@@ -159,6 +155,13 @@ class DashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String userId = dashboardController.sessionData['user_id'] ?? '';
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      // This function will be called after the widget is built
+      if(dashboardController.appVersion.value!=""){
+        dashboardController.checkForUpdate(userId, "interspeed", dashboardController.appVersion.value,context);
+      }
+    });
     final layout = AppLayout(context: context);
     var currentTime = DateFormat('h:mm a', 'en_US').format(
         DateTime.now().toUtc().add(const Duration(hours: 6))); // Dhaka UTC+6
@@ -212,7 +215,7 @@ class DashboardPage extends StatelessWidget {
                         // Flex 2 - Column section
                         Expanded(
                           flex: 2,
-                          child: Container(
+                          child: SizedBox(
                             height: MediaQuery.of(context).size.height *
                                 0.2, // Set a specific height
                             child: Column(
@@ -260,375 +263,242 @@ class DashboardPage extends StatelessWidget {
                     ),
                   ),
 
-                  Column(
-                    children: [
-                      SizedBox(height: layout.getwidth(10),),
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: MediaQuery.of(context).size.width * 0.1 * 0.1, // Adjust as needed
-                              vertical: MediaQuery.of(context).size.height * 0.15 * 0.12,  // Adjust as needed
-                            ),
-                            primary: Colors.lightBlueAccent,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.zero,
-                                topRight: Radius.circular(25),
-                                bottomLeft: Radius.zero,
-                                bottomRight: Radius.circular(25),
+                  Container(
+                    constraints: BoxConstraints(
+                      minHeight: MediaQuery.of(context).size.height*0.4,
+                    ),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: layout.getwidth(10),
+                        ),
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: MediaQuery.of(context).size.width *
+                                    0.1 *
+                                    0.1, // Adjust as needed
+                                vertical: MediaQuery.of(context).size.height *
+                                    0.15 *
+                                    0.12, // Adjust as needed
+                              ),
+                              primary: Colors.lightBlueAccent,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.zero,
+                                  topRight: Radius.circular(25),
+                                  bottomLeft: Radius.zero,
+                                  bottomRight: Radius.circular(25),
+                                ),
                               ),
                             ),
+                            onPressed: () {
+                              _scaffoldKey.currentState?.openDrawer();
+                            },
+                            child: const Icon(Icons.chevron_right, color: Colors.black),
                           ),
-                          onPressed: () {
-                            _scaffoldKey.currentState?.openDrawer();
-                          },
-                          child: Icon(Icons.chevron_right, color: Colors.black),
                         ),
-                      ),
-                      SizedBox(
-                        height: layout.getHeight(80),
-                      ),
-                      SizedBox(
-                        // color: Colors.white,
-                        height: layout.getHeight(200),
-                        width: double.infinity,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.32,
-                              height: MediaQuery.of(context).size.width * 0.40,
-                              decoration: BoxDecoration(
-                                color: const Color(0xff3a473e),
-                                borderRadius: BorderRadius.circular(16.0),
-                              ),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xff00a0b0),
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(16.0),
-                                        topRight: Radius.circular(16.0),
-                                      ),
-                                    ),
-                                    width: double.infinity,
-                                    height: layout.getHeight(25),
-                                  ),
-                                  SizedBox(
-                                    height: layout.getHeight(12),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      getCurrentLocation();
-                                      dashboardController
-                                          .setSignInButtonClicked(true);
-                                      dashboardController
-                                          .setSignOutButtonClicked(false);
-                                      // Add your custom logic here
-                                    },
-                                    child: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        Image.asset(
-                                            'assets/images/entry_button.png',
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.2,
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.2),
-                                        Text(
-                                          'Entry',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .width /
-                                                360 *
-                                                14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(height: layout.getHeight(6)),
-                                  Container(
-                                    width: double.infinity,
-                                    alignment: Alignment.bottomCenter,
-                                    child: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        Image.asset(
-                                            'assets/images/entry_time_box.png',
-                                            height: layout.getHeight(13)),
-                                        Text(
-                                          currentTime,
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .width /
-                                                360 *
-                                                12,
-                                            fontWeight: FontWeight.normal,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.32,
-                              height: MediaQuery.of(context).size.width * 0.40,
-                              decoration: BoxDecoration(
-                                color: const Color(0xff3a473e),
-                                borderRadius: BorderRadius.circular(16.0),
-                              ),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xfffec34f),
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(16.0),
-                                        topRight: Radius.circular(16.0),
-                                      ),
-                                    ),
-                                    width: double.infinity,
-                                    height: layout.getHeight(25),
-                                  ),
-                                  SizedBox(
-                                    height: layout.getHeight(12),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      getCurrentLocation();
-                                      dashboardController
-                                          .setSignOutButtonClicked(true);
-                                      dashboardController
-                                          .setSignInButtonClicked(false);
-                                      // Add your custom logic here
-                                    },
-                                    child: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        Image.asset(
-                                            'assets/images/exit_button.png',
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.2,
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.2),
-                                        Text(
-                                          'Exit',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .width /
-                                                360 *
-                                                14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: layout.getHeight(6),
-                                  ),
-                                  Container(
-                                    width: double.infinity,
-                                    alignment: Alignment.bottomCenter,
-                                    child: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        Image.asset(
-                                            'assets/images/exit_time_box.png',
-                                            height: layout.getHeight(13)),
-                                        Text(
-                                          currentTime,
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .width /
-                                                360 *
-                                                12,
-                                            fontWeight: FontWeight.normal,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            )
-                          ],
+                        SizedBox(
+                          height: layout.getHeight(80),
                         ),
-                      ),
-                      dashboardController.isSignInButtonClicked.value
-                          ? Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 26),
-                              child: Container(
-                                padding: const EdgeInsets.all(10.0),
+                        SizedBox(
+                          // color: Colors.white,
+                          //height: layout.getHeight(200),
+                          width: double.infinity,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.32,
+                                height: MediaQuery.of(context).size.width * 0.40,
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  color: const Color(0xff3a473e),
+                                  borderRadius: BorderRadius.circular(16.0),
                                 ),
                                 child: Column(
                                   children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.35,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.40,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              navigateToCameraPage();
-                                            },
-                                            child: _buildCard(
-                                              layout: layout,
-                                              color: 0xff74c2c6,
-                                              image:
-                                                  'assets/images/ic_camera.png',
-                                              title: 'Camera',
-                                              description: dashboardController
-                                                          .signInBase64Image
-                                                          .value !=
-                                                      ""
-                                                  ? 'Image Captured'
-                                                  : 'Capture Image',
-                                            ),
-                                          ),
+                                    Container(
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xff00a0b0),
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(16.0),
+                                          topRight: Radius.circular(16.0),
                                         ),
-                                        SizedBox(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.1,
-                                        ),
-                                        Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.35,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.40,
-                                          child: _buildCard(
-                                            layout: layout,
-                                            color: 0xff74c2c6,
-                                            image: 'assets/images/ic_gps.png',
-                                            title: 'GPS',
-                                            description: dashboardController
-                                                        .accuracy.value ==
-                                                    100
-                                                ? 'Loading!'
-                                                : 'Accuracy: ${dashboardController.accuracy.value.toString()}',
-                                          ),
-                                        ),
-                                      ],
+                                      ),
+                                      width: double.infinity,
+                                      height: layout.getHeight(25),
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                    SizedBox(
+                                      height: layout.getHeight(12),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        getCurrentLocation();
+                                        dashboardController
+                                            .setSignInButtonClicked(true);
+                                        dashboardController
+                                            .setSignOutButtonClicked(false);
+                                        // Add your custom logic here
+                                      },
+                                      child: Stack(
+                                        alignment: Alignment.center,
                                         children: [
-                                          Checkbox(
-                                            value: dashboardController
-                                                .showRemark.value,
-                                            onChanged: (value) {
-                                              dashboardController
-                                                  .toggleShowRemark(
-                                                      value ?? false);
-                                            },
-                                          ),
-                                          const Text(
-                                            "Write remarks",
+                                          Image.asset(
+                                              'assets/images/entry_button.png',
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.2,
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.2),
+                                          Text(
+                                            'Entry',
                                             style: TextStyle(
-                                              color: Colors.white,
+                                              color: Colors.black,
+                                              fontSize: MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  360 *
+                                                  14,
+                                              fontWeight: FontWeight.bold,
                                             ),
-                                          )
+                                          ),
                                         ],
                                       ),
                                     ),
-
-                                    (dashboardController.showRemark.value)
-                                        ? Container(
-                                            color: const Color(0xff333333),
-                                            child: TextField(
-                                              controller: dashboardController
-                                                  .remarkController.value,
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    360 *
-                                                    13,
-                                              ),
-                                              maxLines: 1,
-                                              keyboardType:
-                                                  TextInputType.multiline,
-                                              decoration: InputDecoration(
-                                                contentPadding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 16,
-                                                        vertical: 8),
-                                                hintStyle: TextStyle(
-                                                  fontSize:
-                                                      MediaQuery.of(context)
-                                                              .size
-                                                              .width /
-                                                          360 *
-                                                          15,
-                                                  fontWeight: FontWeight.w500,
-                                                  color:
-                                                      const Color(0xff808080),
-                                                ),
-                                                border:
-                                                    const OutlineInputBorder(),
-                                                hintText: 'Remark...',
-                                              ),
+                                    SizedBox(height: layout.getHeight(6)),
+                                    Container(
+                                      width: double.infinity,
+                                      alignment: Alignment.bottomCenter,
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Image.asset(
+                                              'assets/images/entry_time_box.png',
+                                              height: layout.getHeight(13)),
+                                          Text(
+                                            currentTime,
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  360 *
+                                                  12,
+                                              fontWeight: FontWeight.normal,
                                             ),
-                                          )
-                                        : const SizedBox(),
-                                    // Return an empty widget if showRemark is false,
-
-                                    SizedBox(height: layout.getHeight(16)),
+                                          ),
+                                        ],
+                                      ),
+                                    )
                                   ],
                                 ),
                               ),
-                            )
-                          : const SizedBox.shrink(),
-                      dashboardController.isSignOutButtonClicked.value
-                          ? Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 26),
-                              child: Container(
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.32,
+                                height: MediaQuery.of(context).size.width * 0.40,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xff3a473e),
+                                  borderRadius: BorderRadius.circular(16.0),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xfffec34f),
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(16.0),
+                                          topRight: Radius.circular(16.0),
+                                        ),
+                                      ),
+                                      width: double.infinity,
+                                      height: layout.getHeight(25),
+                                    ),
+                                    SizedBox(
+                                      height: layout.getHeight(12),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        getCurrentLocation();
+                                        dashboardController
+                                            .setSignOutButtonClicked(true);
+                                        dashboardController
+                                            .setSignInButtonClicked(false);
+                                        // Add your custom logic here
+                                      },
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Image.asset(
+                                              'assets/images/exit_button.png',
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.2,
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.2),
+                                          Text(
+                                            'Exit',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  360 *
+                                                  14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: layout.getHeight(6),
+                                    ),
+                                    Container(
+                                      width: double.infinity,
+                                      alignment: Alignment.bottomCenter,
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Image.asset(
+                                              'assets/images/exit_time_box.png',
+                                              height: layout.getHeight(13)),
+                                          Text(
+                                            currentTime,
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  360 *
+                                                  12,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: layout.getHeight(40),
+                        ),
+                        dashboardController.isSignInButtonClicked.value
+                            ? Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: layout.getHeight(26)),
+                                child: Container(
                                   padding: const EdgeInsets.all(10.0),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8.0),
@@ -654,16 +524,16 @@ class DashboardPage extends StatelessWidget {
                                               },
                                               child: _buildCard(
                                                 layout: layout,
+                                                color: 0xff74c2c6,
                                                 image:
                                                     'assets/images/ic_camera.png',
                                                 title: 'Camera',
                                                 description: dashboardController
-                                                            .signOutBase64Image
+                                                            .signInBase64Image
                                                             .value !=
                                                         ""
                                                     ? 'Image Captured'
                                                     : 'Capture Image',
-                                                color: 0xfffed593,
                                               ),
                                             ),
                                           ),
@@ -684,6 +554,7 @@ class DashboardPage extends StatelessWidget {
                                                 0.40,
                                             child: _buildCard(
                                               layout: layout,
+                                              color: 0xff74c2c6,
                                               image: 'assets/images/ic_gps.png',
                                               title: 'GPS',
                                               description: dashboardController
@@ -691,7 +562,6 @@ class DashboardPage extends StatelessWidget {
                                                       100
                                                   ? 'Loading!'
                                                   : 'Accuracy: ${dashboardController.accuracy.value.toString()}',
-                                              color: 0xfffed593,
                                             ),
                                           ),
                                         ],
@@ -730,20 +600,18 @@ class DashboardPage extends StatelessWidget {
                                                     .remarkController.value,
                                                 style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize:
-                                                      MediaQuery.of(context)
-                                                              .size
-                                                              .width /
-                                                          360 *
-                                                          13,
+                                                  fontSize: MediaQuery.of(context)
+                                                          .size
+                                                          .width /
+                                                      360 *
+                                                      13,
                                                 ),
                                                 maxLines: 1,
                                                 keyboardType:
                                                     TextInputType.multiline,
                                                 decoration: InputDecoration(
                                                   contentPadding:
-                                                      const EdgeInsets
-                                                          .symmetric(
+                                                      const EdgeInsets.symmetric(
                                                           horizontal: 16,
                                                           vertical: 8),
                                                   hintStyle: TextStyle(
@@ -768,10 +636,159 @@ class DashboardPage extends StatelessWidget {
 
                                       SizedBox(height: layout.getHeight(16)),
                                     ],
-                                  )),
-                            )
-                          : const SizedBox.shrink(),
-                    ],
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                        dashboardController.isSignOutButtonClicked.value
+                            ? Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: layout.getHeight(26)),
+                                child: Container(
+                                    padding: const EdgeInsets.all(10.0),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.35,
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.40,
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  navigateToCameraPage();
+                                                },
+                                                child: _buildCard(
+                                                  layout: layout,
+                                                  image:
+                                                      'assets/images/ic_camera.png',
+                                                  title: 'Camera',
+                                                  description: dashboardController
+                                                              .signOutBase64Image
+                                                              .value !=
+                                                          ""
+                                                      ? 'Image Captured'
+                                                      : 'Capture Image',
+                                                  color: 0xfffed593,
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.1,
+                                            ),
+                                            Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.35,
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.40,
+                                              child: _buildCard(
+                                                layout: layout,
+                                                image: 'assets/images/ic_gps.png',
+                                                title: 'GPS',
+                                                description: dashboardController
+                                                            .accuracy.value ==
+                                                        100
+                                                    ? 'Loading!'
+                                                    : 'Accuracy: ${dashboardController.accuracy.value.toString()}',
+                                                color: 0xfffed593,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Checkbox(
+                                                value: dashboardController
+                                                    .showRemark.value,
+                                                onChanged: (value) {
+                                                  dashboardController
+                                                      .toggleShowRemark(
+                                                          value ?? false);
+                                                },
+                                              ),
+                                              const Text(
+                                                "Write remarks",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+
+                                        (dashboardController.showRemark.value)
+                                            ? Container(
+                                                color: const Color(0xff333333),
+                                                child: TextField(
+                                                  controller: dashboardController
+                                                      .remarkController.value,
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width /
+                                                            360 *
+                                                            13,
+                                                  ),
+                                                  maxLines: 1,
+                                                  keyboardType:
+                                                      TextInputType.multiline,
+                                                  decoration: InputDecoration(
+                                                    contentPadding:
+                                                        const EdgeInsets
+                                                            .symmetric(
+                                                            horizontal: 16,
+                                                            vertical: 8),
+                                                    hintStyle: TextStyle(
+                                                      fontSize:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width /
+                                                              360 *
+                                                              15,
+                                                      fontWeight: FontWeight.w500,
+                                                      color:
+                                                          const Color(0xff808080),
+                                                    ),
+                                                    border:
+                                                        const OutlineInputBorder(),
+                                                    hintText: 'Remark...',
+                                                  ),
+                                                ),
+                                              )
+                                            : const SizedBox(),
+                                        // Return an empty widget if showRemark is false,
+
+                                        SizedBox(height: layout.getHeight(16)),
+                                      ],
+                                    )),
+                              )
+                            : const SizedBox.shrink(),
+                      ],
+                    ),
                   ),
                   dashboardController.isSignInButtonClicked.value ||
                           dashboardController.isSignOutButtonClicked.value
@@ -802,6 +819,12 @@ class DashboardPage extends StatelessWidget {
                   SizedBox(
                     height: layout.getHeight(16),
                   ),
+                  Text(
+                    dashboardController.appVersion.value,
+                    style: const TextStyle(
+                      color: Color(0xffF0F0F0),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -827,11 +850,10 @@ class DashboardPage extends StatelessWidget {
           //color: Colors.white,
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(
-              height: 6,
-            ),
+            const Spacer(),
             Text(
               title,
               style: const TextStyle(
@@ -839,6 +861,7 @@ class DashboardPage extends StatelessWidget {
                   fontSize: 14,
                   color: Colors.white),
             ),
+            const Spacer(),
             Padding(
               padding: const EdgeInsets.fromLTRB(25, 0, 25, 0),
               child: Image.asset(
@@ -850,6 +873,7 @@ class DashboardPage extends StatelessWidget {
                 // Adjust the fit based on your requirement
               ),
             ),
+            const Spacer(),
             Text(
               description,
               style: const TextStyle(
@@ -857,6 +881,7 @@ class DashboardPage extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
+            const Spacer(),
           ],
         ),
       ),

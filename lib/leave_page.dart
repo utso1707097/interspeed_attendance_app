@@ -35,61 +35,6 @@ class LeaveApplicationListPage extends StatelessWidget {
     );
   }
 
-  Future<List<Map<String, dynamic>>> fetchLeaveApplications(BuildContext context,String userId, String employeeId) async {
-    try {
-      // Your API endpoint for leave applications
-      final String leaveApplicationsUrl =
-          'https://br-isgalleon.com/api/leave/get_leave_submit.php';
-      final Uri uri = Uri.parse(leaveApplicationsUrl);
-
-      final map = <String, dynamic>{};
-      // Assuming you have SharedPreferences initialized
-      map['UserId'] = userId;
-      map['EmployeeId'] = employeeId;
-
-      final http.Response response = await http.post(
-        uri,
-        body: map,
-      );
-
-      print("Request data: $map");
-      print('Response status code: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
-        print('Response data: $responseData');
-
-        if (responseData['success'] == true) {
-          List<Map<String, dynamic>> resultList =
-          (responseData['resultList'] as List<dynamic>)
-              .map((item) => Map<String, dynamic>.from(item))
-              .toList();
-          // Sort the resultList by the 'submit_date' field
-          resultList.sort((a, b) => DateTime.parse(b['submit_date']).compareTo(DateTime.parse(a['submit_date'])));
-          controller.setLeaveApplications(resultList);
-
-          return resultList;
-        } else {
-          // Handle API response indicating failure
-          //_showDialog(context, "Error", "Failed to load leave applications.",0);
-          return [];
-        }
-      } else {
-        // Handle non-200 status code
-        _showDialog(
-          context,
-          "Error",
-          "Failed to load leave applications. Status code: ${response.statusCode}",0
-        );
-        return [];
-      }
-    } catch (error) {
-      // Handle other errors
-      _showDialog(context, "Error", "Error loading leave applications: $error",0);
-      return [];
-    }
-  }
 
   void _showDialog(BuildContext context, String title, String message,int statusCode) {
     showDialog(
@@ -139,7 +84,7 @@ class LeaveApplicationListPage extends StatelessWidget {
       drawer: MyDrawer(context: context,),
       backgroundColor: const Color(0xff1a1a1a),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: fetchLeaveApplications(context, userId, employeeId),
+        future: controller.fetchLeaveApplications(context, userId, employeeId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Column(
@@ -153,7 +98,7 @@ class LeaveApplicationListPage extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () async {
                         // Handle button press
-                        await fetchLeaveApplications(context, userId, employeeId);
+                        await controller.fetchLeaveApplications(context, userId, employeeId);
                         _showDialog(context, "Success", "Successfully refreshed the page", 200);
                       },
                       style: ElevatedButton.styleFrom(
@@ -202,7 +147,7 @@ class LeaveApplicationListPage extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () async {
                         // Handle button press
-                        await fetchLeaveApplications(context, userId, employeeId);
+                        await controller.fetchLeaveApplications(context, userId, employeeId);
                         _showDialog(context, "Success", "Successfully refreshed the page", 200);
                       },
                       style: ElevatedButton.styleFrom(
@@ -268,7 +213,7 @@ class LeaveApplicationListPage extends StatelessWidget {
                                           ),
                                         ],
                                       ),
-                                      Text('Reason: $reasonOfLeave', style: const TextStyle(color: Colors.white)),
+                                      Text('Reason: ${reasonOfLeave ?? ''}', style: const TextStyle(color: Colors.white)),
                                       Text('Leave Type: $leaveTypeName', style: const TextStyle(color: Colors.white)),
                                       Text('No of days: $leave_days_count', style: const TextStyle(color: Colors.white)),
                                     ],

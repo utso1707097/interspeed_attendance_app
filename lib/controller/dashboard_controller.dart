@@ -1,7 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class DashboardController extends GetxController {
   RxBool isLoading = false.obs;
@@ -15,11 +20,23 @@ class DashboardController extends GetxController {
   RxBool showRemark = false.obs;
   Rx<TextEditingController> remarkController = TextEditingController().obs;
   RxMap<String, dynamic> sessionData = RxMap<String, dynamic>();
+  RxString appVersion = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
     fetchSessionData();
+    fetchAppVersion();
+  }
+
+  Future<void> fetchAppVersion() async {
+    try {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      appVersion.value = packageInfo.version;
+      print("App Version: ${appVersion.value}");
+    } catch (e) {
+      print('Error fetching app version: $e');
+    }
   }
 
   void clearData() {
@@ -110,6 +127,62 @@ class DashboardController extends GetxController {
     accuracy.value = currentPosition.accuracy.toInt();
   }
 
+  Future<void> checkForUpdate(String userId, String appName,
+      String currentVersion, BuildContext context) async {
+    try {
+      // Set up the URL
+      final String url =
+          'https://br-isgalleon.com/api/app_version/version_check.php';
+
+      // Create the multipart request
+      final http.MultipartRequest request =
+          http.MultipartRequest('POST', Uri.parse(url));
+
+      String modifiedVersionCode =
+          currentVersion.substring(0, currentVersion.length - 2);
+
+      // Add your data to the request
+      request.fields['UserId'] = userId;
+      request.fields['AppName'] = appName;
+      request.fields['CurrentVersion'] = modifiedVersionCode;
+      print(request.fields);
+
+      // Send the request
+      final http.Response response =
+          await http.Response.fromStream(await request.send());
+      print("this is the response body: ${response.body}");
+      if (response.statusCode == 200) {
+        // Request was successful
+        Map<String, dynamic> responseData = jsonDecode(response.body);
+        // Process the response data, you can handle it according to your requirements
+
+        if (responseData['success']) {
+          String message = responseData['message'];
+
+          // Check if the message is "Version detail updated"
+          if (message == "New version found.") {
+            // Handle the case when a new version is found
+            Map<String, dynamic> appInfo = responseData['appInfo'];
+            // Extract information from appInfo and take necessary actions
+            String appName = appInfo['app_name'];
+            String appVersion = appInfo['app_version'];
+            String appLocationUrl = appInfo['app_location_url'];
+            // Call another function or perform actions based on the new version information
+            showUpdateDialog(context, "Update", "Please update your app",
+                appLocationUrl, appVersion);
+          }
+        }
+        print("This is response for app response: ${responseData}");
+      } else {
+        // Request failed
+        print('Request failed with status: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle errors
+      print('Error sending version check request: $error');
+    }
+  }
+
   void showAttendanceDialog(
       BuildContext context, String title, String message, int statusCode) {
     showDialog(
@@ -147,14 +220,75 @@ class DashboardController extends GetxController {
             ),
           ],
           contentPadding:
-          const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           shape: RoundedRectangleBorder(
             borderRadius:
-            BorderRadius.circular(15.0), // Adjust the radius as needed
+                BorderRadius.circular(15.0), // Adjust the radius as needed
           ),
         );
       },
     );
   }
 
+  void showUpdateDialog(BuildContext context, String title, String message,
+      String appLocationUrl, String updatedApkVersion) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF333333),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(color: Colors.white),
+              ),
+              const Icon(
+                Icons.arrow_circle_up,
+                color: Colors.blue,
+              ),
+            ],
+          ),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                message,
+                style: const TextStyle(color: Colors.white),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'New Version: $updatedApkVersion',
+                style: const TextStyle(color: Colors.white),
+              ),
+              Text(
+                'Your apk version: ${appVersion.value.substring(0, appVersion.value.length - 2)}',
+                style: const TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          actions: [
+            // Update button instead of cancel
+            TextButton(
+              onPressed: () async {
+                // Download the update file
+                final response = await http.get(Uri.parse(appLocationUrl));
+
+                if (response.statusCode == 200) {
+
+                } else {
+                  // Handle download failure
+                  print('Failed to download update');
+                }
+              },
+              child: const Text('Update', style: TextStyle(color: Colors.red)),
+            ),
+            TextButton(onPressed:  (){Navigator.pop(context);}, child: const Text('Cancel', style: TextStyle(color: Colors.red)),)
+          ],
+        );
+      },
+    );
+  }
 }
