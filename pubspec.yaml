@@ -48,6 +48,7 @@ dependencies:
   image_picker: ^1.0.7
   double_back_to_close_app: ^2.1.0
   package_info_plus: ^5.0.1
+  url_launcher: ^6.2.5
 
 
 dev_dependencies:

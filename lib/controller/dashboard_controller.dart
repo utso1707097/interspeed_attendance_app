@@ -7,8 +7,10 @@ import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class DashboardController extends GetxController {
+  String currentUserId = "";
   RxBool isLoading = false.obs;
   RxString signInBase64Image = ''.obs;
   RxString signOutBase64Image = ''.obs;
@@ -21,12 +23,19 @@ class DashboardController extends GetxController {
   Rx<TextEditingController> remarkController = TextEditingController().obs;
   RxMap<String, dynamic> sessionData = RxMap<String, dynamic>();
   RxString appVersion = ''.obs;
+  RxString appLink = ''.obs;
 
   @override
-  void onInit() {
+  void onInit() async{
     super.onInit();
-    fetchSessionData();
-    fetchAppVersion();
+    await fetchSessionData();
+    await fetchAppVersion();
+    // print("The version is: ${appVersion.value} - ${currentUserId}");
+    if (appVersion.value!="" && currentUserId!= "") {
+      print("called");
+      checkForUpdate(
+          currentUserId, "interspeed", appVersion.value, Get.context!);
+    }
   }
 
   Future<void> fetchAppVersion() async {
@@ -54,6 +63,7 @@ class DashboardController extends GetxController {
 
   Future<void> fetchSessionData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    currentUserId = prefs.getString('user_id') ?? '';
     sessionData.value = {
       'user_id': prefs.getString('user_id') ?? '',
       'user_name': prefs.getString('user_name') ?? '',
@@ -175,7 +185,7 @@ class DashboardController extends GetxController {
         print("This is response for app response: ${responseData}");
       } else {
         // Request failed
-        print('Request failed with status: ${response.statusCode}');
+        // print('Request failed with status: ${response.statusCode}');
       }
     } catch (error) {
       // Handle errors
@@ -230,6 +240,18 @@ class DashboardController extends GetxController {
     );
   }
 
+  Future<void> downloadFile(String appLocationUrl) async {
+    // print(appLocationUrl);
+    Uri fileUrl = Uri.parse(appLocationUrl);
+    print("This is file url: $fileUrl");
+    // const fileUrl = 'YOUR_SHAREABLE_LINK'; // Replace with your shareable link
+    if (await canLaunchUrl(fileUrl)) {
+      await launchUrl(fileUrl);
+    } else {
+      throw 'Could not launch $fileUrl';
+    }
+  }
+
   void showUpdateDialog(BuildContext context, String title, String message,
       String appLocationUrl, String updatedApkVersion) {
     showDialog(
@@ -272,16 +294,8 @@ class DashboardController extends GetxController {
           actions: [
             // Update button instead of cancel
             TextButton(
-              onPressed: () async {
-                // Download the update file
-                final response = await http.get(Uri.parse(appLocationUrl));
-
-                if (response.statusCode == 200) {
-
-                } else {
-                  // Handle download failure
-                  print('Failed to download update');
-                }
+              onPressed: (){
+                downloadFile(appLocationUrl);
               },
               child: const Text('Update', style: TextStyle(color: Colors.red)),
             ),

@@ -153,15 +153,16 @@ class DashboardPage extends StatelessWidget {
 
   // https://br-isgalleon.com/api/employee/get_employee_by_id.php
 
+  // WidgetsBinding.instance!.addPostFrameCallback((_) {
+  // final String userId = dashboardController.sessionData['user_id'] ?? '';
+  // // This function will be called after the widget is built
+  // if(dashboardController.appVersion.value!=""){
+  // dashboardController.checkForUpdate(userId, "interspeed", dashboardController.appVersion.value,context);
+  // }
+  // });
+
   @override
   Widget build(BuildContext context) {
-    final String userId = dashboardController.sessionData['user_id'] ?? '';
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
-      // This function will be called after the widget is built
-      if(dashboardController.appVersion.value!=""){
-        dashboardController.checkForUpdate(userId, "interspeed", dashboardController.appVersion.value,context);
-      }
-    });
     final layout = AppLayout(context: context);
     var currentTime = DateFormat('h:mm a', 'en_US').format(
         DateTime.now().toUtc().add(const Duration(hours: 6))); // Dhaka UTC+6
