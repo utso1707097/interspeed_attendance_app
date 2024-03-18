@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:interspeed_attendance_app/controller/project_details_controller.dart';
 import 'package:interspeed_attendance_app/drawer.dart';
+import 'package:interspeed_attendance_app/utils/remove_employee_dialog.dart';
 
 class SingleProjectDetails extends StatelessWidget {
   final String userId;
@@ -124,7 +125,7 @@ class SingleProjectDetails extends StatelessWidget {
                                   subtitle: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         member['project_role_name'] ?? '',
@@ -155,45 +156,81 @@ class SingleProjectDetails extends StatelessWidget {
                                         ),
                                       ),
                                       projectDetails["project_role_name"] ==
-                                          'Manager' &&
-                                          projectDetails['employee_id'] !=
-                                              member['employee_id']
+                                                  'Manager' &&
+                                              projectDetails['employee_id'] !=
+                                                  member['employee_id']
                                           ? Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          ElevatedButton(
-                                            onPressed: () {},
-                                            style: ElevatedButton.styleFrom(
-                                              primary: Colors.lightBlue, // Change button color
-                                              onPrimary:
-                                              Colors.white, // Change text color
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                BorderRadius.circular(
-                                                    10), // Set border radius
-                                              ),
-                                            ),
-                                            child: Text("Give Point"),
-                                          ),
-                                          ElevatedButton(
-                                            onPressed: () {},
-                                            style: ElevatedButton.styleFrom(
-                                              primary: Colors.red, // Change button color
-                                              onPrimary:
-                                              Colors.white, // Change text color
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                BorderRadius.circular(
-                                                    10), // Set border radius
-                                              ),
-                                            ),
-                                            child: Text("Delete Member"),
-                                          ),
-                                        ],
-                                      )
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                ElevatedButton(
+                                                  onPressed: () {},
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    primary: Colors.lightBlue,
+                                                    // Change button color
+                                                    onPrimary: Colors.white,
+                                                    // Change text color
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10), // Set border radius
+                                                    ),
+                                                  ),
+                                                  child: Text("Give Point"),
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return RemoveEmployeeDialog(
+                                                          userId: userId,
+                                                          projectId: projectDetails[
+                                                          'project_id']
+                                                              .toString() ??
+                                                              '',
+                                                          employeeId: projectDetails[
+                                                                      'employee_id']
+                                                                  .toString() ??
+                                                              '',
+                                                          employeeName: member[
+                                                                      'employee_name']
+                                                                  .toString() ??
+                                                              '',
+                                                          projectRoleId: member[
+                                                          'project_role_id']
+                                                              .toString() ??
+                                                              '',
+                                                          projectMemberId: member[
+                                                                      'id']
+                                                                  .toString() ??
+                                                              '',
+                                                        );
+                                                      },
+                                                    );
+                                                  },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    primary: Colors.red,
+                                                    // Change button color
+                                                    onPrimary: Colors.white,
+                                                    // Change text color
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10), // Set border radius
+                                                    ),
+                                                  ),
+                                                  child: Text("Delete Member"),
+                                                ),
+                                              ],
+                                            )
                                           : SizedBox.shrink(),
                                     ],
                                   ),
@@ -207,10 +244,13 @@ class SingleProjectDetails extends StatelessWidget {
                         child: ElevatedButton(
                           onPressed: () {},
                           style: ElevatedButton.styleFrom(
-                            primary: Colors.green, // Change button color to green
-                            onPrimary: Colors.white, // Change text color to white
+                            primary: Colors.green,
+                            // Change button color to green
+                            onPrimary: Colors.white,
+                            // Change text color to white
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10), // Set border radius
+                              borderRadius: BorderRadius.circular(
+                                  10), // Set border radius
                             ),
                           ),
                           child: Text("Add Member"), // Change button text
@@ -226,5 +266,4 @@ class SingleProjectDetails extends StatelessWidget {
       ),
     );
   }
-
 }

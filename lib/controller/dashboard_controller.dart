@@ -64,6 +64,7 @@ class DashboardController extends GetxController {
   Future<void> fetchSessionData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     currentUserId = prefs.getString('user_id') ?? '';
+    print("This is from fetchSessionData ${prefs.getString('user_name')}");
     sessionData.value = {
       'user_id': prefs.getString('user_id') ?? '',
       'user_name': prefs.getString('user_name') ?? '',

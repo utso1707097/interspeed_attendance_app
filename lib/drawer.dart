@@ -263,6 +263,8 @@ class MyDrawer extends StatelessWidget {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs
         .clear(); // Clear all stored data, you might want to clear specific keys
+    // print("The deleted user name is: ");
+    // print(prefs.getString('user_name'));
 
     // Navigate to the login screen
     Navigator.pushReplacement(
