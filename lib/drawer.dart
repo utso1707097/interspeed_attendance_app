@@ -6,6 +6,7 @@ import 'package:interspeed_attendance_app/leave_page.dart';
 import 'package:interspeed_attendance_app/login_page.dart';
 import 'package:interspeed_attendance_app/password_change_page.dart';
 import 'package:interspeed_attendance_app/profile_page.dart';
+import 'package:interspeed_attendance_app/project_page.dart';
 import 'package:interspeed_attendance_app/utils/layout_size.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -136,6 +137,28 @@ class MyDrawer extends StatelessWidget {
               );
             },
           ),
+
+          ListTile(
+            leading: const Icon(
+              Icons.edit_calendar,
+              color: Colors.white,
+            ),
+            title: const Text(
+              "Projects",
+              style: TextStyle(color: Colors.white),
+            ),
+            onTap: (){
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProjectPage(userId: user_id,
+                    employeeId: employee_id,),
+                ),
+              );
+            },
+          ),
+
           ListTile(
             leading: const Icon(
               Icons.change_circle,

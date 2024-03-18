@@ -17,7 +17,7 @@ class PasswordChangeForm extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       drawer: MyDrawer(context: context),
-      backgroundColor: Color(0xff1a1a1a),
+      backgroundColor: const Color(0xff1a1a1a),
       body: Center(
         child: SafeArea(
           child: Container(

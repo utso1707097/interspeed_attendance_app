@@ -194,9 +194,17 @@ class DashboardPage extends StatelessWidget {
                     width: double.infinity,
                     height: MediaQuery.of(context).size.height *
                         0.25, // Adjust the factor as needed
-                    decoration: const BoxDecoration(
-                      color: Color(0xff333333),
-                      borderRadius: BorderRadius.only(
+                    decoration:BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: const Offset(0, 3), // changes position of shadow
+                        ),
+                      ],
+                      color: const Color(0xff333333),
+                      borderRadius: const BorderRadius.only(
                         bottomLeft: Radius.circular(12),
                         bottomRight: Radius.circular(12),
                       ),
@@ -317,6 +325,14 @@ class DashboardPage extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: const Color(0xff3a473e),
                                   borderRadius: BorderRadius.circular(16.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.1),
+                                      spreadRadius: 2,
+                                      blurRadius: 5,
+                                      offset: const Offset(0, 3), // changes position of shadow
+                                    ),
+                                  ],
                                 ),
                                 child: Column(
                                   children: [
@@ -405,6 +421,14 @@ class DashboardPage extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: const Color(0xff3a473e),
                                   borderRadius: BorderRadius.circular(16.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.1),
+                                      spreadRadius: 2,
+                                      blurRadius: 5,
+                                      offset: const Offset(0, 3), // changes position of shadow
+                                    ),
+                                  ],
                                 ),
                                 child: Column(
                                   children: [
@@ -798,23 +822,37 @@ class DashboardPage extends StatelessWidget {
                           height: layout.getHeight(130),
                         ),
 
-                  GestureDetector(
-                    onTap: () {
-                      // Handle button click here
-                      sendAttendanceData(context, layout);
-                      print('Button Clicked');
-                      // Add your custom logic or navigation here
-                    },
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/images/Submit tickxxxhdpi.png',
-                          width: layout.getwidth(70),
-                          height: layout.getHeight(70),
-                          fit: BoxFit.cover,
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(layout.getwidth(70) / 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: Offset(0, 3), // changes position of shadow
                         ),
                       ],
+                    ),
+                    clipBehavior: Clip.hardEdge,
+                    child: GestureDetector(
+                      onTap: () {
+                        // Handle button click here
+                        sendAttendanceData(context, layout);
+                        print('Button Clicked');
+                        // Add your custom logic or navigation here
+                      },
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/images/Submit tickxxxhdpi.png',
+                            width: layout.getwidth(70),
+                            height: layout.getHeight(70),
+                            fit: BoxFit.cover,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   SizedBox(
@@ -825,6 +863,9 @@ class DashboardPage extends StatelessWidget {
                     style: const TextStyle(
                       color: Color(0xffF0F0F0),
                     ),
+                  ),
+                  SizedBox(
+                    height: layout.getHeight(8),
                   ),
                 ],
               ),

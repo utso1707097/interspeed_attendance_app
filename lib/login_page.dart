@@ -17,7 +17,6 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final layout = AppLayout(context: context);
-    return Obx(() {
       return Scaffold(
         backgroundColor: const Color(0xff1a1a1a),
         resizeToAvoidBottomInset: true,
@@ -156,18 +155,18 @@ class LoginPage extends StatelessWidget {
                                   height: layout.getHeight(70), // Adjust the height as needed
                                 ),
                               ),
-                              if (loginController.isLoading.value)
-                                Positioned.fill(
-                                  child: Container(
-                                    color: Colors.black.withOpacity(0.5),
-                                    child: const Center(
-                                      child: CircularProgressIndicator(
-                                        valueColor: AlwaysStoppedAnimation<Color>(
-                                            Color(0xff010080)),
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                              // if (loginController.isLoading.value)
+                              //   Positioned.fill(
+                              //     child: Container(
+                              //       color: Colors.black.withOpacity(0.5),
+                              //       child: const Center(
+                              //         child: CircularProgressIndicator(
+                              //           valueColor: AlwaysStoppedAnimation<Color>(
+                              //               Color(0xff010080)),
+                              //         ),
+                              //       ),
+                              //     ),
+                              //   ),
                             ]),
                           ],
                         ),
@@ -180,7 +179,6 @@ class LoginPage extends StatelessWidget {
           ),
         ),
       );
-    });
   }
 
   void _submitForm(BuildContext context) async {
