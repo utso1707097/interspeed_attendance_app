@@ -43,7 +43,6 @@ class ProjectListController extends GetxController {
           // Sort the resultList by the 'submit_date' field
           // resultList.sort((a, b) => DateTime.parse(b['submit_date']).compareTo(DateTime.parse(a['submit_date'])));
           setProjects(resultList);
-
           return resultList;
         } else {
           // Handle API response indicating failure

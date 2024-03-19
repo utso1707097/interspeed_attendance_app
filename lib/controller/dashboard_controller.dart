@@ -59,6 +59,7 @@ class DashboardController extends GetxController {
     accuracy.value = 100;
     showRemark.value = false;
     remarkController.value.clear();
+    sessionData.value.clear();
   }
 
   Future<void> fetchSessionData() async {

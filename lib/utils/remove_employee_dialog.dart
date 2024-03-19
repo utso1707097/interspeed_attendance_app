@@ -41,9 +41,10 @@ class RemoveEmployeeDialog extends StatelessWidget {
           ),
         ),
         TextButton(
-          onPressed: () async{
-             // Close the dialog
-            await deleteProjectMember(context,userId,employeeId,projectId,projectMemberId,projectRoleId);
+          onPressed: () async {
+            // Close the dialog
+            await deleteProjectMember(context, userId, employeeId, projectId,
+                projectMemberId, projectRoleId);
           },
           child: Text(
             'Delete',
@@ -54,28 +55,43 @@ class RemoveEmployeeDialog extends StatelessWidget {
     );
   }
 
-  Future<void> deleteProjectMember(BuildContext context,String userId,String employeeId,String projectId, String projectMemberId,String projectRoleId) async {
+  Future<void> deleteProjectMember(
+      BuildContext context,
+      String userId,
+      String employeeId,
+      String projectId,
+      String projectMemberId,
+      String projectRoleId) async {
     try {
       // Set up the URL for delete request
-      final String url = 'https://br-isgalleon.com/api/project_member/delete_project_member.php';
+      final String url =
+          'https://br-isgalleon.com/api/project_member/delete_project_member.php';
 
       // Create the multipart request
       final http.MultipartRequest request =
-      http.MultipartRequest('POST', Uri.parse(url));
+          http.MultipartRequest('POST', Uri.parse(url));
 
       // Add parameters to the request
-      request.fields['UserId'] = employeeId;
+      request.fields['UserId'] = userId;
       request.fields['EmployeeId'] = employeeId;
       request.fields['ProjectMemberId'] = projectMemberId;
       request.fields['ProjectId'] = projectId;
       request.fields['ProjeectRoleId'] = projectRoleId;
+
+      print(
+          "user id: $userId, \n"
+              "Employee Id: $employeeId, \n"
+              "project member Id: $projectMemberId, \n"
+              "project Id: $projectId \n"
+              "ProjectRoleId: $projectRoleId \n");
       // Send the request
       final http.Response response =
-      await http.Response.fromStream(await request.send());
+          await http.Response.fromStream(await request.send());
 
       if (response.statusCode == 200) {
         // Request was successful
         Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("Delete Response body: $responseData");
 
         // Check if deletion was successful
         if (responseData['success']) {
@@ -153,16 +169,13 @@ class RemoveEmployeeDialog extends StatelessWidget {
             ),
           ],
           contentPadding:
-          const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           shape: RoundedRectangleBorder(
             borderRadius:
-            BorderRadius.circular(15.0), // Adjust the radius as needed
+                BorderRadius.circular(15.0), // Adjust the radius as needed
           ),
         );
       },
     );
   }
-
-
-
 }

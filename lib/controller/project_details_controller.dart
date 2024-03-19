@@ -5,9 +5,124 @@ import 'package:get/get.dart';
 
 class ProjectDetailsController extends GetxController {
   RxList<Map<String, dynamic>> projectMembers = <Map<String, dynamic>>[].obs;
+  RxList<Map<String, dynamic>> allUserList = <Map<String,dynamic>>[].obs;
 
   void setprojectMembers(List<Map<String, dynamic>> applications) {
     projectMembers.assignAll(applications);
+  }
+
+  void setAllUserList(List<Map<String, dynamic>> users) {
+    allUserList.assignAll(users);
+  }
+
+  Future<List<Map<String, dynamic>>>fetchContributeScale(String userId, BuildContext context) async {
+    try{
+      final String userUrl =
+          'https://br-isgalleon.com/api/contribution_scale/get_contribution_scale.php';
+      final Uri uri = Uri.parse(userUrl);
+      final map = <String, dynamic>{};
+      map['UserId'] = userId;
+      final http.Response response = await http.post(
+        uri,
+        body: map,
+      );
+
+      print("Request data: $map");
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        print('Response data: $responseData');
+
+        if (responseData['success'] == true) {
+          print("Executing this success true");
+          List<Map<String, dynamic>> resultList =
+          (responseData['resultList'] as List<dynamic>)
+              .map((item) => {
+            'id': item['id'],
+            'name': item['name'],
+          })
+              .toList();
+          // Sort the resultList by the 'submit_date' field
+          // resultList.sort((a, b) => DateTime.parse(b['submit_date']).compareTo(DateTime.parse(a['submit_date'])));
+          // setAllUserList(resultList);
+          print("this is scale list: $resultList");
+          return resultList;
+        } else {
+          // Handle API response indicating failure
+          //_showDialog(context, "Error", "Failed to load projectMembers.",0);
+          return [];
+        }
+      } else {
+        // Handle non-200 status code
+        _showDialog(
+            context,
+            "Error",
+            "Failed to load projectMembers. Status code: ${response.statusCode}",0
+        );
+        return [];
+      }
+    } catch (error) {
+      print("Catch Executing");
+      // Handle other errors
+      _showDialog(context, "Error", "Error loading projectMembers: $error",0);
+      return [];
+    }
+  }
+
+  Future<List<Map<String, dynamic>>>fetchUserList(String userId, BuildContext context) async {
+    try{
+      final String userUrl =
+          'https://br-isgalleon.com/api/employee/get_employee.php';
+      final Uri uri = Uri.parse(userUrl);
+      final map = <String, dynamic>{};
+      map['UserId'] = userId;
+      final http.Response response = await http.post(
+        uri,
+        body: map,
+      );
+
+      print("Request data: $map");
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        print('Response data: $responseData');
+
+        if (responseData['success'] == true) {
+          List<Map<String, dynamic>> resultList =
+          (responseData['resultList'] as List<dynamic>)
+              .map((item) => {
+            'id': item['id'],
+            'name': item['name'],
+            'sbu' : item['sbu_name'],
+          })
+              .toList();
+          // Sort the resultList by the 'submit_date' field
+          // resultList.sort((a, b) => DateTime.parse(b['submit_date']).compareTo(DateTime.parse(a['submit_date'])));
+          setAllUserList(resultList);
+          return resultList;
+        } else {
+          // Handle API response indicating failure
+          //_showDialog(context, "Error", "Failed to load projectMembers.",0);
+          return [];
+        }
+      } else {
+        // Handle non-200 status code
+        _showDialog(
+            context,
+            "Error",
+            "Failed to load projectMembers. Status code: ${response.statusCode}",0
+        );
+        return [];
+      }
+    } catch (error) {
+      // Handle other errors
+      _showDialog(context, "Error", "Error loading projectMembers: $error",0);
+      return [];
+    }
   }
 
   Future<List<Map<String, dynamic>>> fetchProjectMembers(BuildContext context,String userId, String projectId) async {

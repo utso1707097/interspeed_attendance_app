@@ -164,15 +164,12 @@ class DashboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final layout = AppLayout(context: context);
+    dashboardController.fetchSessionData();
     var currentTime = DateFormat('h:mm a', 'en_US').format(
         DateTime.now().toUtc().add(const Duration(hours: 6))); // Dhaka UTC+6
     // Add this line
     return Obx(() {
       // print(dashboardController.sessionData);
-      final String fullName =
-          dashboardController.sessionData['full_name'] ?? '';
-      final designationName =
-          dashboardController.sessionData['designation_name'] ?? '';
       return Scaffold(
         key: _scaffoldKey,
         drawer: MyDrawer(context: context),
@@ -232,7 +229,7 @@ class DashboardPage extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  fullName,
+                                  dashboardController.sessionData['full_name']?? '',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize:
@@ -243,7 +240,7 @@ class DashboardPage extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  designationName,
+                                  dashboardController.sessionData['designation_name'] ?? '',
                                   style: TextStyle(
                                     fontWeight: FontWeight.normal,
                                     fontSize:

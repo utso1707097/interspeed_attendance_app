@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:interspeed_attendance_app/controller/project_details_controller.dart';
 import 'package:interspeed_attendance_app/drawer.dart';
+import 'package:interspeed_attendance_app/utils/add_user_dialog.dart';
+import 'package:interspeed_attendance_app/utils/custom_loading_indicator.dart';
 import 'package:interspeed_attendance_app/utils/remove_employee_dialog.dart';
 
 class SingleProjectDetails extends StatelessWidget {
@@ -166,7 +168,33 @@ class SingleProjectDetails extends StatelessWidget {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 ElevatedButton(
-                                                  onPressed: () {},
+                                                  onPressed: () async {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return CustomLoadingIndicator();
+                                                      },
+                                                    );
+                                                    final result =
+                                                        await controller
+                                                            .fetchContributeScale(
+                                                                userId,
+                                                                context);
+                                                    Navigator.pop(context);
+                                                    print("This is result: $result");
+
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return AddUserDialog(
+                                                          resultList: result,
+                                                        );
+                                                      },
+                                                    );
+                                                    // Navigator.pop(context);
+                                                  },
                                                   style:
                                                       ElevatedButton.styleFrom(
                                                     primary: Colors.lightBlue,
@@ -191,8 +219,8 @@ class SingleProjectDetails extends StatelessWidget {
                                                         return RemoveEmployeeDialog(
                                                           userId: userId,
                                                           projectId: projectDetails[
-                                                          'project_id']
-                                                              .toString() ??
+                                                                      'project_id']
+                                                                  .toString() ??
                                                               '',
                                                           employeeId: projectDetails[
                                                                       'employee_id']
@@ -203,8 +231,8 @@ class SingleProjectDetails extends StatelessWidget {
                                                                   .toString() ??
                                                               '',
                                                           projectRoleId: member[
-                                                          'project_role_id']
-                                                              .toString() ??
+                                                                      'project_role_id']
+                                                                  .toString() ??
                                                               '',
                                                           projectMemberId: member[
                                                                       'id']
@@ -240,22 +268,44 @@ class SingleProjectDetails extends StatelessWidget {
                           );
                         },
                       ),
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.green,
-                            // Change button color to green
-                            onPrimary: Colors.white,
-                            // Change text color to white
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  10), // Set border radius
-                            ),
-                          ),
-                          child: Text("Add Member"), // Change button text
-                        ),
-                      ),
+                      projectDetails["project_role_name"] == 'Manager'
+                          ? Center(
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return CustomLoadingIndicator();
+                                    },
+                                  );
+                                  final result = await controller.fetchUserList(
+                                      userId, context);
+                                  Navigator.pop(context);
+
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AddUserDialog(
+                                        resultList: result,
+                                      );
+                                    },
+                                  );
+                                  // Navigator.pop(context);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.green,
+                                  // Change button color to green
+                                  onPrimary: Colors.white,
+                                  // Change text color to white
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        10), // Set border radius
+                                  ),
+                                ),
+                                child: Text("Add Member"), // Change button text
+                              ),
+                            )
+                          : SizedBox.shrink(),
                     ],
                   );
                 }
