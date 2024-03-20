@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:interspeed_attendance_app/controller/project_details_controller.dart';
 import 'package:interspeed_attendance_app/utils/custom_loading_indicator.dart';
 
 class RemoveEmployeeDialog extends StatelessWidget {
@@ -11,9 +12,11 @@ class RemoveEmployeeDialog extends StatelessWidget {
   final String projectMemberId;
   final String projectRoleId;
   final String employeeName;
+  final ProjectDetailsController controller;
 
   const RemoveEmployeeDialog({
     Key? key,
+    required this.controller,
     required this.userId,
     required this.employeeId,
     required this.projectId,
@@ -164,6 +167,7 @@ class RemoveEmployeeDialog extends StatelessWidget {
               onPressed: () {
                 Navigator.pop(context);
                 Navigator.pop(context);
+                controller.isRefreshing.value = true;
               },
               child: const Text('OK', style: TextStyle(color: Colors.white)),
             ),

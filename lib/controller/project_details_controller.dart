@@ -6,6 +6,29 @@ import 'package:get/get.dart';
 class ProjectDetailsController extends GetxController {
   RxList<Map<String, dynamic>> projectMembers = <Map<String, dynamic>>[].obs;
   RxList<Map<String, dynamic>> allUserList = <Map<String,dynamic>>[].obs;
+  // This RxBool will be used to trigger a refresh
+  RxBool isRefreshing = false.obs;
+  Rx<DateTime?> selectedDate = Rx<DateTime?>(DateTime.now());
+  // Rx variable to hold the selected user
+  Rx<Map<String, dynamic>?> selectedUser = Rx<Map<String, dynamic>?>(null);
+  Rx<Map<String, dynamic>?> selectedRole = Rx<Map<String, dynamic>?>({'id': 2, 'role': 'Executive'});
+  // Method to set the selected user
+  void setSelectedUser(Map<String, dynamic>? user) {
+    selectedUser.value = user;
+  }
+
+  // Method to set the selected role
+  void setSelectedRole(Map<String, dynamic>? role) {
+    selectedRole.value = role;
+  }
+  // Function to toggle the refresh state
+  void toggleRefresh() {
+    isRefreshing.toggle();
+  }
+
+  void setSelectedDate(DateTime? date) {
+    selectedDate.value = date;
+  }
 
   void setprojectMembers(List<Map<String, dynamic>> applications) {
     projectMembers.assignAll(applications);
@@ -102,6 +125,60 @@ class ProjectDetailsController extends GetxController {
               .toList();
           // Sort the resultList by the 'submit_date' field
           // resultList.sort((a, b) => DateTime.parse(b['submit_date']).compareTo(DateTime.parse(a['submit_date'])));
+          setAllUserList(resultList);
+          return resultList;
+        } else {
+          // Handle API response indicating failure
+          //_showDialog(context, "Error", "Failed to load projectMembers.",0);
+          return [];
+        }
+      } else {
+        // Handle non-200 status code
+        _showDialog(
+            context,
+            "Error",
+            "Failed to load projectMembers. Status code: ${response.statusCode}",0
+        );
+        return [];
+      }
+    } catch (error) {
+      // Handle other errors
+      _showDialog(context, "Error", "Error loading projectMembers: $error",0);
+      return [];
+    }
+  }
+
+  Future<List<Map<String, dynamic>>>fetchRoleList(String userId, BuildContext context) async {
+    try{
+      final String userUrl =
+          'https://br-isgalleon.com/api/project_role/get_project_role.php';
+      final Uri uri = Uri.parse(userUrl);
+      final map = <String, dynamic>{};
+      map['UserId'] = userId;
+      final http.Response response = await http.post(
+        uri,
+        body: map,
+      );
+
+      print("Request data: $map");
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        print('Response data: $responseData');
+
+        if (responseData['success'] == true) {
+          List<Map<String, dynamic>> resultList =
+          (responseData['resultList'] as List<dynamic>)
+              .map((item) => {
+            'id': item['id'],
+            'role': item['name'],
+          })
+              .toList();
+          // Sort the resultList by the 'submit_date' field
+          // resultList.sort((a, b) => DateTime.parse(b['submit_date']).compareTo(DateTime.parse(a['submit_date'])));
+          resultList.removeWhere((item) => item['id'] == 1 && item['role'] == 'Manager');
           setAllUserList(resultList);
           return resultList;
         } else {
