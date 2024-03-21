@@ -46,12 +46,26 @@ class PasswordChangeForm extends StatelessWidget {
                   buildPasswordField(context, layout, 'Confirm New Password', controller.confirmObscureText),
                   const SizedBox(height: 8,),
                   const Spacer(),
-                  GestureDetector(
-                    onTap: () => controller.submitForm(context),
-                    child: Image.asset(
-                      'assets/images/Submit tickxxxhdpi.png',
-                      width: 70,
-                      height: 70,
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(layout.getwidth(70) / 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: const Offset(0, 3), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    clipBehavior: Clip.hardEdge,
+                    child: GestureDetector(
+                      onTap: () => controller.submitForm(context),
+                      child: Image.asset(
+                        'assets/images/Submit tickxxxhdpi.png',
+                        width: 70,
+                        height: 70,
+                      ),
                     ),
                   ),
                   const Spacer(),

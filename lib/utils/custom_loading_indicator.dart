@@ -7,7 +7,7 @@ class CustomLoadingIndicator extends StatelessWidget {
     AppLayout layout = AppLayout(context: context);
 
     return AlertDialog(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.transparent.withOpacity(0),
       contentPadding: EdgeInsets.zero,
       content: FractionallySizedBox(
         widthFactor: 0.35,

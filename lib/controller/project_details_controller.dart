@@ -11,7 +11,7 @@ class ProjectDetailsController extends GetxController {
   Rx<DateTime?> selectedDate = Rx<DateTime?>(DateTime.now());
   // Rx variable to hold the selected user
   Rx<Map<String, dynamic>?> selectedUser = Rx<Map<String, dynamic>?>(null);
-  Rx<Map<String, dynamic>?> selectedRole = Rx<Map<String, dynamic>?>({'id': 2, 'role': 'Executive'});
+  Rx<Map<String, dynamic>?> selectedRole = Rx<Map<String, dynamic>?>(null);
   // Method to set the selected user
   void setSelectedUser(Map<String, dynamic>? user) {
     selectedUser.value = user;

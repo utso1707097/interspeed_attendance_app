@@ -60,7 +60,7 @@ class SingleProjectDetails extends StatelessWidget {
                     Container(
                       width: MediaQuery.of(context).size.width,
                       padding: const EdgeInsets.all(10),
-                      height: MediaQuery.of(context).size.height * 0.15,
+                      // height: MediaQuery.of(context).size.height * 0.15,
                       decoration: const BoxDecoration(
                           color: Color(0xff00a0b0),
                           borderRadius: BorderRadius.only(
@@ -308,6 +308,7 @@ class SingleProjectDetails extends StatelessWidget {
                                       url: "https://br-isgalleon.com/api/project_member/insert_project_member.php",
                                       title: "Select Employee",
                                       userList: result,
+                                      projectMembers:controller.projectMembers,
                                       roleList: roleList,
                                       userId: userId,
                                       projectDetails: projectDetails,

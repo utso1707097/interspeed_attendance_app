@@ -81,11 +81,12 @@ class MyDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(
               Icons.home,
-              color: Colors.white,
+              color: Color(0xffFFCC80),
+              // color: Colors.white,
             ),
             title: const Text(
               "Home",
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500),
             ),
             onTap: () {
               Navigator.pop(context);
@@ -100,11 +101,11 @@ class MyDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(
               Icons.person,
-              color: Colors.white,
+              color: Color(0xffFFCC80),
             ),
             title: const Text(
               "Profile",
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500),
             ),
             onTap: () {
               Navigator.pop(context);
@@ -120,11 +121,11 @@ class MyDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(
               Icons.edit_calendar,
-              color: Colors.white,
+              color: Color(0xffFFCC80),
             ),
             title: const Text(
               "Request Leave",
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500),
             ),
             onTap: (){
               Navigator.pop(context);
@@ -141,11 +142,11 @@ class MyDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(
               Icons.edit_calendar,
-              color: Colors.white,
+              color: Color(0xffFFCC80),
             ),
             title: const Text(
               "Projects",
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500),
             ),
             onTap: (){
               Navigator.pop(context);
@@ -162,11 +163,11 @@ class MyDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(
               Icons.change_circle,
-              color: Colors.white,
+              color: Color(0xffFFCC80),
             ),
             title: const Text(
               "Update Password",
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500),
             ),
             onTap: (){
               Navigator.pop(context);
@@ -181,11 +182,11 @@ class MyDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(
               Icons.exit_to_app_sharp,
-              color: Colors.white,
+              color: Color(0xffFFCC80),
             ),
             title: const Text(
               "Logout",
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500),
             ),
             onTap: () {
               _showLogoutDialog();

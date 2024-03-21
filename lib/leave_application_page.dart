@@ -192,17 +192,31 @@ class LeaveApplicationPage extends StatelessWidget {
               // Return an empty widget if showRemark is false,
               const Spacer(),
 
-              GestureDetector(
-                onTap: () async{
-                  final SharedPreferences prefs = await SharedPreferences.getInstance();
-                  final String userId = prefs.getString("user_id") ?? "";
-                  final String employeeId = prefs.getString("employee_id") ?? "";
-                  controller.submitLeaveApplication(userId, employeeId,context);
-                },
-                child: Image.asset(
-                  'assets/images/Submit tickxxxhdpi.png',
-                  width: 70,
-                  height: 70,
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(layout.getwidth(70) / 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: const Offset(0, 3), // changes position of shadow
+                    ),
+                  ],
+                ),
+                clipBehavior: Clip.hardEdge,
+                child: GestureDetector(
+                  onTap: () async{
+                    final SharedPreferences prefs = await SharedPreferences.getInstance();
+                    final String userId = prefs.getString("user_id") ?? "";
+                    final String employeeId = prefs.getString("employee_id") ?? "";
+                    controller.submitLeaveApplication(userId, employeeId,context);
+                  },
+                  child: Image.asset(
+                    'assets/images/Submit tickxxxhdpi.png',
+                    width: 70,
+                    height: 70,
+                  ),
                 ),
               ),
               const Spacer(),
