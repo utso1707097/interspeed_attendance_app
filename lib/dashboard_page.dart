@@ -190,7 +190,7 @@ class DashboardPage extends StatelessWidget {
                   Container(
                     width: double.infinity,
                     height: MediaQuery.of(context).size.height *
-                        0.25, // Adjust the factor as needed
+                        0.20, // Adjust the factor as needed
                     decoration:BoxDecoration(
                       boxShadow: [
                         BoxShadow(
@@ -232,6 +232,7 @@ class DashboardPage extends StatelessWidget {
                                   dashboardController.sessionData['full_name']?? '',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
+                                    fontFamily: 'Nunito',
                                     fontSize:
                                         MediaQuery.of(context).size.width /
                                             360 *
@@ -243,6 +244,7 @@ class DashboardPage extends StatelessWidget {
                                   dashboardController.sessionData['designation_name'] ?? '',
                                   style: TextStyle(
                                     fontWeight: FontWeight.normal,
+                                    fontFamily: 'Nunito',
                                     fontSize:
                                         MediaQuery.of(context).size.width /
                                             360 *
@@ -254,6 +256,7 @@ class DashboardPage extends StatelessWidget {
                                   "Interspeed Marketing Solutions Ltd",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
+                                    fontFamily: 'Nunito',
                                     fontSize:
                                         MediaQuery.of(context).size.width /
                                             360 *
@@ -280,34 +283,28 @@ class DashboardPage extends StatelessWidget {
                         ),
                         Align(
                           alignment: Alignment.topLeft,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
+                          child: GestureDetector(
+                            onTap: () {
+                              _scaffoldKey.currentState?.openDrawer();
+                            },
+                            child: Container(
                               padding: EdgeInsets.symmetric(
-                                horizontal: MediaQuery.of(context).size.width *
-                                    0.1 *
-                                    0.1, // Adjust as needed
-                                vertical: MediaQuery.of(context).size.height *
-                                    0.15 *
-                                    0.12, // Adjust as needed
+                                horizontal: layout.getwidth(14), // Adjust as needed
+                                vertical:layout.getwidth(12), // Adjust as needed
                               ),
-                              primary: Colors.lightBlueAccent,
-                              shape: const RoundedRectangleBorder(
+                              decoration: const BoxDecoration(
+                                color: Colors.lightBlueAccent,
                                 borderRadius: BorderRadius.only(
-                                  topLeft: Radius.zero,
                                   topRight: Radius.circular(25),
-                                  bottomLeft: Radius.zero,
                                   bottomRight: Radius.circular(25),
                                 ),
                               ),
+                              child: Icon(Icons.chevron_right, color: Colors.black),
                             ),
-                            onPressed: () {
-                              _scaffoldKey.currentState?.openDrawer();
-                            },
-                            child: const Icon(Icons.chevron_right, color: Colors.black),
                           ),
                         ),
                         SizedBox(
-                          height: layout.getHeight(80),
+                          height: layout.getHeight(40),
                         ),
                         SizedBox(
                           // color: Colors.white,

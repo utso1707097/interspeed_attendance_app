@@ -12,8 +12,7 @@ import 'package:shimmer/shimmer.dart';
 class LeaveApplicationListPage extends StatelessWidget {
   final String userId;
   final String employeeId;
-  final LeaveListController controller =
-  Get.put(LeaveListController());
+  final LeaveListController controller = Get.put(LeaveListController());
 
   LeaveApplicationListPage({required this.userId, required this.employeeId});
 
@@ -35,8 +34,8 @@ class LeaveApplicationListPage extends StatelessWidget {
     );
   }
 
-
-  void _showDialog(BuildContext context, String title, String message,int statusCode) {
+  void _showDialog(
+      BuildContext context, String title, String message, int statusCode) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -67,7 +66,8 @@ class LeaveApplicationListPage extends StatelessWidget {
               child: const Text('OK', style: TextStyle(color: Colors.white)),
             ),
           ],
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
           ),
@@ -81,7 +81,9 @@ class LeaveApplicationListPage extends StatelessWidget {
     AppLayout layout = AppLayout(context: context);
     print("Called Leave page");
     return Scaffold(
-      drawer: MyDrawer(context: context,),
+      drawer: MyDrawer(
+        context: context,
+      ),
       backgroundColor: const Color(0xff1a1a1a),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: controller.fetchLeaveApplications(context, userId, employeeId),
@@ -98,13 +100,22 @@ class LeaveApplicationListPage extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () async {
                         // Handle button press
-                        await controller.fetchLeaveApplications(context, userId, employeeId);
-                        _showDialog(context, "Success", "Successfully refreshed the page", 200);
+                        await controller.fetchLeaveApplications(
+                            context, userId, employeeId);
+                        _showDialog(context, "Success",
+                            "Successfully refreshed the page", 200);
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.red,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              8.0), // Adjust the radius as needed
+                        ),
+                        primary: const Color(0xff74c2c6), // Set to transparent to make it square
                       ),
-                      child: const Text('Refresh', style: TextStyle(color: Colors.white)),
+                      child: const Text('Refresh',
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold)),
                     ),
                     const SizedBox(width: 16),
                     ElevatedButton(
@@ -118,9 +129,16 @@ class LeaveApplicationListPage extends StatelessWidget {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.red,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              8.0), // Adjust the radius as needed
+                        ),
+                        primary: const Color(0xfffed593),
                       ),
-                      child: const Text('Apply', style: TextStyle(color: Colors.white)),
+                      child: const Text('Apply',
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -147,13 +165,22 @@ class LeaveApplicationListPage extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () async {
                         // Handle button press
-                        await controller.fetchLeaveApplications(context, userId, employeeId);
-                        _showDialog(context, "Success", "Successfully refreshed the page", 200);
+                        await controller.fetchLeaveApplications(
+                            context, userId, employeeId);
+                        _showDialog(context, "Success",
+                            "Successfully refreshed the page", 200);
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.red,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              8.0), // Adjust the radius as needed
+                        ),
+                        primary: const Color(0xff74c2c6), // Set to transparent to make it square
                       ),
-                      child: const Text('Refresh', style: TextStyle(color: Colors.white)),
+                      child: const Text('Refresh',
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold)),
                     ),
                     const SizedBox(width: 16),
                     ElevatedButton(
@@ -167,9 +194,16 @@ class LeaveApplicationListPage extends StatelessWidget {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.red,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              8.0), // Adjust the radius as needed
+                        ),
+                        primary: const Color(0xfffed593),
                       ),
-                      child: const Text('Apply', style: TextStyle(color: Colors.white)),
+                      child: const Text('Apply',
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -189,7 +223,8 @@ class LeaveApplicationListPage extends StatelessWidget {
                         return Column(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0, horizontal: 16),
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: const Color(0xff333333),
@@ -197,25 +232,39 @@ class LeaveApplicationListPage extends StatelessWidget {
                                 ),
                                 child: ListTile(
                                   subtitle: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text('Submit Date: $submitDate', style: const TextStyle(color: Colors.white)),
+                                          Text('Submit Date: $submitDate',
+                                              style: const TextStyle(
+                                                  color: Colors.white)),
                                           Text(
                                             '$leave_status_name',
                                             style: TextStyle(
-                                              color: leave_status_name == 'Pending'
-                                                  ? Colors.yellow
-                                                  : (leave_status_name == 'Accepted' ? Colors.green : Colors.red),
+                                              color:
+                                                  leave_status_name == 'Pending'
+                                                      ? Colors.yellow
+                                                      : (leave_status_name ==
+                                                              'Accepted'
+                                                          ? Colors.green
+                                                          : Colors.red),
                                             ),
                                           ),
                                         ],
                                       ),
-                                      Text('Reason: ${reasonOfLeave ?? ''}', style: const TextStyle(color: Colors.white)),
-                                      Text('Leave Type: $leaveTypeName', style: const TextStyle(color: Colors.white)),
-                                      Text('No of days: $leave_days_count', style: const TextStyle(color: Colors.white)),
+                                      Text('Reason: ${reasonOfLeave ?? ''}',
+                                          style: const TextStyle(
+                                              color: Colors.white)),
+                                      Text('Leave Type: $leaveTypeName',
+                                          style: const TextStyle(
+                                              color: Colors.white)),
+                                      Text('No of days: $leave_days_count',
+                                          style: const TextStyle(
+                                              color: Colors.white)),
                                     ],
                                   ),
                                 ),
@@ -234,5 +283,4 @@ class LeaveApplicationListPage extends StatelessWidget {
       ),
     );
   }
-
 }
