@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:interspeed_attendance_app/activity_page.dart';
 import 'package:interspeed_attendance_app/dashboard_page.dart';
 import 'package:interspeed_attendance_app/leave_page.dart';
 import 'package:interspeed_attendance_app/login_page.dart';
@@ -98,33 +99,36 @@ class MyDrawer extends StatelessWidget {
               );
             },
           ),
+
           ListTile(
             leading: const Icon(
-              Icons.person,
+              Icons.manage_accounts,
               color: Color(0xffFFCC80),
+              // color: Colors.white,
             ),
             title: const Text(
-              "Profile",
+              "Activity",
               style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500),
             ),
             onTap: () {
               Navigator.pop(context);
-              // Fetch user data when the ListTile is tapped
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const ProfilePage(),
+                  builder: (context) => ActivityPage(userId: user_id,
+                    employeeId: employee_id,),
                 ),
               );
             },
           ),
+
           ListTile(
             leading: const Icon(
               Icons.edit_calendar,
               color: Color(0xffFFCC80),
             ),
             title: const Text(
-              "Request Leave",
+              "Leave Info",
               style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500),
             ),
             onTap: (){
@@ -155,6 +159,27 @@ class MyDrawer extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => ProjectPage(userId: user_id,
                     employeeId: employee_id,),
+                ),
+              );
+            },
+          ),
+
+          ListTile(
+            leading: const Icon(
+              Icons.person,
+              color: Color(0xffFFCC80),
+            ),
+            title: const Text(
+              "Profile",
+              style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              // Fetch user data when the ListTile is tapped
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfilePage(),
                 ),
               );
             },

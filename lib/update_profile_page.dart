@@ -825,8 +825,8 @@ class UpdateProfilePage extends StatelessWidget {
             print('Update successful');
             controller.clearValues();
           }
+          prefs.setString("full_name", formData["EmployeeName"]);
           Navigator.pop(context);
-
           // Push the previous page with replacement
           Navigator.pushReplacement(
             context,

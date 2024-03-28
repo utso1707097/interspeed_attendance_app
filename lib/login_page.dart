@@ -251,7 +251,7 @@ class LoginPage extends StatelessWidget {
         if (loginSuccess) {
           // print('Login successful! Response: ${response.body}');
           var sessionData = jsonResponse['sessionData'];
-          if (sessionData["user_type_id"].toString() == "4") {
+          if (sessionData["user_type_id"].toString() == "4" && sessionData["user_is_active"].toString() == "1" && sessionData["employee_is_active"].toString() == "1") {
             // print("Executed");
             await saveSessionData(sessionData);
             print(sessionData);
@@ -296,7 +296,7 @@ class LoginPage extends StatelessWidget {
       prefs.setString("user_password", passwordController.text);
       prefs.setString("user_id", sessionData["user_id"].toString() ?? "");
       prefs.setString("user_name", sessionData["user_name"].toString() ?? "");
-      prefs.setString("full_name", sessionData["full_name"].toString() ?? "");
+      prefs.setString("full_name", sessionData["employee_name"].toString() ?? "");
       prefs.setString(
           "user_type_id", sessionData["user_type_id"].toString() ?? "");
       prefs.setString(
